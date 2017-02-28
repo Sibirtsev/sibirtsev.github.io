@@ -12,15 +12,35 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.js"></script>
   <![endif]-->
   <script type="text/javascript" src="https://platform.linkedin.com/badges/js/profile.js" async defer></script>
+  <style>
+  html, body {
+      widht: 100%;
+  }
+  .center-block {
+      margin: 5em auto;
+      position: relative;
+      width: 300px;
+  }
+  </style>
 </head>
 
 <body>
-  <div style="margin: 5em auto;">
-    <div class="LI-profile-badge"  data-version="v1" data-size="large" data-locale="en_US" data-type="vertical" data-theme="dark" data-vanity="alexeysibirtsev"><a class="LI-simple-link" href='https://ru.linkedin.com/in/alexeysibirtsev?trk=profile-badge'>Alexey Sibirtsev</a></div>
-    <ul>
-      <li><a href="https://www.facebook.com/alexey.sibirtsev">Facebook</a></li>
-      <li><a href="https://telegram.me/alexeysibirtsev">Telegram</a></li>
-    </ul>
+  <div id="fb-root"></div>
+  <script>
+    (function(d, s, id) {
+      var js, fjs = d.getElementsByTagName(s)[0];
+      if (d.getElementById(id)) return;
+      js = d.createElement(s); js.id = id;
+      js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.8&appId=157441807678098";
+      fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'facebook-jssdk'));
+  </script>
+
+  <div class="center-block">
+    <div class="LI-profile-badge"  data-version="v1" data-size="large" data-locale="en_US" data-type="vertical" data-theme="dark" data-vanity="alexeysibirtsev">
+        <a class="LI-simple-link" href='https://ru.linkedin.com/in/alexeysibirtsev?trk=profile-badge'>Alexey Sibirtsev</a>
+    </div>
+    <div class="fb-follow" data-href="https://www.facebook.com/alexey.sibirtsev" data-width="300" data-layout="standard" data-size="large" data-show-faces="true"></div>
   </div>
 </body>
 </html>
