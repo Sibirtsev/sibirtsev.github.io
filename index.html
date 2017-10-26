@@ -2,74 +2,115 @@
 
 <html lang="en">
 <head>
-  <meta charset="utf-8">
+    <meta charset="utf-8">
 
-  <title>Alexey Sibirtsev</title>
-  <meta name="description" content="">
-  <meta name="author" content="Alexey Sibirtsev">
+    <title>Alexey Sibirtsev</title>
+    <meta name="description" content="Alexey Sibirtsev's personal page">
+    <meta name="author" content="Alexey Sibirtsev">
+    <meta name="keywords" content="Alexey Sibirtsev, web developer, php developer, data scientist">
 
-  <!--[if lt IE 9]>
+
+    <!--[if lt IE 9]>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.js"></script>
-  <![endif]-->
-  <script type="text/javascript" src="https://platform.linkedin.com/badges/js/profile.js" async defer></script>
-  <style>
-  html, body {
-      width: 100%;
-      font-family: Verdana; 
-      font-size: 11pt;
-  }
-  .center-block {
-      margin: 5em auto;
-      position: relative;
-      width: 300px;
-  }
-  .bottom-space {
-    padding: 0 0 1em;
-  }
-  .align-center {
-    text-align: center;
-  }
-  .common-link {
-    color: #0077b5;
-  }
-  </style>
+    <![endif]-->
+
+    <style>
+        html, body {
+            width: 100%;
+            font-family: Verdana;
+            font-size: 11pt;
+        }
+        h3 {
+            padding: .5em 0 0;
+        }
+        .page {
+            margin: 5em auto;
+            position: relative;
+            width: 800px;
+        }
+            .left-column {
+                float: left;
+                width: 50%;
+            }
+                .left-column .avatar {
+                    float: left;
+                    padding: 0 1em 0 0;
+                }
+                .header {
+                    height: 100px;
+                }
+                    .header h1 {
+                        padding: 0 0 .5em;
+                        margin: 0;
+                    }
+
+                    .header .keywords {
+                        display: block;
+                    }
+                        .header .keywords li {
+                            display: inline-block;
+                            float: left;
+                            font-weight: bold;
+                            font-size: 1.1em;
+                        }
+                        .header .keywords li::after {
+                            content: ',\0000a0';
+                        }
+                        .header .keywords li:last-of-type::after {
+                            content: '';
+                        }
+        .common-link {
+            color: #0077b5;
+        }
+    </style>
 </head>
 
 <body>
-  <div id="fb-root"></div>
-  <script>
-    (function(d, s, id) {
-      var js, fjs = d.getElementsByTagName(s)[0];
-      if (d.getElementById(id)) return;
-      js = d.createElement(s); js.id = id;
-      js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.8&appId=157441807678098";
-      fjs.parentNode.insertBefore(js, fjs);
-    }(document, 'script', 'facebook-jssdk'));
-  </script>
-
-  <div class="center-block">
-    <div class="LI-profile-badge" data-version="v1" data-size="medium" data-locale="en_US" data-type="vertical" data-theme="dark" data-vanity="alexeysibirtsev">
-        <a class="LI-simple-link" href='https://ru.linkedin.com/in/alexeysibirtsev?trk=profile-badge'>Alexey Sibirtsev</a>
+<div class="page">
+    <div class="left-column">
+        <div class="header">
+            <div class="avatar">
+                <img src="https://www.gravatar.com/avatar/f8fcb903bd41d4fd1c608b1b3ba695eb.jpg">
+            </div>
+            <h1>Alexey Sibirtsev</h1>
+            <div class="keywords">
+                <ul class="keywords-list">
+                    <li>php</li>
+                    <li>web</li>
+                    <li>agile</li>
+                    <li>data science</li>
+                </ul>
+            </div>
+            <div></div>
+        </div>
+        <div class="profiles">
+            <h3>Social links</h3>
+            <ul class="profile-links">
+                <li><a class="common-link linked-in" href="https://www.linkedin.com/in/alexeysibirtsev/">LinkedIn</a></li>
+                <li><a class="common-link facebook" href="https://www.facebook.com/alexey.sibirtsev">Facebook</a></li>
+                <li><a class="common-link vk" href="https://vk.com/alexey.sibirtsev">VK</a></li>
+            </ul>
+            <h3>CV</h3>
+            <ul class="cv-links">
+                <li><a href="/AlexeySibirtsev_cv.pdf" class="common-link">Download CV in PDF</a><sup>v0.1</sup></li>
+            </ul>
+        </div>
     </div>
-    
-    <div class="fb-follow bottom-space" data-href="https://www.facebook.com/alexey.sibirtsev" data-width="300" data-layout="standard" data-size="large" data-show-faces="true"></div>
-    
-    <a frameborder="0" data-theme="light" data-stack-embed="true" data-layers="1,2,3,4" href="https://embed.stackshare.io/stacks/embed/e72820b9cbb22b9b167f9ed74ef38c"/></a><script async src="https://cdn1.stackshare.io/javascripts/client-code.js" charset="utf-8"></script>
-    
-    <div class="align-center bottom-space">
-      <a href="/AlexeySibirtsev_cv.pdf" class="common-link">Download CV in PDF</a><sup>v0.1</sup>
+    <div class="right-column">
+        <h3>My stack</h3>
+        <a frameborder="0" data-theme="light" data-stack-embed="true" data-layers="1,2,3,4" href="https://embed.stackshare.io/stacks/embed/e72820b9cbb22b9b167f9ed74ef38c"/></a><script async src="https://cdn1.stackshare.io/javascripts/client-code.js" charset="utf-8"></script>
     </div>
-  </div>
-  
-  <script>
-  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+</div>
 
-  ga('create', 'UA-11926312-2', 'auto');
-  ga('send', 'pageview');
+<script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
 
-  </script>
+    ga('create', 'UA-11926312-2', 'auto');
+    ga('send', 'pageview');
+
+</script>
 </body>
 </html>
