@@ -3,11 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <title>Random note</title>
+    <link href='https://fonts.googleapis.com/css?family=Fira Mono' rel='stylesheet'>
     <style>
         html, body {
             margin: 0;
             padding: 0;
             width: 100%;
+        }
+        body {
+            font-family: 'Fira Mono';
         }
         .main {
             max-width: 760px;
@@ -19,7 +23,11 @@
             top: 50%;
             left: 50%;
             margin-right: -50%;
-            transform: translate(-50%, -50%)
+            transform: translate(-50%, -50%);
+            border-radius: 1em;
+            border: 1px solid #0077b5;
+            background-color: #0077b5;
+            color: #fff;
         }
         .note span {
             font-size: 10em;
@@ -33,9 +41,24 @@
         </div>
     </div>
     <script>
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
         var container = document.getElementById('note');
-        var notes = ['Ab', 'A', 'A#', 'Bb', 'B', 'C', 'C#', 'Db', 'D', 'D#', 'Eb', 'E', 'F', 'F#', 'Gb', 'G', 'G#'];
-        container.innerText = notes[Math.floor(Math.random() * notes.length)];
+        function refresh(container) {
+            var notes = [
+                ' Ab', ' A ', ' A#', ' Bb', ' B ', ' C ', ' C#', ' Db', ' D ',  ' D#',
+                ' Eb',  ' E ', ' F ', ' F#', ' Gb', ' G ', ' G#'
+            ];
+            for (var i = 0; i < 10; ++i) {
+                sleep(i * 100).then(() => {
+                    container.innerText = notes[Math.floor(Math.random() * notes.length)].replace(new RegExp(' ', 'g'), "\xa0");
+                });
+            }
+        }
+        refresh(container);
+        container.addEventListener('click', () => {refresh(container);});
     </script>
 </body>
 </html>
