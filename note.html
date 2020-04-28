@@ -17,6 +17,24 @@
             max-width: 760px;
             margin: 0 auto;
         }
+        .translate {
+            padding: 1em;
+            position: absolute;
+            top: 15%;
+            left: 50%;
+            margin-right: -50%;
+            transform: translate(-50%, -50%);
+            border-radius: 1em;
+            border: 1px solid #0077b5;
+            background-color: #0077b5;
+            color: #fff;
+            width: 12em;
+            text-align: center;
+        }
+        .translate span {
+            font-size: 2em;
+        }
+
         .note {
             padding: 1em;
             position: absolute;
@@ -28,6 +46,8 @@
             border: 1px solid #0077b5;
             background-color: #0077b5;
             color: #fff;
+            width: 12em;
+            text-align: center;
         }
         .note span {
             font-size: 10em;
@@ -35,30 +55,50 @@
     </style>
 </head>
 <body>
-    <div class="main">
+    <div class="main" id="app">
+        <div class="translate">
+            <span v-on:click="changeTranslate">{{ displayTranslate }}</span>
+        </div>
         <div class="note">
-            <span id="note"></span>
+            <span v-on:click="getRandomNote">{{ note }}</span>
         </div>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
     <script>
-        function sleep(ms) {
-            return new Promise(resolve => setTimeout(resolve, ms));
-        }
+        let app = new Vue({
+            el: '#app',
 
-        var container = document.getElementById('note');
-        function refresh(container) {
-            var notes = [
-                ' Ab', ' A ', ' A#', ' Bb', ' B ', ' C ', ' C#', ' Db', ' D ',  ' D#',
-                ' Eb',  ' E ', ' F ', ' F#', ' Gb', ' G ', ' G#'
-            ];
-            for (var i = 0; i < 10; ++i) {
-                sleep(i * 100).then(() => {
-                    container.innerText = notes[Math.floor(Math.random() * notes.length)].replace(new RegExp(' ', 'g'), "\xa0");
-                });
+            data: {
+                noteTranslations: [
+                    ["A", "A#", "B", "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#"],
+                    ["A", "Bb", "B", "C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab"],
+                ],
+                translateOptions: ["sharp", "flat"],
+                translate: 0,
+                note: null
+            },
+
+            computed: {
+                displayTranslate: function () {
+                    return this.translateOptions[this.translate];
+                }
+            },
+
+            created: function () {
+                this.getRandomNote();
+            },
+
+            methods: {
+                getRandomNote: function () {
+                    const note = Math.floor(Math.random() * 12);
+                    this.note = this.noteTranslations[this.translate][note];
+                },
+                changeTranslate: function () {
+                    this.translate = 1 - this.translate;
+                    this.getRandomNote();
+                }
             }
-        }
-        refresh(container);
-        container.addEventListener('click', () => {refresh(container);});
+        });
     </script>
 </body>
 </html>
