@@ -1,0 +1,229 @@
+html, body {
+    padding: 0;
+    margin: 0;
+    font-size: 16pt;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Courier New', Courier, monospace;
+}
+
+.page {
+    max-width: 1024px;
+    margin: 0 auto;
+    min-height: 100%;
+}
+
+.page nav {
+    padding: 0 0 1em 0;
+    clear: left;
+}
+
+.page nav ul {
+    padding: 0;
+}
+
+.page nav ul li {
+    list-style: none;
+    display: block;
+    float: left;
+}
+
+.page nav ul li:nth-child(n+2):before {
+    padding: 0 1em 0;
+    content: "*";
+}
+
+.page article.post {
+    display: block;
+    margin: 0 0 4em 0;
+}
+
+.page article.post .post-publishing_date {
+    color: #ccc;
+    clear: both;
+    font-size: 0.7em;
+}
+
+.page article.post p {
+    text-align: justify;
+    line-height: 1.5;
+    font-family: 'Times New Roman', Times, serif;
+}
+
+.page article.post figure.post-figure {
+    display: inline-block;
+    margin: 0 0 1em 0;
+}
+
+.page article.post figure.post-figure figcaption {
+    text-align: center;
+    font-size: .9em;
+}
+
+.page article.post figure.post-figure__left {
+    float: left;
+    margin-right: 1em;
+}
+
+.page article.post figure.post-figure__right {
+    float: right;
+    margin-left: 1em;
+}
+
+.page article.post blockquote {
+    background: #f9f9f9;
+    border-left: 10px solid #ccc;
+    margin: 1.5em 0;
+    padding: 0.5em 10px;
+    quotes: "\201C""\201D""\2018""\2019";
+}
+.page article.post blockquote:before {
+    color: #ccc;
+    content: open-quote;
+    font-size: 4em;
+    line-height: 0.1em;
+    margin-right: 0.25em;
+    vertical-align: -0.4em;
+}
+
+.page article.post blockquote p {
+    display: inline;
+}
+
+.page article.post blockquote cite:before {
+    padding-right: .2em;
+    content: "—";
+}
+
+.page article.post blockquote cite {
+    text-align: right;
+    display: block;
+}
+
+.page article.post footer {
+    color: #ccc;
+}
+
+@media screen {
+    .page article.post .sidenote {
+        display: block;
+        max-width: 10em;
+        width: 10em;
+        position: absolute;
+        top: auto;
+        padding: 0 .5em;
+    }
+
+    .page article.post .sidenote.sidenote__left {
+        margin-left: -12em;
+        text-align: right;
+        border-right: 2px solid #ccc;
+    }
+
+    .page article.post .sidenote.sidenote__right {
+        border-left: 2px solid #ccc;
+        position: relative;
+        float: right;
+        width: 10em;
+        margin-right: -12em;
+    }
+}
+
+.page article.post footer.post-footer ul {
+    padding: 0;
+    margin: 0;
+    display: inline-block;
+}
+
+.page article.post footer.post-footer ul li {
+    list-style: none;
+    display: block;
+    float: left;
+}
+
+.page article.post footer.post-footer ul li:nth-child(n+2):before {
+    padding: 0 .5em 0 0;
+    content: ",";
+}
+
+.page footer.page-footer {
+    clear: right;
+    display: block;
+    margin: 1em 0;
+    padding: 1em 0;
+}
+
+.page footer.page-footer section.footer.footer-social ul {
+    padding: 0;
+}
+
+.page footer.page-footer section.footer.footer-social ul li {
+    list-style: none;
+    display: block;
+    float: left;
+}
+
+.page footer.page-footer section.footer.footer-social ul li:nth-child(n+2):before {
+    padding: 0 1em 0;
+    content: "∗";
+}
+
+@media screen and (max-width: 1280px) {
+    .page {
+        max-width: 860px;
+        margin: 0 auto;
+    }
+
+    .page nav {
+        font-size: 18pt;
+    }
+
+    .page article.post span.sidenote {
+        position: relative;
+        display: inline-block;
+        clear: both;
+        margin: 0;
+        padding: 0;
+        width: 30%;
+        max-width: 100%;
+
+    }
+
+    .page article.post span.sidenote.sidenote__left {
+        float: left;
+        text-align: left;
+        border-right: 2px solid #ccc;
+        margin: 0 1em 1em 0;
+    }
+
+    .page article.post span.sidenote.sidenote__right {
+        float: right;
+        padding: 0 0 1em 1em;
+        border-left: 2px solid #ccc;
+        margin: 1em 0 0 1em;
+    }
+}
+
+@media print {
+    p {
+        text-indent: 1.5em;
+    }
+
+    a:after{
+        content: " (" attr(href) ") ";
+    }
+
+    .page nav,
+    .page header.page-header,
+    .page footer.page-footer,
+    .page section.pager {
+        display: none;
+    }
+
+    .page article.post span.sidenote {
+        display: table;
+        border-left: 1px dotted #ccc;
+        padding-left: 1em;
+    }
+}
