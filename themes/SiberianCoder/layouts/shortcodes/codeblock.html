@@ -1,0 +1,4 @@
+<div class="code-block" id='{{ .Get "id" }}'>
+    {{ highlight .Inner (.Get "lang") "" }}
+    <div class="code-title"><a href='#{{ .Get "id" }}' title='{{ .Get "title" }}'>{{ .Get "title" }}</a></div>
+</div>

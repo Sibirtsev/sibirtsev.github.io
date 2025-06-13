@@ -1,0 +1,27 @@
+<article>
+    <div class="article-header">
+        <h3>
+            <a href="{{ .RelPermalink }}">
+                {{ .Title }}
+            </a>
+        </h3>
+        {{ with .Date }}
+        <p class="article-header__published-at-date">{{ .Format "02.01.2006" }}</p>
+        {{ end }}
+    </div>
+
+    <div class="article-body">
+        {{ if .Params.description }}
+        {{ .Params.description }}
+        {{ else }}
+        {{ .Summary }}
+        {{ end }}
+    </div>
+
+    <div class="article-footer">
+        <a href="{{ .RelPermalink }}">
+            {{ i18n "read_more"}}
+        </a>
+    </div>
+
+</article>

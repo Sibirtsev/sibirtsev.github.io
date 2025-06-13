@@ -1,0 +1,42 @@
+<footer>
+    <div id="footer-wrapper">
+        <div id="footer-content">
+            <div id="footer-content-column">
+                <div>
+                    <!-- h3 class="font-bold">About</h3 -->
+                    <p>
+                        © {{ now.Year }} Siberian Coder
+                    </p>
+                </div>
+            </div>
+
+            <div id="footer-content-column">
+                <div>
+                    <!-- h3 class="font-bold">Social</h3 -->
+                    <ul class="list-reset">
+                        {{ with .Site.Params.Social.github }}
+                        <li>
+                            <a class="hover:text-underline" href="{{ . }}">GitHub</a>
+                        </li>
+                        {{ end }}
+                        {{ with .Site.Params.Social.telegram }}
+                        <li>
+                            <a class="hover:text-underline" href="{{ . }}">Telegram</a>
+                        </li>
+                        {{ end }}
+                        {{ with .Site.Params.Social.twitter }}
+                        <li>
+                            <a class="hover:text-underline" href="{{ . }}">Twitter</a>
+                        </li>
+                        {{ end }}
+                        {{ with .Site.Params.Social.linkedin }}
+                        <li>
+                            <a class="hover:text-underline" href="{{ . }}">LinkedIn</a>
+                        </li>
+                        {{ end }}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>

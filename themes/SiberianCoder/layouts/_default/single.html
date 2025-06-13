@@ -1,0 +1,77 @@
+{{ define "main" }}
+<article>
+    <!--Title-->
+    <div class="article-header">
+        {{ if eq .Type "posts" }}
+        <p class="article-header__back-to-posts">
+            <a href='{{ "/posts/" | relLangURL }}'>{{ i18n "back_to_posts" }}</a>
+        </p>
+        {{ end }}
+
+        <div class="article-header__post-links">
+            {{ with .Params.categories }}
+            {{ range . }}
+            <a href='{{ "/categories/" | relLangURL }}{{ . | urlize }}' class="category">{{ . }}</a>
+            {{ end }}
+            {{ end }}
+            {{ with .Params.tags }}
+            {{ range . }}
+            <a href='{{ "/tags/" | relLangURL }}{{ . | urlize }}' class="tag">{{ . }}</a>
+            {{ end }}
+            {{ end }}
+        </div>
+
+        <h1>{{ .Title }}</h1>
+        {{ with .Date }}
+        <p class="article-header__published-at-date">{{ .Format "02.01.2006" }}</p>
+        {{ end }}
+    </div>
+
+    {{ if and (.TableOfContents) (gt (len .TableOfContents) 32) }}
+    <div class="toc toc-mobile">
+        <h2>{{ i18n "table_of_contents" }}</h2>
+        {{ .TableOfContents }}
+    </div>
+    {{ end }}
+
+    <div class="article-body">
+        {{ .Content }}
+    </div>
+
+    {{ if eq .Type "posts" }}
+    <!--Next & Prev Links-->
+    <div class="article-footer">
+        {{ $prev := "" }}
+        {{ range where .Site.RegularPages "Type" "posts" }}
+        {{ if and (lt .Date $.Date) (or (eq $prev "") (gt .Date $prev.Date)) }}
+        {{ $prev = . }}
+        {{ end }}
+        {{ end }}
+        {{ with $prev }}
+        <div class="text-left">
+            <a href="{{ .RelPermalink }}">{{ i18n "prev_post" }}{{ .Title }}</a>
+        </div>
+        {{ end }}
+        {{ $next := "" }}
+        {{ range where .Site.RegularPages "Type" "posts" }}
+        {{ if and (gt .Date $.Date) (or (eq $next "") (lt .Date $next.Date)) }}
+        {{ $next = . }}
+        {{ end }}
+        {{ end }}
+        {{ with $next }}
+        <div class="text-right">
+            <a href="{{ .RelPermalink }}">{{ .Title }}{{ i18n "next_post" }}</a>
+        </div>
+        {{ end }}
+    </div>
+
+    {{ if and (.TableOfContents) (gt (len .TableOfContents) 32) }}
+    <aside class="toc toc-desktop">
+        <h2>{{ i18n "table_of_contents" }}</h2>
+        {{ .TableOfContents }}
+    </aside>
+    {{ end }}
+
+    {{ end }}
+</article>
+{{ end }}

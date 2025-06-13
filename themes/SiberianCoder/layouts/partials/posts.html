@@ -1,0 +1,22 @@
+<div class="page-content">
+    {{ range .Paginator.Pages }}
+    {{ partial "article.html" . }}
+    {{ end }}
+</div>
+
+
+<div class="page-footer">
+    {{ if .Paginator.HasPrev }}
+    <a href="{{ .Paginator.Prev.URL }}">
+        {{ i18n "prev_page" }}
+    </a>
+    {{ end }}
+
+    <span>{{ i18n "page" }} {{ .Paginator.PageNumber }} {{ i18n "from" }} {{ .Paginator.TotalPages }}</span>
+
+    {{ if .Paginator.HasNext }}
+    <a href="{{ .Paginator.Next.URL }}">
+        {{ i18n "next_page" }}
+    </a>
+    {{ end }}
+</div>

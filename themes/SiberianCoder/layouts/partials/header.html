@@ -1,0 +1,63 @@
+<header id="header">
+    <nav>
+        <div class="header-logo">
+            <a href="{{ .Site.BaseURL  | relLangURL }}">
+                {{ .Site.Title}}
+            </a>
+        </div>
+
+        <div class="nav-toggle">
+            <button id="nav-toggle">
+                <svg viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                    <title>{{ i18n "menu" }}</title>
+                    <path d="M0 3h20v2H0V3zm0 6h20v2H0V9zm0 6h20v2H0v-2z" />
+                </svg>
+            </button>
+        </div>
+
+        <div id="nav-content" class="hidden">
+            <ul>
+                {{ range .Site.Menus.main }}
+                <li>
+                    <a href="{{ .URL }}">
+                        <span>{{ .Name }}</span>
+                        {{- if (findRE "://" .URL) }}&nbsp;
+                        <svg fill="none" shape-rendering="geometricPrecision" stroke="currentColor"
+                            stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewBox="0 0 24 24"
+                            height="12" width="12">
+                            <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"></path>
+                            <path d="M15 3h6v6"></path>
+                            <path d="M10 14L21 3"></path>
+                        </svg>
+                        {{- end }}
+                    </a>
+                </li>
+                {{ end }}
+            </ul>
+        </div>
+
+
+        {{- $lang := .Lang}}
+        {{- with site.Home.Translations }}
+        <div id="lang-switcher">
+            {{- range . -}}
+            {{- if ne $lang .Lang }}
+            <a href="{{- .Permalink -}}"
+                title="{{ .Language.Params.languageAltTitle | default (.Language.LanguageName | emojify) | default (.Lang | title) }}"
+                aria-label="{{ .Language.LanguageName | default (.Lang | title) }}">
+                {{- if (and site.Params.displayFullLangName (.Language.LanguageName)) }}
+                {{- .Language.LanguageName | emojify -}}
+                {{- else }}
+                {{- .Lang | title -}}
+                {{- end -}}
+            </a>
+            {{ end }}
+            {{ end }}
+        </div>
+        {{- end }}
+        <button id="theme-toggle" accesskey="t" title="(Alt + T)">
+            <span id="moon">🌙</span>
+            <span id="sun">☀️</span>
+        </button>
+    </nav>
+</header>

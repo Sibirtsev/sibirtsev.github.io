@@ -1,0 +1,119 @@
+baseURL = 'https://sibirtsev.com/'
+languageCode = 'en-us'
+title = 'Alexey Sibirtsev'
+theme = 'SiberianCoder'
+googleAnalytics = "G-FYR06ENQX2"
+
+[markup.goldmark.renderer]
+unsafe = true
+
+[pagination]
+pagerSize = 5
+
+[taxonomies]
+  tag = "tags"
+  category = "categories"
+
+[params]
+[params.social]
+  github = ""
+  telegram = ""
+  twitter = ""
+  linkedin = ""
+
+defaultContentLanguage = 'ru'
+defaultContentLanguageInSubdir = true
+
+[languages]
+  [languages.en]
+    contentDir = 'content/en'
+    disabled = false
+    languageCode = 'en-US'
+    languageDirection = 'ltr'
+    languageName = 'English'
+    title = 'Alexey Sibirtsev'
+    weight = 1
+    [languages.en.menu]
+      [[languages.en.menu.main]]
+      name = "Posts"
+      url = "/posts/"
+      weight = 2
+
+      [[languages.en.menu.main]]
+      name = "Youtube"
+      url = "https://www.youtube.com/@alexey.sibirtsev"
+      weight = 3
+
+      [[languages.en.menu.main]]
+      name = "LinkedIn"
+      url = "https://www.linkedin.com/in/alexeysibirtsev/"
+      weight = 4
+
+      [[languages.en.menu.main]]
+      name = "Github"
+      url = "https://github.com/Sibirtsev"
+      weight = 5
+
+  [languages.ru]
+    contentDir = 'content/ru'
+    disabled = false
+    languageCode = 'ru-RU'
+    languageDirection = 'ltr'
+    languageName = 'Русский'
+    title = 'Алексей Сибирцев'
+    weight = 2
+
+    [languages.ru.menu]
+      [[languages.ru.menu.main]]
+      name = "Посты"
+      url = "/ru/posts/"
+      weight = 2
+
+      [[languages.ru.menu.main]]
+      name = "Ютуб"
+      url = "https://www.youtube.com/@alexey.sibirtsev"
+      weight = 3
+
+      [[languages.ru.menu.main]]
+      name = "ЛинкедИн"
+      url = "https://www.linkedin.com/in/alexeysibirtsev/"
+      weight = 4
+
+      [[languages.ru.menu.main]]
+      name = "Гитхаб"
+      url = "https://github.com/Sibirtsev"
+      weight = 5
+
+[markup]
+  [markup.highlight]
+    codeFences = true
+    guessSyntax = true
+    style = "github"
+    lineNos = false
+    lineNumbersInTable = false
+    noClasses = false
+  [markup.tableOfContents]
+    startLevel = 1
+    endLevel = 6
+    ordered = false
+
+[build]
+  [build.buildStats]
+    enable = true
+  [[build.cachebusters]]
+    source = 'assets/notwatching/hugo_stats\.json'
+    target = 'css'
+  [[build.cachebusters]]
+    source = '(postcss|tailwind)\.config\.js'
+    target = 'css'
+[module]
+  [[module.mounts]]
+    source = 'assets'
+    target = 'assets'
+  [[module.mounts]]
+    disableWatch = true
+    source = 'hugo_stats.json'
+    target = 'assets/notwatching/hugo_stats.json'
+  [[module.mounts]]
+    source = 'static'
+    target = 'static'

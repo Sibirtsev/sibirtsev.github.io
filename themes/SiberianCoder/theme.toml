@@ -1,0 +1,23 @@
+name = "SiberianCoder"
+license = "MIT"
+licenselink = "https://github.com/siberiancoder/siberiancoder.github.io/blob/main/LICENSE"
+description = "My personal website theme"
+homepage = "https://siberiancoder.github.io/"
+tags = [
+  "blog",
+  "personal",
+  "responsive",
+  "clean",
+  "simple"
+]
+features = [
+  "blog",
+  "responsive",
+  "simple",
+  "clean"
+]
+min_version = "0.112.4"
+
+[author]
+  name = "Alexey"
+  homepage = "https://siberiancoder.github.io/"

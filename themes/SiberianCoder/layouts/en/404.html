@@ -1,0 +1,7 @@
+{{- define "main" }}
+<h1 class="text-4xl font-bold">404</h1>
+<p class="text-lg mt-2">{{ i18n "page_not_found_text" }}</p>
+<a href='{{ "/" | relLangURL }}' class="break-normal text-base md:text-sm font-bold no-underline hover:underline">
+    {{ i18n "back_to_home" }}
+</a>
+{{- end }}{{/* end main */ -}}
