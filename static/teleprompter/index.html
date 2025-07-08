@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Teleprompter</title>
+  <style>
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: Arial, sans-serif;
+      background: #000;
+      color: #fff;
+    }
+
+    .screen {
+      display: none;
+      height: 100%;
+    }
+
+    button {
+      padding: 10px 14px;
+      font-size: 1rem;
+      cursor: pointer;
+      background: #222;
+      border: none;
+      color: #fff;
+      border-radius: 6px;
+      transition: background 0.2s;
+    }
+
+    button:hover {
+      background: #444;
+    }
+
+    input[type="range"] {
+      width: 200px;
+    }
+
+    #screen1 {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      padding: 20px;
+    }
+
+    #screen1 textarea {
+      width: 80%;
+      height: 200px;
+    }
+
+    .controls {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    #screen2 {
+      display: flex;
+      height: 100%;
+    }
+
+    #contentColumn {
+      flex: 1;
+      overflow: hidden;
+      padding: 40px;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      text-align: left;
+      transition: font-size 0.2s;
+    }
+
+    #buttonsColumn {
+      width: 260px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding: 20px;
+      background: #111;
+    }
+
+    #infoBox {
+      margin-bottom: 10px;
+      text-align: left;
+      font-size: 0.9rem;
+      line-height: 1.3;
+    }
+
+    #infoBox p {
+      margin: 0;
+    }
+
+    .highlight {
+      font-weight: bold;
+      color: yellow;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="screen1" class="screen">
+    <h1>Teleprompter</h1>
+    <textarea id="inputText" placeholder="Put text here..."></textarea>
+
+    <div class="controls">
+      <label for="wpmRange">Words/m:</label>
+      <input type="range" id="wpmRange" min="60" max="300" value="120">
+      <input type="number" id="wpmNumber" min="60" max="300" value="120" style="width:80px">
+    </div>
+
+    <div class="controls">
+      <label for="fontSizeRange">Font size (px):</label>
+      <input type="range" id="fontSizeRange" min="16" max="96" value="50">
+      <input type="number" id="fontSizeNumber" min="16" max="96" value="50" style="width:80px">
+    </div>
+
+    <div class="controls">
+      <input type="checkbox" id="highlightCheckbox">
+      <label for="highlightCheckbox">Highlight first letters</label>
+    </div>
+
+    <button id="startBtn">Start</button>
+  </div>
+
+  <div id="screen2" class="screen">
+    <div id="contentColumn">
+      <div id="scrollContainer"></div>
+    </div>
+    <div id="buttonsColumn">
+      <div id="infoBox">
+        <p id="speedInfo"></p>
+        <p id="fontInfo"></p>
+        <p id="progressInfo"></p>
+      </div>
+      <button id="pauseBtn">Pause</button>
+      <button id="resumeBtn">Play</button>
+      <button id="fasterBtn">Speed +</button>
+      <button id="slowerBtn">Speed -</button>
+      <button id="increaseFontBtn">A +</button>
+      <button id="decreaseFontBtn">A -</button>
+      <button id="toggleHighlightBtn">Highlight ↔</button>
+      <button id="mirrorBtn">Mirror ↔</button>
+      <button id="restartBtn">Restart</button>
+      <button id="forwardBtn">Forward</button>
+      <button id="backwardBtn">Backward</button>
+      <button id="backBtn">← Back</button>
+    </div>
+  </div>
+
+  <script>
+    /*********************************
+     * DOM helpers & element refs
+     *********************************/
+    const $ = id => document.getElementById(id);
+    // Screens
+    const screen1 = $("screen1");
+    const screen2 = $("screen2");
+    // Inputs & checkboxes
+    const inputText = $("inputText");
+    const wpmRange = $("wpmRange");
+    const wpmNumber = $("wpmNumber");
+    const fontSizeRange = $("fontSizeRange");
+    const fontSizeNumber = $("fontSizeNumber");
+    const highlightCheckbox = $("highlightCheckbox");
+    // Columns & Info
+    const contentColumn = $("contentColumn");
+    const scrollContainer = $("scrollContainer");
+    const speedInfo = $("speedInfo");
+    const fontInfo = $("fontInfo");
+    const progressInfo = $("progressInfo");
+    // Buttons
+    const btns = {
+      start: $("startBtn"), pause: $("pauseBtn"), resume: $("resumeBtn"), faster: $("fasterBtn"), slower: $("slowerBtn"),
+      plus: $("increaseFontBtn"), minus: $("decreaseFontBtn"), highlight: $("toggleHighlightBtn"), mirror: $("mirrorBtn"),
+      restart: $("restartBtn"), fwd: $("forwardBtn"), back: $("backwardBtn"), home: $("backBtn")
+    };
+    /*********************************
+     * State
+     *********************************/
+    let wpm = 120;
+    let fontSize = 32;
+    let highlight = false;
+    let mirrored = false;
+    // scrolling variables
+    let animId = null;
+    let startTime = 0;
+    let elapsedBeforePause = 0;
+    let scrollTarget = 0;
+    let duration = 0; // ms total duration of scroll
+
+    /*********************************
+     * Helpers
+     *********************************/
+    const clamp = (v, min, max) => Math.min(Math.max(v, min), max);
+    const wordCount = txt => (txt.match(/\S+/g) || []).length;
+    const isRunning = () => animId !== null;
+    const currentProgress = () => scrollTarget ? contentColumn.scrollTop / scrollTarget : 0;
+
+    function applyFont() { contentColumn.style.fontSize = fontSize + "px"; }
+    function applyMirror() {
+      if (mirrored) {
+        contentColumn.style.transform = "scaleX(-1)";
+      } else {
+        contentColumn.style.transform = "none";
+      }
+    }
+    // Highlight first two letters of each word
+    function buildHTML(text) {
+      if (!highlight) return text.replace(/\n/g, "<br>");
+      return text.split(/(\s+)/).map(part => {
+        if (/\s+/.test(part)) return part; // keep spaces
+        const first = part.slice(0, 2);
+        const rest = part.slice(2);
+        return `<span class="highlight">${first}</span>${rest}`;
+      }).join("").replace(/\n/g, "<br>");
+    }
+    function updateInfo(p = 0) {
+      speedInfo.textContent = `Speed: ${wpm} w/m`;
+      fontInfo.textContent = `Font: ${fontSize}px`;
+      progressInfo.textContent = `Progress: ${(p * 100).toFixed(1)} %`;
+    }
+
+    /*********************************
+     * Prepare content & layout
+     *********************************/
+    function prepareScroll(p = 0) {
+      applyFont();
+      applyMirror();
+      scrollContainer.innerHTML = buildHTML(inputText.value.replace(/\r/g, ""));
+
+      const total = scrollContainer.scrollHeight;
+      const view = contentColumn.clientHeight;
+      scrollTarget = Math.max(total - view / 2, 0);
+      contentColumn.scrollTop = p * scrollTarget;
+    }
+
+    /*********************************
+     * Scrolling animation loop
+     *********************************/
+    function step(ts) {
+      if (!startTime) startTime = ts;
+      const elapsed = ts - startTime + elapsedBeforePause;
+      const p = Math.min(elapsed / duration, 1);
+      contentColumn.scrollTop = p * scrollTarget;
+      updateInfo(p);
+      if (p < 1) {
+        animId = requestAnimationFrame(step);
+      } else {
+        cancelAnimationFrame(animId);
+        animId = null;
+      }
+    }
+    function startScrolling(p = 0) {
+      const words = wordCount(inputText.value);
+      duration = (words / wpm) * 60000; // ms
+      elapsedBeforePause = p * duration;
+      startTime = 0;
+      animId = requestAnimationFrame(step);
+    }
+    function pauseScrolling() {
+      if (animId) {
+        cancelAnimationFrame(animId);
+        animId = null;
+        if (startTime) {
+          elapsedBeforePause += performance.now() - startTime;
+        }
+      }
+    }
+    function resumeScrolling() {
+      if (!animId) {
+        startTime = 0;
+        animId = requestAnimationFrame(step);
+      }
+    }
+
+    /*********************************
+     * Shared update without resetting scroll state
+     *********************************/
+    function refreshMaintainingProgress() {
+      const p = currentProgress();
+      const running = isRunning();
+      pauseScrolling();
+      prepareScroll(p);
+      updateInfo(p);
+      if (running) {
+        startScrolling(p);
+      }
+    }
+
+    /*********************************
+     * Input synchronisation (WPM & font size)
+     *********************************/
+    [wpmRange, wpmNumber].forEach(el => el.addEventListener("input", e => {
+      wpm = clamp(parseInt(e.target.value, 10) || 120, 60, 300);
+      wpmRange.value = wpmNumber.value = wpm;
+      refreshMaintainingProgress();
+    }));
+    [fontSizeRange, fontSizeNumber].forEach(el => el.addEventListener("input", e => {
+      fontSize = clamp(parseInt(e.target.value, 10) || 32, 16, 96);
+      fontSizeRange.value = fontSizeNumber.value = fontSize;
+      refreshMaintainingProgress();
+    }));
+
+    highlightCheckbox.addEventListener("change", e => {
+      highlight = e.target.checked;
+    });
+
+    /*********************************
+     * Screen navigation
+     *********************************/
+    function showScreen(id) {
+      screen1.style.display = id === 1 ? "flex" : "none";
+      screen2.style.display = id === 2 ? "flex" : "none";
+    }
+
+    btns.start.addEventListener("click", () => {
+      if (!inputText.value.trim()) return alert("Please enter the text!");
+      // init state
+      wpm = parseInt(wpmRange.value, 10);
+      fontSize = parseInt(fontSizeRange.value, 10);
+      highlight = highlightCheckbox.checked;
+      mirrored = false;
+      showScreen(2);
+      prepareScroll(0);
+      updateInfo(0);
+      startScrolling(0);
+    });
+
+    btns.home.addEventListener("click", () => {
+      pauseScrolling();
+      showScreen(1);
+    });
+
+    /*********************************
+     * Playback controls
+     *********************************/
+    btns.pause.addEventListener("click", () => pauseScrolling());
+    btns.resume.addEventListener("click", () => resumeScrolling());
+    btns.faster.addEventListener("click", () => {
+      wpm = clamp(wpm + 20, 60, 300);
+      wpmRange.value = wpmNumber.value = wpm;
+      refreshMaintainingProgress();
+    });
+    btns.slower.addEventListener("click", () => {
+      wpm = clamp(wpm - 20, 60, 300);
+      wpmRange.value = wpmNumber.value = wpm;
+      refreshMaintainingProgress();
+    });
+    btns.plus.addEventListener("click", () => {
+      fontSize = clamp(fontSize + 4, 16, 96);
+      fontSizeRange.value = fontSizeNumber.value = fontSize;
+      refreshMaintainingProgress();
+    });
+    btns.minus.addEventListener("click", () => {
+      fontSize = clamp(fontSize - 4, 16, 96);
+      fontSizeRange.value = fontSizeNumber.value = fontSize;
+      refreshMaintainingProgress();
+    });
+    btns.highlight.addEventListener("click", () => {
+      highlight = !highlight;
+      highlightCheckbox.checked = highlight;
+      refreshMaintainingProgress();
+    });
+    btns.mirror.addEventListener("click", () => {
+      mirrored = !mirrored;
+      refreshMaintainingProgress();
+    });
+    btns.restart.addEventListener("click", () => {
+      pauseScrolling();
+      prepareScroll(0);
+      updateInfo(0);
+      startScrolling(0);
+    });
+    btns.fwd.addEventListener("click", () => jump(0.10));
+    btns.back.addEventListener("click", () => jump(-0.10));
+    function jump(delta) {
+      const p0 = currentProgress();
+      const p = clamp(p0 + delta, 0, 1);
+      const running = isRunning();
+      pauseScrolling();
+      prepareScroll(p);
+      updateInfo(p);
+      if (running) startScrolling(p);
+    }
+
+    document.addEventListener('keydown', evt => {
+      const tag = evt.target.tagName;
+      if (tag === 'TEXTAREA' || tag === 'INPUT') return;
+
+      if (evt.code === 'Space') {
+        evt.preventDefault();
+        if (isRunning()) pauseScrolling();
+        else resumeScrolling();
+      }
+    });
+  </script>
+</body>
+
+</html>
