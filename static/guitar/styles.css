@@ -1,0 +1,733 @@
+/* Common styles for both pages */
+:root {
+  /* Base palette (you provided) */
+  --bg-dark: hsl(220 59% 91%);
+  --bg: hsl(220 100% 97%);
+  --bg-light: hsl(220 100% 100%);
+  --text: hsl(226 85% 7%);
+  --text-muted: hsl(220 26% 31%);
+  --highlight: hsl(220 100% 100%);
+  --border: hsl(220 19% 53%);
+  --border-muted: hsl(220 27% 65%);
+  --primary: hsl(221 49% 33%);
+  --secondary: hsl(44 100% 14%);
+  --danger: hsl(9 21% 41%);
+  --warning: hsl(52 23% 34%);
+  --success: hsl(147 19% 36%);
+  --info: hsl(217 22% 41%);
+
+  /* Map existing app variables to palette tokens */
+  --panel: var(--bg-light);
+  --panel-2: var(--bg);
+  --muted: var(--text-muted);
+  --brand: var(--primary);
+  --brand-2: var(--info);
+  --accent: var(--info);
+  --ok: var(--success);
+  --warn: var(--warning);
+  --danger: var(--danger);
+  --nut: hsl(224 8% 10%);
+  --fret: var(--nut);
+  --string: hsl(215 12% 58%);
+  --note: var(--brand);
+  --tonic: var(--success);
+  --open-note-bg: var(--highlight);
+  /* Base tokens (light theme) */
+  --base-foreground: var(--text); /* headings / stronger text */
+  --base-muted: var(--muted);
+  --base-brand: var(--brand);
+  --base-brand-2: var(--brand-2);
+  --base-surface: var(--panel);
+  --base-surface-2: var(--panel-2);
+  --base-divider: var(--border);
+  --base-shadow: rgba(2, 6, 23, .06);
+  --base-shadow-soft: rgba(0, 0, 0, 0.05);
+  --base-inset: rgba(255,255,255,0.6);
+  --base-faint: rgba(2,6,23,0.04);
+  --base-stroke: rgba(0,0,0,.35);
+  --base-dot-stroke: rgba(0,0,0,.2);
+  --base-dot-border: rgba(0,0,0,.15);
+  --note-label-fill: #ffffff;
+  --note-label-open-fill: var(--base-muted);
+  --fret-num-fill: #64748b;
+  /* Map derived tokens to base tokens to minimize distinct colors */
+  --heading: var(--base-foreground);
+  --btn-grad-start: var(--base-brand);
+  --btn-grad-end: var(--base-brand-2);
+  --btn-border: var(--base-brand-2);
+  --card-shadow-color: var(--base-shadow);
+  --card-shadow-color-2: var(--base-shadow);
+  --inset-highlight: var(--base-inset);
+  --selected-tab-shadow: var(--base-faint);
+  --fretboard-inset: rgba(2, 6, 23, .05);
+  --label-stroke: var(--base-stroke);
+  --dot-stroke: var(--base-dot-stroke);
+  --dot-border: var(--base-dot-border);
+  --divider: var(--base-divider);
+}
+
+/* Dark theme (applied when documentElement has data-theme="dark") */
+:root[data-theme="dark"] {
+  /* derive darker surfaces from the light palette */
+  --bg: hsl(222 55% 5%);
+  --bg-dark: hsl(228 79% 2%);
+  --bg-light: hsl(220 35% 10%);
+  --text: hsl(220 100% 98%);
+  --text-muted: hsl(220 35% 73%);
+  --highlight: hsl(220 20% 42%);
+  --border: hsl(220 26% 31%);
+  --border-muted: hsl(220 37% 20%);
+  --primary: hsl(220 78% 76%);
+  --secondary: hsl(40 53% 60%);
+  --danger: hsl(9 26% 64%);
+  --warning: hsl(52 19% 57%);
+  --success: hsl(146 17% 59%);
+  --info: hsl(217 28% 65%);
+  --panel: var(--bg-light);
+  --panel-2: var(--bg);
+  --text: hsl(220 100% 98%);
+  --muted: var(--text-muted);
+  --brand: var(--primary);
+  --brand-2: var(--info);
+  --accent: var(--info);
+  --ok: var(--success);
+  --warn: var(--warning);
+  --danger: var(--danger);
+  --nut: hsl(0, 0%, 60%);
+  --fret: var(--nut);
+  --string: color-mix(in srgb, hsl(215 12% 58%) 30%, black 70%);
+  --note: var(--brand);
+  --tonic: var(--success);
+  --open-note-bg: var(--highlight);
+
+  /* Base tokens (dark theme) */
+  --base-foreground: var(--text);
+  --base-muted: var(--muted);
+  --base-brand: var(--brand);
+  --base-brand-2: var(--brand-2);
+  --base-surface: var(--panel);
+  --base-surface-2: var(--panel-2);
+  --base-divider: color-mix(in srgb, var(--border) 30%, black 70%);
+  --base-shadow: rgba(0,0,0,.6);
+  --base-shadow-soft: rgba(0,0,0,.16);
+  --base-inset: rgba(255,255,255,0.02);
+  --base-faint: rgba(0,0,0,0.04);
+  --base-stroke: rgba(0,0,0,.35);
+  --base-dot-stroke: rgba(0,0,0,.2);
+  --base-dot-border: rgba(0,0,0,.12);
+  --note-label-fill: var(--text);
+  --note-label-open-fill: var(--base-muted);
+  --fret-num-fill: var(--base-muted);
+  --header-bg: var(--bg);
+
+  /* Map derived tokens to base tokens (reuse where sensible) */
+  --btn-grad-start: var(--base-brand);
+  --btn-grad-end: var(--base-brand-2);
+  --btn-border: var(--base-brand-2);
+  --card-shadow-color: var(--base-shadow);
+  --card-shadow-color-2: var(--base-shadow);
+  --inset-highlight: var(--base-inset);
+  --label-stroke: var(--base-stroke);
+  --dot-stroke: var(--base-dot-stroke);
+}
+
+header[data-theme="dark"], header[data-theme] {
+  background: var(--header-bg);
+}
+
+/* theme toggle small style */
+.theme-chip input[type="checkbox"] { width: 18px; height: 18px; }
+
+/* Smooth transitions when theme changes (applied briefly at init) */
+html.theme-init, html[data-theme] {
+  transition: background 240ms ease, color 240ms ease;
+}
+
+.theme-control select {
+  padding: 6px 8px;
+  border-radius: 8px;
+  font-size: 13px;
+}
+
+.theme-control svg { color: var(--muted); }
+.theme-control select:focus { outline: 2px solid var(--brand); outline-offset: 2px; }
+
+.theme-seg {
+  display: inline-flex;
+  gap: 8px;
+  background: var(--panel-2);
+  padding: 6px;
+  border-radius: 10px;
+  border: 1px solid var(--fret);
+}
+.theme-seg .seg-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 40px;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  color: var(--muted);
+  cursor: pointer;
+}
+.theme-seg .seg-btn svg { width: 22px; height: 22px; }
+.theme-seg .seg-btn.active {
+  background: var(--brand-2);
+  color: white;
+}
+.theme-seg .seg-btn:focus {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+html {
+  min-height: 100%;
+  background: var(--bg);
+}
+
+body {
+  margin: 0;
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif;
+  color: var(--text);
+  min-height: 100%;
+  background: transparent;
+}
+
+header {
+  padding: 16px;
+  position: sticky;
+  top: 0;
+  background: var(--panel);
+  border-bottom: 1px solid var(--fret);
+  z-index: 5;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+h1 {
+  font-size: 24px;
+  margin: 0 0 4px;
+  letter-spacing: .2px;
+  font-weight: 600;
+}
+
+.sub {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.header-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.lang {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 600px 1fr;
+  gap: 16px;
+  margin: 16px 0 24px;
+}
+
+@media (max-width: 980px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.card {
+  background: var(--panel);
+  border: 1px solid var(--fret);
+  border-radius: 16px;
+  box-shadow: 0 6px 20px var(--card-shadow-color);
+  padding: 20px;
+}
+
+.card h2 {
+  font-size: 18px;
+  margin: 0 0 16px;
+  font-weight: 600;
+  color: var(--heading);
+}
+
+.card .body {
+  padding: 16px;
+}
+
+label {
+  display: block;
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+
+select,
+button,
+input[type="text"],
+.chip {
+  appearance: none;
+  background: var(--panel-2);
+  color: var(--text);
+  border: 1px solid var(--fret);
+  padding: 10px 16px;
+  border-radius: 12px;
+  font-size: 15px;
+  transition: all 0.2s;
+}
+
+button {
+  color: var(--highlight);
+}
+
+select:focus,
+button:focus,
+input:focus {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+
+button {
+  background: linear-gradient(180deg, var(--btn-grad-start), var(--btn-grad-end));
+  border: 1px solid var(--btn-border);
+  font-weight: 500;
+  cursor: pointer;
+}
+
+button:hover {
+  background: linear-gradient(180deg, var(--btn-grad-end), var(--btn-border));
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.row3 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 12px;
+}
+
+.mt {
+  margin-top: 12px;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  padding-right: 8px;
+}
+
+.chip input {
+  margin: 0;
+  accent-color: var(--brand);
+}
+
+.info {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.pill {
+  background: var(--panel-2);
+  color: var(--text);
+  border: 1px solid var(--fret);
+  padding: 8px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+}
+
+.legend {
+  display: flex;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--muted);
+  padding: 0 16px 12px;
+}
+
+.legend .dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 999px;
+  display: inline-block;
+  border: 1px solid var(--dot-border);
+}
+
+.legend .tonic {
+  background: var(--tonic);
+}
+
+.legend .scale {
+  background: var(--note);
+}
+
+.foot {
+  padding: 20px 16px;
+  color: var(--muted);
+  font-size: 12px;
+  text-align: center;
+}
+
+a {
+  color: var(--brand-2);
+}
+
+/* Specific to scales.html */
+.scale-list {
+  display: grid;
+  gap: 8px;
+}
+
+.scale-item {
+  border-top: 1px solid var(--fret);
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 16px;
+  background: var(--panel);
+  box-shadow: 0 4px 6px var(--card-shadow-color-2);
+}
+
+.scale-head {
+  padding: 12px 16px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.scale-title {
+  font-weight: 700;
+}
+
+.scale-sub {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+}
+
+.btn {
+  background: linear-gradient(180deg, var(--btn-grad-start), var(--btn-grad-end));
+  border: 1px solid var(--btn-border);
+  padding: 10px 16px;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn:hover {
+  background: linear-gradient(180deg, var(--btn-grad-end), var(--btn-border));
+}
+
+.collapse {
+  display: none;
+  border-top: 1px dashed var(--divider);
+}
+
+.collapse.show {
+  display: block;
+}
+
+.tools {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 12px 16px;
+  flex-wrap: wrap;
+}
+
+/* Tabs styling: make .tab-btn look like pill buttons (inactive + active state) */
+.tabs {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  padding: 8px 0;
+  margin-bottom: 12px;
+}
+.tab-btn {
+  appearance: none;
+  border: 1px solid var(--btn-border);
+  color: var(--highlight);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  position: relative;
+  z-index: 1;
+}
+.tab-btn[aria-selected="true"] {
+  /* active looks like a pressed Play button with slight elevation */
+  background: var(--success);
+  color: var(--highlight);
+  border-color: var(--btn-border);
+  z-index: 6;
+}
+.tab-btn:not([aria-selected="true"]) { opacity: 0.95; }
+.tab-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--brand) 14%, transparent 86%);
+}
+
+/* small icon spacing if tabs include inline svgs */
+.tab-btn svg { vertical-align: middle; margin-right: 8px; height: 14px; width: 14px; }
+
+/* make the panel area visually connected to active tab */
+.tab-panels { margin-top: 0; }
+.tab-panels .panel { border-top: 1px solid var(--fret); padding-top: 26px; margin-top: 0; }
+
+/* Fretboard */
+.fret-wrap {
+  overflow: auto;
+  padding: 16px;
+  background: var(--panel-2);
+  border-radius: 12px;
+  margin-top: 12px;
+}
+
+svg.fretboard {
+  background: linear-gradient(180deg, var(--panel), var(--panel-2));
+  border: 1px solid var(--fret);
+  border-radius: 12px;
+  box-shadow: inset 0 1px 0 var(--fretboard-inset);
+}
+
+.note-label {
+  font-size: 11px;
+  fill: var(--note-label-fill);
+  stroke: var(--label-stroke);
+  stroke-width: .8px;
+  paint-order: stroke;
+  dominant-baseline: middle;
+  text-anchor: middle;
+  pointer-events: none;
+}
+
+.note-label-open {
+  font-size: 11px;
+  fill: var(--note-label-open-fill);
+  stroke: var(--label-stroke);
+  stroke-width: .8px;
+  paint-order: stroke;
+  dominant-baseline: middle;
+  text-anchor: middle;
+  pointer-events: none;
+}
+
+.open-label {
+  font-size: 12px;
+  fill: var(--muted);
+  text-anchor: start;
+  dominant-baseline: middle;
+}
+
+.fret-num {
+  font-size: 10px;
+  fill: var(--fret-num-fill);
+  text-anchor: middle;
+}
+
+.note-dot {
+  cursor: pointer;
+}
+
+.note-dot circle {
+  stroke: var(--dot-stroke);
+}
+
+/* Specific to chords.html */
+.header-actions {
+  margin-top: 12px;
+}
+
+.controls-section {
+  margin-top: 20px;
+}
+
+.two-column-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.mt-10 {
+  margin-top: 10px;
+}
+
+.wrap {
+  flex-wrap: wrap;
+}
+
+.mono {
+  font-family: monospace;
+}
+
+/* Chord info layout helpers (keep visual styles consistent) */
+.chord-title--block { margin: 0 0 6px 0; font-size: 16px; }
+.chord-notes--block { display: block; margin: 6px 0; color: var(--muted); }
+.chord-play-wrap { display: block; margin: 8px 0; }
+.chord-play-btn { display: inline-block; }
+
+/* Ensure chordInfo container renders its children on separate lines
+   without changing the generic .info behavior elsewhere. */
+#chordInfo {
+  display: block;
+}
+#chordInfo > * {
+  display: block;
+  margin-bottom: 8px;
+}
+#chordInfo .muted {
+  color: var(--muted);
+}
+
+header[data-theme="dark"], header[data-theme] {
+  background: var(--header-bg);
+}
+
+/* theme toggle small style */
+.theme-chip input[type="checkbox"] { width: 18px; height: 18px; }
+
+/* Smooth transitions when theme changes (applied briefly at init) */
+html.theme-init, html[data-theme] {
+  transition: background 240ms ease, color 240ms ease;
+}
+
+.theme-control select {
+  padding: 6px 8px;
+  border-radius: 8px;
+  font-size: 13px;
+}
+
+.theme-control svg { color: var(--muted); }
+.theme-control select:focus { outline: 2px solid var(--brand); outline-offset: 2px; }
+
+.theme-seg {
+  display: inline-flex;
+  gap: 8px;
+  background: var(--panel-2);
+  padding: 6px;
+  border-radius: 10px;
+  border: 1px solid var(--fret);
+}
+.theme-seg .seg-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 40px;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  color: var(--muted);
+  cursor: pointer;
+}
+.theme-seg .seg-btn svg { width: 22px; height: 22px; }
+.theme-seg .seg-btn.active {
+  background: var(--brand-2);
+  color: white;
+}
+.theme-seg .seg-btn:focus {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+
+.voicing {
+  position: relative;
+  border: 1px solid var(--fret);
+  border-radius: 12px;
+  padding: 16px;
+  background: var(--panel);
+}
+
+.svgwrap {
+  margin-bottom: 12px;
+}
+
+.meta2 {
+  margin-bottom: 10px;
+}
+
+.meta-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.meta-label {
+  color: var(--muted);
+}
+
+.meta-value {
+  font-weight: 500;
+}
+
+.play-btn {
+  margin-top: 10px;
+  width: 100%;
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px;
+  margin-top: 12px;
+}
+
+.pos-title {
+  font-weight: 600;
+  margin: 24px 0 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--divider);
+}
+
+.results-info {
+  margin: 16px 0;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.generate-section {
+  margin: 20px 0;
+}
