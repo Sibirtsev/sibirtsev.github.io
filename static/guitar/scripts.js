@@ -142,7 +142,64 @@
             function pluck(freq, dur = 0.8, when = 0, gain = 0.72) { try { if (ac.state === 'suspended') ac.resume(); } catch (e) { } ensureMasterGain(); const sampleRate = ac.sampleRate; const len = Math.max(1, Math.floor(dur * sampleRate)); const N = Math.max(2, Math.floor(sampleRate / freq)); const buffer = ac.createBuffer(1, len, sampleRate); const data = buffer.getChannelData(0); for (let i = 0; i < N; i++) data[i] = (Math.random() * 2 - 1) * 0.5; for (let i = N; i < len; i++) data[i] = 0.5 * (data[i - N] + (i - N - 1 >= 0 ? data[i - N - 1] : 0)) * 0.995; const src = ac.createBufferSource(); src.buffer = buffer; const g = ac.createGain(); const lp = ac.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = Math.max(1000, freq * 6); const sustainGain = ac.createGain(); const sustainFilt = ac.createBiquadFilter(); sustainFilt.type = 'lowpass'; sustainFilt.frequency.value = Math.max(600, freq * 4); const t0 = ac.currentTime + when; g.gain.setValueAtTime(0.0001, t0); g.gain.exponentialRampToValueAtTime(Math.max(0.0001, gain), t0 + 0.01); g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur); const susLevel = Math.max(0.02, gain * 0.4); sustainGain.gain.setValueAtTime(0.0001, t0); sustainGain.gain.exponentialRampToValueAtTime(susLevel, t0 + 0.02); sustainGain.gain.exponentialRampToValueAtTime(0.0001, t0 + Math.max(dur, 3.0)); src.connect(lp); lp.connect(g); g.connect(masterGain); src.connect(sustainFilt); sustainFilt.connect(sustainGain); sustainGain.connect(masterGain); src.start(t0); src.stop(t0 + Math.max(dur, 3.2)); src.onended = () => { try { src.disconnect(); lp.disconnect(); g.disconnect(); sustainFilt.disconnect(); sustainGain.disconnect(); } catch (e) { } } }
             function playFreq(f, dur = 0.8, when = 0) { try { if (ac.state === 'suspended') ac.resume(); } catch (e) { } ensureMasterGain(); pluck(f, dur, when, 0.76); }
             function playNoteName(name, octave = 4, dur = 0.8, when = 0) { playFreq(freqFromMidi(midiFromSpelled(name, octave)), dur, when); }
-            function playScale(noteNames, baseOct = 3, step = 0.45) { const up = noteNames.slice(); const upperTonic = up[0]; const ascend = [...up, upperTonic]; const descend = [...up].reverse(); const seq = [...ascend, ...descend]; const noteDur = 1.0; const firstPc = pitchClass(noteNames[0]); seq.forEach((n, i) => { let addOct = 0; if (i === up.length) addOct = 1; const pc = pitchClass(n); if (i > up.length && pc < firstPc) addOct = 1; const freq = freqFromMidi(midiFromSpelled(n, baseOct + addOct)); playFreq(freq, noteDur, i * step); }); }
+            function playScale(noteNames, baseOct = 4, step = 0.5) {
+                console.log('Playing scale with notes:', noteNames);
+
+                // Создаем правильную последовательность
+                const upperTonic = noteNames[0]
+                const ascending = [...noteNames, upperTonic]; // восходящая гамма
+                const descending = [...noteNames].reverse(); // нисходящая (с повтором верхней ноты)
+                const fullSequence = [...ascending, ...descending];
+
+                console.log('Ascending:', ascending);
+                console.log('Descending:', descending);
+                console.log('Full sequence:', fullSequence);
+
+                const noteDur = 0.6;
+
+                // Вычисляем октавы для каждой ноты заранее
+                const noteOctaves = [];
+
+                // Восходящая часть - начинаем с baseOct, повышаем октаву когда нота "возвращается к началу"
+                let currentOctave = baseOct;
+                let lastPitchClass = -1;
+
+                for (let i = 0; i < ascending.length; i++) {
+                    const currentPitchClass = pitchClass(ascending[i]);
+
+                    // Если текущая нота имеет меньший pitch class чем предыдущая, значит мы "обернулись" - повышаем октаву
+                    if (i > 0 && currentPitchClass < lastPitchClass) {
+                        currentOctave++;
+                    }
+
+                    noteOctaves.push(currentOctave);
+                    lastPitchClass = currentPitchClass;
+                }
+
+                // Нисходящая часть - начинаем с той же октавы что последняя восходящая, понижаем при "обертывании"
+                lastPitchClass = pitchClass(descending[0]);
+
+                for (let i = 0; i < descending.length; i++) {
+                    const currentPitchClass = pitchClass(descending[i]);
+
+                    // Если текущая нота имеет больший pitch class чем предыдущая, значит мы "обернулись" - понижаем октаву
+                    if (i > 0 && currentPitchClass > lastPitchClass) {
+                        currentOctave--;
+                    }
+
+                    noteOctaves.push(currentOctave);
+                    lastPitchClass = currentPitchClass;
+                }
+
+                // Проигрываем все ноты
+                fullSequence.forEach((noteName, i) => {
+                    const octave = noteOctaves[i];
+                    const freq = freqFromMidi(midiFromSpelled(noteName, octave));
+                    console.log(`${i + 1}. ${noteName}${octave} (${freq.toFixed(1)} Hz) at ${(i * step).toFixed(1)}s`);
+
+                    playFreq(freq, noteDur, i * step);
+                });
+            }
             return { playNoteName, playScale, playFreq, freqFromMidi: freqFromMidi, ac };
         })();
 
