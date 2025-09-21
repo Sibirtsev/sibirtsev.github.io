@@ -3,16 +3,25 @@
 
 <head>
   <meta charset="UTF-8" />
-  <title>Teleprompter</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description"
+    content="Professional teleprompter app for smooth text scrolling with customizable speed and font size" />
+  <meta name="keywords" content="teleprompter, text scrolling, presentation, speech, reading" />
+  <meta name="author" content="Sibirtsev" />
+  <meta name="robots" content="index, follow" />
+  <title>Teleprompter - Professional Text Scrolling Tool</title>
   <style>
     html,
     body {
       margin: 0;
       padding: 0;
-      height: 100%;
+      height: 100vh !important;
       font-family: Arial, sans-serif;
       background: #000;
       color: #fff;
+      overflow: hidden !important;
+      position: fixed;
+      width: 100%;
     }
 
     .screen {
@@ -98,305 +107,2187 @@
       font-weight: bold;
       color: yellow;
     }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    .container {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+      -webkit-transition: all 0.3s ease;
+      -moz-transition: all 0.3s ease;
+      transition: all 0.3s ease;
+    }
+
+    .col {
+      padding: 10px;
+    }
+
+    #control-column {
+      height: 15vh;
+      width: 100%;
+      background: #111;
+      overflow: hidden;
+      padding: 5px 10px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      box-sizing: border-box;
+      order: 2;
+    }
+
+    #content-column {
+      height: 85vh;
+      background: #000;
+      overflow: hidden;
+      position: relative;
+      order: 1;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+    }
+
+    #scroll-container {
+      font-size: 32px;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      height: 100%;
+      overflow-y: auto;
+      padding: 20px;
+      box-sizing: border-box;
+      max-width: 100%;
+      margin: 0 auto;
+      transition: max-width 0.3s ease;
+    }
+
+    .setting {
+      margin-bottom: 15px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    .setting label {
+      display: block;
+      margin-bottom: 5px;
+      font-size: 14px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    .input-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+    }
+
+    .input-group input[type="range"] {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .input-group input[type="number"] {
+      width: 60px;
+      margin-left: 0;
+      flex-shrink: 0;
+    }
+
+    .setting input[type="range"] {
+      width: 100%;
+      margin-bottom: 5px;
+      box-sizing: border-box;
+    }
+
+    .setting input[type="number"] {
+      width: 60px;
+      margin-left: 10px;
+      box-sizing: border-box;
+      flex-shrink: 0;
+    }
+
+    button {
+      margin-right: 5px;
+      margin-bottom: 5px;
+      box-sizing: border-box;
+      word-wrap: break-word;
+      flex-shrink: 0;
+    }
+
+    #control-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+    }
+
+    /* Desktop/Mobile visibility controls */
+    .mobile-only {
+      display: none;
+    }
+
+    .desktop-only {
+      display: inline-block;
+    }
+
+    #advanced-settings {
+      transition: all 0.3s ease;
+    }
+
+    /* По умолчанию скрываем дополнительные настройки, но оставляем базовую структуру */
+    #advanced-settings:not(.show) {
+      position: absolute !important;
+      top: -9999px !important;
+      left: -9999px !important;
+      opacity: 0 !important;
+      z-index: -1 !important;
+      pointer-events: none !important;
+    }
+
+    /* Полноэкранные настройки для всех устройств */
+    #advanced-settings.show {
+      display: flex !important;
+      visibility: visible !important;
+      position: fixed !important;
+      top: 0 !important;
+      left: 0 !important;
+      width: 100vw !important;
+      height: 100vh !important;
+      background: #111 !important;
+      z-index: 1000 !important;
+      flex-direction: column !important;
+      opacity: 1 !important;
+      overflow-y: auto !important;
+      -webkit-overflow-scrolling: touch !important;
+      padding: 20px !important;
+      box-sizing: border-box !important;
+    }
+
+    /* Заголовок полноэкранных настроек */
+    #advanced-settings.show .mobile-settings-header {
+      display: flex !important;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 2px solid #333;
+    }
+
+    .mobile-settings-header h2 {
+      color: #fff;
+      font-size: 24px;
+      margin: 0;
+      font-weight: 600;
+    }
+
+    .close-button {
+      background: #333 !important;
+      color: #fff !important;
+      border: 2px solid #555 !important;
+      border-radius: 50% !important;
+      width: 40px !important;
+      height: 40px !important;
+      font-size: 18px !important;
+      font-weight: bold !important;
+      cursor: pointer !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      padding: 0 !important;
+      margin: 0 !important;
+    }
+
+    .close-button:hover {
+      background: #555 !important;
+      border-color: #777 !important;
+    }
+
+    /* Убираем видимые элементы настроек только когда они НЕ в полноэкранном режиме */
+    #advanced-settings:not(.show) * {
+      display: none !important;
+      visibility: hidden !important;
+    }
+
+    /* Показываем элементы настроек в полноэкранном режиме */
+    #advanced-settings.show * {
+      display: block !important;
+      visibility: visible !important;
+    }
+
+    #advanced-settings.show .input-group {
+      display: flex !important;
+    }
+
+    #advanced-settings.show .mobile-settings-header {
+      display: flex !important;
+    }
+
+    #advanced-settings.show .setting {
+      margin-bottom: 20px !important;
+    }
+
+    #advanced-settings.show input[type="range"] {
+      height: 6px !important;
+      margin: 10px 0 !important;
+    }
+
+    #advanced-settings.show input[type="number"] {
+      font-size: 14px !important;
+      padding: 8px 12px !important;
+      width: 80px !important;
+    }
+
+    #advanced-settings.show textarea {
+      height: 120px !important;
+      font-size: 16px !important;
+      padding: 12px !important;
+      margin-bottom: 20px !important;
+    }
+
+    /* Enhanced Interactive States */
+    button {
+      background: linear-gradient(135deg, #333, #2a2a2a);
+      color: #ffffff;
+      border: 1px solid #555;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-weight: 500;
+    }
+
+    button:hover {
+      background: linear-gradient(135deg, #4a4a4a, #3a3a3a);
+      border-color: #666;
+      transform: translateY(-1px);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    button:active {
+      transform: translateY(0);
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    }
+
+    button:focus,
+    input:focus,
+    textarea:focus {
+      outline: 2px solid #00ff88;
+      outline-offset: 2px;
+      box-shadow: 0 0 0 4px rgba(0, 255, 136, 0.2);
+    }
+
+    button[aria-pressed="true"] {
+      background: linear-gradient(135deg, #00cc66, #00aa55);
+      color: #000;
+      font-weight: 600;
+    }
+
+    .toggle-button {
+      width: 100%;
+      text-align: left;
+      padding: 10px 12px;
+      margin-bottom: 8px;
+      background: linear-gradient(135deg, #2a2a2a, #1a1a1a);
+      border: 1px solid #444;
+      color: #ccc;
+      transition: all 0.2s ease;
+    }
+
+    .toggle-button:hover {
+      background: linear-gradient(135deg, #3a3a3a, #2a2a2a);
+      border-color: #555;
+    }
+
+    .toggle-button.active,
+    .toggle-button[aria-pressed="true"] {
+      background: linear-gradient(135deg, #00cc66, #00aa55);
+      color: #000;
+      border-color: #00aa55;
+      font-weight: 600;
+    }
+
+    .action-button {
+      padding: 10px 15px;
+      background: linear-gradient(135deg, #2196F3, #1976D2);
+      color: white;
+      border: 2px solid #1976D2;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+      transition: all 0.2s ease;
+      width: 100%;
+      text-align: center;
+      text-transform: none;
+    }
+
+    .action-button:hover {
+      background: linear-gradient(135deg, #1976D2, #1565C0);
+      border-color: #1565C0;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(25, 118, 210, 0.3);
+    }
+
+    .action-button:active {
+      transform: translateY(0);
+      background: linear-gradient(135deg, #1565C0, #0D47A1);
+    }
+
+    input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
+      background: transparent;
+      cursor: pointer;
+    }
+
+    input[type="range"]::-webkit-slider-track {
+      background: #555;
+      height: 4px;
+      border-radius: 2px;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      height: 18px;
+      width: 18px;
+      border-radius: 50%;
+      background: #00ff88;
+      cursor: pointer;
+      border: 2px solid #333;
+      transition: all 0.2s ease;
+    }
+
+    input[type="range"]::-webkit-slider-thumb:hover {
+      background: #00cc66;
+      transform: scale(1.1);
+    }
+
+    input[type="range"]::-moz-range-track {
+      background: #555;
+      height: 4px;
+      border-radius: 2px;
+      border: none;
+    }
+
+    input[type="range"]::-moz-range-thumb {
+      height: 18px;
+      width: 18px;
+      border-radius: 50%;
+      background: #00ff88;
+      cursor: pointer;
+      border: 2px solid #333;
+      transition: all 0.2s ease;
+    }
+
+    input[type="number"] {
+      background: #333;
+      color: #fff;
+      border: 1px solid #555;
+      border-radius: 4px;
+      padding: 4px 8px;
+      font-size: 12px;
+      transition: border-color 0.2s ease;
+    }
+
+    input[type="number"]:hover {
+      border-color: #666;
+    }
+
+    input[type="checkbox"] {
+      accent-color: #00ff88;
+      transform: scale(1.2);
+      cursor: pointer;
+    }
+
+    textarea {
+      width: 100%;
+      height: 100px;
+      background: #1a1a1a;
+      color: #ffffff;
+      border: 2px solid #444;
+      padding: 12px;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-size: 14px;
+      line-height: 1.4;
+      border-radius: 6px;
+      resize: vertical;
+      box-sizing: border-box;
+      max-width: 100%;
+      -webkit-transition: border-color 0.2s ease, box-shadow 0.2s ease;
+      -moz-transition: border-color 0.2s ease, box-shadow 0.2s ease;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    textarea:hover {
+      border-color: #666;
+    }
+
+    textarea:focus {
+      border-color: #00ff88;
+      background: #222;
+      box-shadow: 0 0 0 3px rgba(0, 255, 136, 0.1);
+    }
+
+    /* Improved Typography */
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    #scroll-container {
+      text-rendering: optimizeLegibility;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    .setting label {
+      color: #e0e0e0;
+      font-weight: 500;
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+    }
+
+    /* Loading and Animation States */
+    .loading {
+      opacity: 0.7;
+      pointer-events: none;
+      -webkit-filter: blur(1px);
+      filter: blur(1px);
+    }
+
+    @-webkit-keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
+      }
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
+      }
+    }
+
+    .fade-in {
+      -webkit-animation: fadeIn 0.3s ease-in;
+      animation: fadeIn 0.3s ease-in;
+    }
+
+    /* Применяем мобильный стиль для всех устройств */
+
+    /* Перенесли мобильные стили как базовые для всех устройств */
+
+    #control-column {
+      height: 15vh;
+      /* Фиксированная высота */
+      width: 100%;
+      overflow: hidden;
+      /* Полностью убираем скролл */
+      padding: 5px 10px;
+      /* Уменьшили отступы */
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      /* Центрируем содержимое по вертикали */
+    }
+
+    #content-column {
+      height: 85vh;
+      /* Еще больше места для контента */
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Показываем мобильные элементы */
+    .mobile-only {
+      display: inline-block;
+    }
+
+    .desktop-only {
+      display: none;
+    }
+
+    /* По умолчанию скрываем дополнительные настройки на мобильном, но оставляем базовую структуру */
+    #advanced-settings:not(.show) {
+      position: absolute !important;
+      top: -9999px !important;
+      left: -9999px !important;
+      opacity: 0 !important;
+      z-index: -1 !important;
+      pointer-events: none !important;
+    }
+
+    /* Полноэкранные настройки на мобильном - сбрасываем все предыдущие стили */
+    #advanced-settings.show {
+      display: flex !important;
+      visibility: visible !important;
+      position: fixed !important;
+      top: 0 !important;
+      left: 0 !important;
+      width: 100vw !important;
+      height: 100vh !important;
+      background: #111 !important;
+      z-index: 1000 !important;
+      flex-direction: column !important;
+      opacity: 1 !important;
+      overflow-y: auto !important;
+      -webkit-overflow-scrolling: touch !important;
+      padding: 20px !important;
+      box-sizing: border-box !important;
+    }
+
+    /* Заголовок полноэкранных настроек */
+    #advanced-settings.show .mobile-settings-header {
+      display: flex !important;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 2px solid #333;
+    }
+
+    .mobile-settings-header h2 {
+      color: #fff;
+      font-size: 24px;
+      margin: 0;
+      font-weight: 600;
+    }
+
+    .close-button {
+      background: #333 !important;
+      color: #fff !important;
+      border: 2px solid #555 !important;
+      border-radius: 50% !important;
+      width: 40px !important;
+      height: 40px !important;
+      font-size: 18px !important;
+      font-weight: bold !important;
+      cursor: pointer !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      padding: 0 !important;
+      margin: 0 !important;
+    }
+
+    .close-button:hover {
+      background: #555 !important;
+      border-color: #777 !important;
+    }
+
+    /* Полноэкранные настройки не влияют на layout контейнера */
+
+    /* Убираем видимые элементы настроек только когда они НЕ в полноэкранном режиме */
+    #advanced-settings:not(.show) * {
+      display: none !important;
+      visibility: hidden !important;
+    }
+
+    /* Показываем элементы настроек в полноэкранном режиме */
+    #advanced-settings.show * {
+      display: block !important;
+      visibility: visible !important;
+    }
+
+    #advanced-settings.show .input-group {
+      display: flex !important;
+    }
+
+    #advanced-settings.show .mobile-settings-header {
+      display: flex !important;
+    }
+
+    .setting {
+      margin-bottom: 5px;
+      /* Уменьшили отступы для компактности */
+    }
+
+    .input-group input[type="number"] {
+      width: 70px;
+    }
+
+    #control-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(70px, 1fr));
+      gap: 3px;
+      width: 100%;
+      margin: 0;
+      padding: 0;
+      flex: 1;
+      /* Занимает всю доступную высоту */
+      align-content: center;
+      /* Центрирует кнопки по вертикали */
+    }
+
+    button {
+      margin: 0;
+      padding: 8px 6px;
+      font-size: 11px;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      font-weight: 600;
+      height: auto;
+      /* Автоматическая высота */
+      max-height: none;
+    }
+
+    #settings-toggle {
+      background: linear-gradient(135deg, #444, #333);
+      border-color: #666;
+    }
+
+    #settings-toggle.active {
+      background: linear-gradient(135deg, #00cc66, #00aa55);
+      color: #000;
+    }
+
+    #scroll-container {
+      font-size: 24px;
+      height: 100%;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    /* Textarea в настройках - компактная версия */
+    #advanced-settings textarea {
+      height: 60px;
+      font-size: 11px;
+      padding: 6px;
+      margin-bottom: 5px;
+      resize: none;
+      /* Запрещаем изменение размера */
+    }
+
+    /* Настройки в полноэкранном режиме - нормальные размеры */
+    #advanced-settings.show label {
+      font-size: 16px !important;
+      margin-bottom: 8px !important;
+      color: #e0e0e0 !important;
+    }
+
+    #advanced-settings.show button:not(.close-button) {
+      padding: 12px 16px !important;
+      font-size: 14px !important;
+      margin-bottom: 10px !important;
+    }
+
+    #advanced-settings.show textarea {
+      height: 120px !important;
+      font-size: 14px !important;
+      padding: 12px !important;
+      margin-bottom: 15px !important;
+      resize: vertical !important;
+    }
+
+    #advanced-settings.show .setting {
+      margin-bottom: 20px !important;
+    }
+
+    #advanced-settings.show input[type="range"] {
+      height: 6px !important;
+      margin: 10px 0 !important;
+    }
+
+    /* Стили для полноэкранных настроек перенесены в основную часть */
+
+    @media (max-width: 480px) {
+      #scroll-container {
+        font-size: 20px;
+        padding: 10px;
+      }
+
+      button {
+        padding: 8px 6px;
+        font-size: 11px;
+        min-width: 50px;
+      }
+
+      .setting input[type="number"] {
+        width: 60px;
+      }
+
+      #control-row {
+        grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
+      }
+    }
+
+    /* Touch-friendly improvements */
+    @media (hover: none) and (pointer: coarse) {
+
+      button,
+      input[type="range"],
+      input[type="number"] {
+        min-height: 44px;
+        /* Apple's recommended touch target size */
+      }
+
+      button {
+        padding: 12px 16px;
+      }
+    }
   </style>
 </head>
 
 <body>
-  <div id="screen1" class="screen">
-    <h1>Teleprompter</h1>
-    <textarea id="inputText" placeholder="Put text here..."></textarea>
+  <div class="container" role="application" aria-label="Teleprompter Application">
+    <aside class="col" id="control-column" role="region" aria-label="Controls Panel">
+      <section id="control-row" role="group" aria-label="Playback Controls">
+        <button id="play-button" aria-describedby="play-help">Play</button>
+        <div id="play-help" class="sr-only">Start or pause text scrolling</div>
 
-    <div class="controls">
-      <label for="wpmRange">Words/m:</label>
-      <input type="range" id="wpmRange" min="60" max="300" value="120">
-      <input type="number" id="wpmNumber" min="60" max="300" value="120" style="width:80px">
-    </div>
+        <button onclick="stop()" aria-describedby="stop-help">Stop</button>
+        <div id="stop-help" class="sr-only">Stop scrolling and return to start</div>
 
-    <div class="controls">
-      <label for="fontSizeRange">Font size (px):</label>
-      <input type="range" id="fontSizeRange" min="16" max="96" value="50">
-      <input type="number" id="fontSizeNumber" min="16" max="96" value="50" style="width:80px">
-    </div>
+        <button onclick="jump(-0.1)" aria-describedby="back-help" class="desktop-only">-10%</button>
+        <div id="back-help" class="sr-only">Jump back 10 percent</div>
 
-    <div class="controls">
-      <input type="checkbox" id="highlightCheckbox">
-      <label for="highlightCheckbox">Highlight first letters</label>
-    </div>
+        <button onclick="jump(0.1)" aria-describedby="forward-help" class="desktop-only">+10%</button>
+        <div id="forward-help" class="sr-only">Jump forward 10 percent</div> <button id="fullscreen-button"
+          aria-describedby="fullscreen-help">Fullscreen</button>
+        <div id="fullscreen-help" class="sr-only">Toggle fullscreen mode</div>
 
-    <button id="startBtn">Start</button>
-  </div>
+        <button id="settings-toggle" aria-describedby="settings-help" aria-expanded="false">Settings</button>
+        <div id="settings-help" class="sr-only">Show or hide additional settings</div>
+      </section>
 
-  <div id="screen2" class="screen">
-    <div id="contentColumn">
-      <div id="scrollContainer"></div>
-    </div>
-    <div id="buttonsColumn">
-      <div id="infoBox">
-        <p id="speedInfo"></p>
-        <p id="fontInfo"></p>
-        <p id="progressInfo"></p>
+      <section id="advanced-settings" role="group" aria-label="Settings">
+        <!-- Заголовок для полноэкранного режима настроек -->
+        <div class="mobile-settings-header mobile-only" style="display: none;">
+          <h2>Настройки</h2>
+          <button id="close-settings" type="button" class="close-button" aria-label="Закрыть настройки">✕</button>
+        </div>
+
+        <div class="setting">
+          <label for="input-text">Enter text to scroll</label>
+          <textarea id="input-text" placeholder="Enter text to scroll" aria-label="Text content for teleprompter"
+            aria-describedby="text-help">
+            </textarea>
+          <div id="text-help" class="sr-only">Enter the text you want to display in the teleprompter. Use the controls
+            below to adjust speed and appearance.</div>
+        </div>
+
+        <div class="setting">
+          <label for="speed-range">Speed</label>
+          <div class="input-group">
+            <input type="range" id="speed-range" min="0" max="10" step="0.1" value="1" aria-describedby="speed-help">
+            <input type="number" id="speed-number" min="0" max="10" step="0.1" value="1" aria-label="Speed value"
+              aria-describedby="speed-help">
+          </div>
+          <div id="speed-help" class="sr-only">Control scrolling speed from 0 to 10</div>
+        </div>
+
+        <div class="setting">
+          <label for="font-range">Font Size</label>
+          <div class="input-group">
+            <input type="range" id="font-range" min="16" max="80" step="1" value="32" aria-describedby="font-help">
+            <input type="number" id="font-number" min="16" max="80" step="1" value="32" aria-label="Font size value"
+              aria-describedby="font-help">
+          </div>
+          <div id="font-help" class="sr-only">Adjust font size from 16 to 80 pixels</div>
+        </div>
+
+        <div class="setting desktop-only">
+          <label for="width-range">Text Width</label>
+          <div class="input-group">
+            <input type="range" id="width-range" min="60" max="100" step="5" value="100" aria-describedby="width-help">
+            <input type="number" id="width-number" min="60" max="100" step="5" value="100"
+              aria-label="Text width percentage" aria-describedby="width-help">
+          </div>
+          <div id="width-help" class="sr-only">Adjust text area width from 60% to 100% of screen width</div>
+        </div>
+
+        <div class="setting">
+          <button type="button" id="highlight-button" aria-pressed="false" aria-describedby="highlight-help"
+            class="toggle-button">
+            Highlight: OFF
+          </button>
+          <div id="highlight-help" class="sr-only">When enabled, highlights the first two letters of each word to aid
+            reading</div>
+        </div>
+
+        <div class="setting">
+          <button type="button" id="mirror-button" aria-pressed="false" aria-describedby="mirror-help"
+            class="toggle-button">
+            Mirror: OFF
+          </button>
+          <div id="mirror-help" class="sr-only">When enabled, mirrors text horizontally for use with teleprompter
+            mirrors</div>
+        </div>
+
+        <div class="setting">
+          <button type="button" id="share-button" aria-describedby="share-help" class="action-button">
+            📤 Поделиться ссылкой
+          </button>
+          <div id="share-help" class="sr-only">Share link via Chrome's "Send to your devices" or copy to clipboard.
+            Right-click for more options</div>
+        </div>
+      </section>
+    </aside>
+
+    <main class="col" id="content-column" role="main" aria-label="Teleprompter Display">
+      <div id="scroll-container" role="region" aria-live="polite" aria-label="Scrolling text content">
       </div>
-      <button id="pauseBtn">Pause</button>
-      <button id="resumeBtn">Play</button>
-      <button id="fasterBtn">Speed +</button>
-      <button id="slowerBtn">Speed -</button>
-      <button id="increaseFontBtn">A +</button>
-      <button id="decreaseFontBtn">A -</button>
-      <button id="toggleHighlightBtn">Highlight ↔</button>
-      <button id="mirrorBtn">Mirror ↔</button>
-      <button id="restartBtn">Restart</button>
-      <button id="forwardBtn">Forward</button>
-      <button id="backwardBtn">Backward</button>
-      <button id="backBtn">← Back</button>
-    </div>
+    </main>
   </div>
 
   <script>
+    /**
+     * Teleprompter Application - Enhanced Version
+     * Improved with error handling, validation, and accessibility
+     */
+
     /*********************************
-     * DOM helpers & element refs
+     * Utility Functions
      *********************************/
-    const $ = id => document.getElementById(id);
-    // Screens
-    const screen1 = $("screen1");
-    const screen2 = $("screen2");
-    // Inputs & checkboxes
-    const inputText = $("inputText");
-    const wpmRange = $("wpmRange");
-    const wpmNumber = $("wpmNumber");
-    const fontSizeRange = $("fontSizeRange");
-    const fontSizeNumber = $("fontSizeNumber");
-    const highlightCheckbox = $("highlightCheckbox");
-    // Columns & Info
-    const contentColumn = $("contentColumn");
-    const scrollContainer = $("scrollContainer");
-    const speedInfo = $("speedInfo");
-    const fontInfo = $("fontInfo");
-    const progressInfo = $("progressInfo");
-    // Buttons
-    const btns = {
-      start: $("startBtn"), pause: $("pauseBtn"), resume: $("resumeBtn"), faster: $("fasterBtn"), slower: $("slowerBtn"),
-      plus: $("increaseFontBtn"), minus: $("decreaseFontBtn"), highlight: $("toggleHighlightBtn"), mirror: $("mirrorBtn"),
-      restart: $("restartBtn"), fwd: $("forwardBtn"), back: $("backwardBtn"), home: $("backBtn")
+
+    /**
+     * Safe element selector with error handling
+     * @param {string} id - Element ID
+     * @returns {HTMLElement|null}
+     */
+    const $ = (id) => {
+      try {
+        return document.getElementById(id);
+      } catch (error) {
+        console.error(`Error selecting element with ID "${id}":`, error);
+        return null;
+      }
     };
-    /*********************************
-     * State
-     *********************************/
-    let wpm = 120;
-    let fontSize = 32;
-    let highlight = false;
-    let mirrored = false;
-    // scrolling variables
-    let animId = null;
-    let startTime = 0;
-    let elapsedBeforePause = 0;
-    let scrollTarget = 0;
-    let duration = 0; // ms total duration of scroll
 
-    /*********************************
-     * Helpers
-     *********************************/
-    const clamp = (v, min, max) => Math.min(Math.max(v, min), max);
-    const wordCount = txt => (txt.match(/\S+/g) || []).length;
-    const isRunning = () => animId !== null;
-    const currentProgress = () => scrollTarget ? contentColumn.scrollTop / scrollTarget : 0;
+    /**
+     * Validates and clamps numeric values
+     * @param {any} value - Value to validate
+     * @param {number} min - Minimum allowed value
+     * @param {number} max - Maximum allowed value
+     * @param {number} defaultValue - Default value if invalid
+     * @returns {number}
+     */
+    const validateNumber = (value, min, max, defaultValue) => {
+      const num = parseFloat(value);
+      if (isNaN(num) || num < min || num > max) {
+        return defaultValue;
+      }
+      return num;
+    };
 
-    function applyFont() { contentColumn.style.fontSize = fontSize + "px"; }
-    function applyMirror() {
-      if (mirrored) {
-        contentColumn.style.transform = "scaleX(-1)";
-      } else {
-        contentColumn.style.transform = "none";
+    /**
+     * Debounce function for performance optimization
+     * @param {Function} func - Function to debounce
+     * @param {number} wait - Wait time in milliseconds
+     * @returns {Function}
+     */
+    const debounce = (func, wait) => {
+      let timeout;
+      return function executedFunction(...args) {
+        const later = () => {
+          clearTimeout(timeout);
+          func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+      };
+    };
+
+    /**
+     * Initializes mobile scroll prevention
+     */
+    function initializeMobileScrollPrevention() {
+      // Remove existing listeners first
+      if (window.mobileScrollListeners) {
+        document.body.removeEventListener('touchmove', window.mobileScrollListeners.touchmove);
+        document.body.removeEventListener('touchstart', window.mobileScrollListeners.touchstart);
+        document.body.removeEventListener('touchend', window.mobileScrollListeners.touchend);
+      }
+
+      // Only apply on mobile devices
+      if (window.innerWidth <= 768) {
+        const listeners = {
+          touchmove: (e) => {
+            // Allow scrolling in teleprompter text and fullscreen settings
+            const isInScrollContainer = e.target.closest('#scroll-container');
+            const isInFullscreenSettings = e.target.closest('#advanced-settings.show');
+
+            if (!isInScrollContainer && !isInFullscreenSettings) {
+              e.preventDefault();
+            }
+          },
+          touchstart: (e) => {
+            if (e.touches.length > 1) {
+              e.preventDefault();
+            }
+          },
+          touchend: (e) => {
+            if (e.touches.length > 0) {
+              e.preventDefault();
+            }
+          }
+        };
+
+        document.body.addEventListener('touchmove', listeners.touchmove, { passive: false });
+        document.body.addEventListener('touchstart', listeners.touchstart, { passive: false });
+        document.body.addEventListener('touchend', listeners.touchend, { passive: false });
+
+        // Store listeners for cleanup
+        window.mobileScrollListeners = listeners;
       }
     }
-    // Highlight first two letters of each word
-    function buildHTML(text) {
-      if (!highlight) return text.replace(/\n/g, "<br>");
-      return text.split(/(\s+)/).map(part => {
-        if (/\s+/.test(part)) return part; // keep spaces
-        const first = part.slice(0, 2);
-        const rest = part.slice(2);
-        return `<span class="highlight">${first}</span>${rest}`;
-      }).join("").replace(/\n/g, "<br>");
-    }
-    function updateInfo(p = 0) {
-      speedInfo.textContent = `Speed: ${wpm} w/m`;
-      fontInfo.textContent = `Font: ${fontSize}px`;
-      progressInfo.textContent = `Progress: ${(p * 100).toFixed(1)} %`;
+
+    /**
+     * Shows sharing options menu
+     */
+    function showShareOptions(x, y) {
+      // Remove any existing menu
+      const existingMenu = document.querySelector('.share-menu');
+      if (existingMenu) {
+        existingMenu.remove();
+      }
+
+      const menu = document.createElement('div');
+      menu.className = 'share-menu';
+      menu.style.cssText = `
+        position: fixed;
+        top: ${y}px;
+        left: ${x}px;
+        background: #333;
+        border: 2px solid #555;
+        border-radius: 8px;
+        padding: 8px 0;
+        z-index: 10000;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        min-width: 200px;
+      `;
+
+      const options = [
+        {
+          text: '🔗 Обычное копирование',
+          action: async () => {
+            const result = createShareableURL();
+            if (result.success) {
+              await navigator.clipboard.writeText(result.url);
+              alert('Ссылка скопирована в буфер обмена!');
+            }
+          }
+        },
+        {
+          text: '📱 Отправить на устройство',
+          action: async () => {
+            const result = createShareableURL();
+            if (result.success && navigator.share) {
+              try {
+                await navigator.share({
+                  title: 'Teleprompter Settings',
+                  text: 'Настройки телепромптера',
+                  url: result.url
+                });
+              } catch (error) {
+                if (error.name !== 'AbortError') {
+                  alert('Web Share API недоступен');
+                }
+              }
+            } else {
+              alert('Web Share API недоступен в этом браузере');
+            }
+          }
+        }
+      ];
+
+      options.forEach(option => {
+        const item = document.createElement('div');
+        item.style.cssText = `
+          padding: 12px 16px;
+          cursor: pointer;
+          color: white;
+          font-size: 14px;
+          transition: background-color 0.2s;
+        `;
+        item.textContent = option.text;
+
+        item.addEventListener('mouseenter', () => {
+          item.style.backgroundColor = '#555';
+        });
+
+        item.addEventListener('mouseleave', () => {
+          item.style.backgroundColor = 'transparent';
+        });
+
+        item.addEventListener('click', () => {
+          option.action();
+          menu.remove();
+        });
+
+        menu.appendChild(item);
+      });
+
+      document.body.appendChild(menu);
+
+      // Close menu when clicking outside
+      const closeMenu = (event) => {
+        if (!menu.contains(event.target)) {
+          menu.remove();
+          document.removeEventListener('click', closeMenu);
+        }
+      };
+
+      setTimeout(() => {
+        document.addEventListener('click', closeMenu);
+      }, 100);
     }
 
     /*********************************
-     * Prepare content & layout
+     * DOM Element References
+     *********************************/
+    const elements = {
+      inputText: $('input-text'),
+      speedRange: $('speed-range'),
+      speedNumber: $('speed-number'),
+      fontRange: $('font-range'),
+      fontNumber: $('font-number'),
+      widthRange: $('width-range'),
+      widthNumber: $('width-number'),
+      highlightButton: $('highlight-button'),
+      mirrorButton: $('mirror-button'),
+      contentColumn: $('content-column'),
+      scrollContainer: $('scroll-container'),
+      playButton: $('play-button'),
+      fullscreenButton: $('fullscreen-button'),
+      settingsToggle: $('settings-toggle'),
+      advancedSettings: $('advanced-settings')
+    };
+
+    /*********************************
+     * Application State
+     *********************************/
+    let state = {
+      speed: 1,
+      fontSize: 32,
+      textWidth: 100, // Text area width percentage (desktop only)
+      highlight: false,
+      mirrored: false,
+      isPlaying: false,
+      isFullscreen: false,
+      animationId: null,
+      startTime: 0,
+      pausedTime: 0,
+      scrollTarget: 0
+    };
+
+    /*********************************
+     * Settings Management
+     *********************************/
+
+    /**
+     * Saves current settings to localStorage
+     */
+    function saveSettings() {
+      try {
+        const settings = {
+          speed: state.speed,
+          fontSize: state.fontSize,
+          textWidth: state.textWidth,
+          highlight: state.highlight,
+          mirrored: state.mirrored,
+          text: elements.inputText ? elements.inputText.value : ''
+        };
+
+        localStorage.setItem('teleprompter-settings', JSON.stringify(settings));
+      } catch (error) {
+        console.error('Error saving settings:', error);
+      }
+    }
+
+    /**
+     * Loads settings from localStorage
+     */
+    function loadSettings() {
+      try {
+        const savedSettings = localStorage.getItem('teleprompter-settings');
+        if (!savedSettings) return;
+
+        const settings = JSON.parse(savedSettings);
+
+        // Apply loaded settings to state
+        if (typeof settings.speed === 'number') {
+          state.speed = validateNumber(settings.speed, 0, 10, 1);
+        }
+        if (typeof settings.fontSize === 'number') {
+          state.fontSize = validateNumber(settings.fontSize, 16, 80, 32);
+        }
+        if (typeof settings.textWidth === 'number') {
+          state.textWidth = validateNumber(settings.textWidth, 60, 100, 100);
+        }
+        if (typeof settings.highlight === 'boolean') {
+          state.highlight = settings.highlight;
+        }
+        if (typeof settings.mirrored === 'boolean') {
+          state.mirrored = settings.mirrored;
+        }
+
+        // Update UI elements
+        if (elements.speedRange && elements.speedNumber) {
+          elements.speedRange.value = elements.speedNumber.value = state.speed;
+        }
+        if (elements.fontRange && elements.fontNumber) {
+          elements.fontRange.value = elements.fontNumber.value = state.fontSize;
+        }
+        if (elements.widthRange && elements.widthNumber) {
+          elements.widthRange.value = elements.widthNumber.value = state.textWidth;
+        }
+        if (elements.inputText && settings.text) {
+          elements.inputText.value = settings.text;
+        }
+
+        console.log('Settings loaded successfully');
+      } catch (error) {
+        console.error('Error loading settings:', error);
+      }
+    }
+
+    /**
+     * Clears all saved settings from localStorage
+     */
+    function clearSettings() {
+      try {
+        localStorage.removeItem('teleprompter-settings');
+        console.log('Settings cleared');
+      } catch (error) {
+        console.error('Error clearing settings:', error);
+      }
+    }
+
+    /*********************************
+     * URL Sharing Functions
+     *********************************/
+
+    /**
+     * Compresses text using simple LZW-like algorithm
+     */
+    function compressText(text) {
+      if (!text) return '';
+
+      try {
+        // Simple compression: replace common patterns
+        return text
+          .replace(/\s+/g, ' ') // Multiple spaces to single
+          .replace(/\n\s*/g, '\n') // Clean line breaks
+          .trim();
+      } catch (error) {
+        console.error('Error compressing text:', error);
+        return text;
+      }
+    }
+
+    /**
+     * Creates a shareable URL with current settings
+     */
+    function createShareableURL() {
+      try {
+        const settings = {
+          s: state.speed, // speed
+          f: state.fontSize, // font
+          w: state.textWidth, // width
+          h: state.highlight ? 1 : 0, // highlight
+          m: state.mirrored ? 1 : 0, // mirror
+          t: compressText(elements.inputText ? elements.inputText.value : '') // text
+        };
+
+        // Convert to base64 to make URL-safe
+        const dataString = JSON.stringify(settings);
+        const base64Data = btoa(encodeURIComponent(dataString));
+
+        const baseURL = window.location.origin + window.location.pathname;
+        const shareURL = `${baseURL}#shared=${base64Data}`;
+
+        // Check URL length limit (2000 chars is safe for most browsers)
+        if (shareURL.length > 2000) {
+          return {
+            success: false,
+            url: null,
+            reason: 'too_long',
+            length: shareURL.length,
+            data: base64Data
+          };
+        }
+
+        return {
+          success: true,
+          url: shareURL,
+          length: shareURL.length,
+          data: base64Data
+        };
+
+      } catch (error) {
+        console.error('Error creating shareable URL:', error);
+        return { success: false, error: error.message };
+      }
+    }
+
+    /**
+     * Loads settings from URL hash
+     */
+    function loadFromURL() {
+      try {
+        const hash = window.location.hash;
+        if (!hash.startsWith('#shared=')) return false;
+
+        const base64Data = hash.replace('#shared=', '');
+        const dataString = decodeURIComponent(atob(base64Data));
+        const settings = JSON.parse(dataString);
+
+        // Apply settings
+        if (typeof settings.s === 'number') {
+          state.speed = validateNumber(settings.s, 0, 10, 1);
+        }
+        if (typeof settings.f === 'number') {
+          state.fontSize = validateNumber(settings.f, 16, 80, 32);
+        }
+        if (typeof settings.w === 'number') {
+          state.textWidth = validateNumber(settings.w, 60, 100, 100);
+        }
+        if (typeof settings.h === 'number') {
+          state.highlight = settings.h === 1;
+        }
+        if (typeof settings.m === 'number') {
+          state.mirrored = settings.m === 1;
+        }
+        if (settings.t && elements.inputText) {
+          elements.inputText.value = settings.t;
+        }
+
+        // Update UI
+        if (elements.speedRange && elements.speedNumber) {
+          elements.speedRange.value = elements.speedNumber.value = state.speed;
+        }
+        if (elements.fontRange && elements.fontNumber) {
+          elements.fontRange.value = elements.fontNumber.value = state.fontSize;
+        }
+        if (elements.widthRange && elements.widthNumber) {
+          elements.widthRange.value = elements.widthNumber.value = state.textWidth;
+        }
+
+        // Clear the hash to keep URL clean
+        history.replaceState(null, null, window.location.pathname);
+
+        console.log('Settings loaded from URL successfully');
+        return true;
+
+      } catch (error) {
+        console.error('Error loading from URL:', error);
+        return false;
+      }
+    }
+
+    /**
+     * Shares URL using Web Share API or copies to clipboard as fallback
+     */
+    async function shareViaURL() {
+      try {
+        const result = createShareableURL();
+
+        if (!result.success) {
+          if (result.reason === 'too_long') {
+            alert(`URL слишком длинный (${result.length} символов). Попробуйте сократить текст или используйте экспорт в файл.`);
+            return false;
+          } else {
+            alert('Ошибка создания ссылки: ' + (result.error || 'Unknown error'));
+            return false;
+          }
+        }
+
+        // Check if Web Share API is supported (Chrome's "Send to your devices" feature)
+        if (navigator.share) {
+          try {
+            await navigator.share({
+              title: 'Teleprompter Settings',
+              text: 'Настройки телепромптера',
+              url: result.url
+            });
+            console.log('Successfully shared via Web Share API');
+            return true;
+          } catch (shareError) {
+            // User cancelled or sharing failed, fall back to clipboard
+            if (shareError.name !== 'AbortError') {
+              console.warn('Web Share API failed, falling back to clipboard:', shareError);
+            }
+          }
+        }
+
+        // Fallback: Copy to clipboard
+        if (navigator.clipboard) {
+          await navigator.clipboard.writeText(result.url);
+          alert(`Ссылка скопирована в буфер обмена!\nДлина: ${result.length} символов\n\nВы можете использовать функцию "Отправить на устройство" в меню Chrome.`);
+        } else {
+          // Fallback for older browsers
+          const textArea = document.createElement('textarea');
+          textArea.value = result.url;
+          document.body.appendChild(textArea);
+          textArea.select();
+          document.execCommand('copy');
+          document.body.removeChild(textArea);
+          alert(`Ссылка скопирована в буфер обмена!\nДлина: ${result.length} символов\n\nВы можете использовать функцию "Отправить на устройство" в меню Chrome.`);
+        }
+
+        return true;
+
+      } catch (error) {
+        console.error('Error sharing URL:', error);
+        alert('Ошибка при копировании ссылки: ' + error.message);
+        return false;
+      }
+    }
+
+    /*********************************
+     * Core Helper Functions
+     *********************************/
+
+    /**
+     * Clamps a value between min and max
+     * @param {number} value - Value to clamp
+     * @param {number} min - Minimum value
+     * @param {number} max - Maximum value
+     * @returns {number} - Clamped value
+     */
+    const clamp = (value, min, max) => {
+      try {
+        return Math.min(Math.max(parseFloat(value) || 0, min), max);
+      } catch (error) {
+        console.error('Error in clamp function:', error);
+        return min;
+      }
+    };
+
+    /**
+     * Gets word count from text safely
+     * @param {string} text - Text to count words in
+     * @returns {number} - Word count
+     */
+    const wordCount = (text) => {
+      try {
+        return (text && text.match(/\S+/g) || []).length;
+      } catch (error) {
+        console.error('Error counting words:', error);
+        return 0;
+      }
+    };
+
+    /**
+     * Checks if scrolling animation is running
+     * @returns {boolean}
+     */
+    const isRunning = () => state.animationId !== null;
+
+    /**
+     * Gets current scroll progress
+     * @returns {number} - Progress between 0 and 1
+     */
+    const currentProgress = () => {
+      try {
+        if (!elements.scrollContainer || !state.scrollTarget) return 0;
+        return elements.scrollContainer.scrollTop / state.scrollTarget;
+      } catch (error) {
+        console.error('Error getting scroll progress:', error);
+        return 0;
+      }
+    };
+
+    /**
+     * Applies font size to content
+     */
+    function applyFont() {
+      try {
+        if (elements.scrollContainer) {
+          elements.scrollContainer.style.fontSize = state.fontSize + "px";
+        }
+      } catch (error) {
+        console.error('Error applying font:', error);
+      }
+    }
+
+    /**
+     * Applies mirror transform to content
+     */
+    function applyMirror() {
+      try {
+        if (elements.scrollContainer) {
+          elements.scrollContainer.style.transform = state.mirrored ? "scaleX(-1)" : "none";
+        }
+      } catch (error) {
+        console.error('Error applying mirror:', error);
+      }
+    }
+
+    /**
+     * Applies text width (desktop only)
+     */
+    function applyTextWidth() {
+      try {
+        if (elements.scrollContainer) {
+          // Only apply width restriction on desktop (screen width > 1024px)
+          const isDesktop = window.innerWidth > 1024;
+          if (isDesktop) {
+            elements.scrollContainer.style.maxWidth = state.textWidth + "%";
+          } else {
+            // Reset to full width on mobile/tablet
+            elements.scrollContainer.style.maxWidth = "100%";
+          }
+        }
+      } catch (error) {
+        console.error('Error applying text width:', error);
+      }
+    }
+    /**
+     * Safely builds HTML content with highlighting support
+     * @param {string} text - Input text to process
+     * @returns {DocumentFragment} - Safe DOM fragment
+     */
+    function buildHTML(text) {
+      const fragment = document.createDocumentFragment();
+
+      if (!state.highlight) {
+        // Simple text with line breaks
+        const lines = text.split(/\n/);
+        lines.forEach((line, index) => {
+          if (index > 0) {
+            fragment.appendChild(document.createElement('br'));
+          }
+          if (line.trim()) {
+            fragment.appendChild(document.createTextNode(line));
+          }
+        });
+        return fragment;
+      }
+
+      // Highlight mode - process word by word
+      const lines = text.split(/\n/);
+      lines.forEach((line, lineIndex) => {
+        if (lineIndex > 0) {
+          fragment.appendChild(document.createElement('br'));
+        }
+
+        const words = line.split(/(\s+)/);
+        words.forEach(part => {
+          if (/\s+/.test(part)) {
+            // Keep spaces as text nodes
+            fragment.appendChild(document.createTextNode(part));
+          } else if (part.length > 0) {
+            // Create highlighted word
+            const first = part.slice(0, 2);
+            const rest = part.slice(2);
+
+            if (first) {
+              const highlightSpan = document.createElement('span');
+              highlightSpan.className = 'highlight';
+              highlightSpan.textContent = first;
+              fragment.appendChild(highlightSpan);
+            }
+
+            if (rest) {
+              fragment.appendChild(document.createTextNode(rest));
+            }
+          }
+        });
+      });
+
+      return fragment;
+    }
+    /*********************************
+     * Content Management Functions
      *********************************/
     function prepareScroll(p = 0) {
-      applyFont();
-      applyMirror();
-      scrollContainer.innerHTML = buildHTML(inputText.value.replace(/\r/g, ""));
+      try {
+        applyFont();
+        applyMirror();
+        applyTextWidth();
 
-      const total = scrollContainer.scrollHeight;
-      const view = contentColumn.clientHeight;
-      scrollTarget = Math.max(total - view / 2, 0);
-      contentColumn.scrollTop = p * scrollTarget;
-    }
-
-    /*********************************
-     * Scrolling animation loop
-     *********************************/
-    function step(ts) {
-      if (!startTime) startTime = ts;
-      const elapsed = ts - startTime + elapsedBeforePause;
-      const p = Math.min(elapsed / duration, 1);
-      contentColumn.scrollTop = p * scrollTarget;
-      updateInfo(p);
-      if (p < 1) {
-        animId = requestAnimationFrame(step);
-      } else {
-        cancelAnimationFrame(animId);
-        animId = null;
-      }
-    }
-    function startScrolling(p = 0) {
-      const words = wordCount(inputText.value);
-      duration = (words / wpm) * 60000; // ms
-      elapsedBeforePause = p * duration;
-      startTime = 0;
-      animId = requestAnimationFrame(step);
-    }
-    function pauseScrolling() {
-      if (animId) {
-        cancelAnimationFrame(animId);
-        animId = null;
-        if (startTime) {
-          elapsedBeforePause += performance.now() - startTime;
+        if (!elements.scrollContainer || !elements.inputText || !elements.contentColumn) {
+          console.error('Missing required DOM elements for scroll preparation');
+          return;
         }
-      }
-    }
-    function resumeScrolling() {
-      if (!animId) {
-        startTime = 0;
-        animId = requestAnimationFrame(step);
-      }
-    }
 
-    /*********************************
-     * Shared update without resetting scroll state
-     *********************************/
-    function refreshMaintainingProgress() {
-      const p = currentProgress();
-      const running = isRunning();
-      pauseScrolling();
-      prepareScroll(p);
-      updateInfo(p);
-      if (running) {
-        startScrolling(p);
+        // Clear previous content safely
+        elements.scrollContainer.innerHTML = '';
+
+        // Append safe content
+        const textContent = elements.inputText.value.replace(/\r/g, "");
+        const safeContent = buildHTML(textContent);
+        elements.scrollContainer.appendChild(safeContent);
+
+        const total = elements.scrollContainer.scrollHeight;
+        const view = elements.scrollContainer.clientHeight;
+        // Скролим до полностью пустого экрана (весь контент + высота экрана)
+        state.scrollTarget = Math.max(total, 0);
+        elements.scrollContainer.scrollTop = p * state.scrollTarget;
+      } catch (error) {
+        console.error('Error preparing scroll:', error);
       }
     }
 
     /*********************************
-     * Input synchronisation (WPM & font size)
+     * Scrolling Animation Functions
      *********************************/
-    [wpmRange, wpmNumber].forEach(el => el.addEventListener("input", e => {
-      wpm = clamp(parseInt(e.target.value, 10) || 120, 60, 300);
-      wpmRange.value = wpmNumber.value = wpm;
-      refreshMaintainingProgress();
-    }));
-    [fontSizeRange, fontSizeNumber].forEach(el => el.addEventListener("input", e => {
-      fontSize = clamp(parseInt(e.target.value, 10) || 32, 16, 96);
-      fontSizeRange.value = fontSizeNumber.value = fontSize;
-      refreshMaintainingProgress();
-    }));
 
-    highlightCheckbox.addEventListener("change", e => {
-      highlight = e.target.checked;
-    });
+    /**
+     * Animation step function with error handling
+     * @param {number} timestamp - Current timestamp
+     */
+    function animationStep(timestamp) {
+      try {
+        if (!state.startTime) state.startTime = timestamp;
 
-    /*********************************
-     * Screen navigation
-     *********************************/
-    function showScreen(id) {
-      screen1.style.display = id === 1 ? "flex" : "none";
-      screen2.style.display = id === 2 ? "flex" : "none";
+        const elapsed = timestamp - state.startTime + state.pausedTime;
+        const duration = calculateDuration();
+
+        if (duration <= 0) {
+          stop();
+          return;
+        }
+
+        const progress = Math.min(elapsed / duration, 1);
+
+        if (elements.scrollContainer && state.scrollTarget > 0) {
+          elements.scrollContainer.scrollTop = progress * state.scrollTarget;
+        }
+
+        if (progress < 1 && state.isPlaying) {
+          state.animationId = requestAnimationFrame(animationStep);
+        } else {
+          stop();
+        }
+      } catch (error) {
+        console.error('Error in animation step:', error);
+        stop();
+      }
     }
 
-    btns.start.addEventListener("click", () => {
-      if (!inputText.value.trim()) return alert("Please enter the text!");
-      // init state
-      wpm = parseInt(wpmRange.value, 10);
-      fontSize = parseInt(fontSizeRange.value, 10);
-      highlight = highlightCheckbox.checked;
-      mirrored = false;
-      showScreen(2);
-      prepareScroll(0);
-      updateInfo(0);
-      startScrolling(0);
-    });
+    /**
+     * Calculates scroll duration based on word count and speed
+     * @returns {number} Duration in milliseconds
+     */
+    function calculateDuration() {
+      try {
+        if (!elements.inputText) return 0;
 
-    btns.home.addEventListener("click", () => {
-      pauseScrolling();
-      showScreen(1);
-    });
+        const words = wordCount(elements.inputText.value);
+        const speedWPM = Math.max(state.speed * 60, 1); // Convert to words per minute, minimum 1
 
+        return (words / speedWPM) * 60000; // Convert to milliseconds
+      } catch (error) {
+        console.error('Error calculating duration:', error);
+        return 0;
+      }
+    }
+
+    /**
+     * Starts scrolling animation
+     * @param {number} startProgress - Starting progress (0-1)
+     */
+    function play(startProgress = 0) {
+      try {
+        if (state.isPlaying) return;
+
+        // Check if there's text content
+        if (!elements.inputText || !elements.inputText.value.trim()) {
+          console.warn('Cannot start scrolling: no text content');
+          alert('Пожалуйста, введите текст для скрола!');
+          return;
+        }
+
+        prepareScroll(startProgress);
+
+        const duration = calculateDuration();
+
+        if (duration <= 0) {
+          console.warn('Cannot start scrolling: no content or invalid speed');
+          return;
+        }
+
+        state.isPlaying = true;
+        state.pausedTime = startProgress * duration;
+        state.startTime = 0;
+
+        updatePlayButton();
+        state.animationId = requestAnimationFrame(animationStep);
+      } catch (error) {
+        console.error('Error starting playback:', error);
+        stop();
+      }
+    }
+
+    /**
+     * Pauses scrolling animation
+     */
+    function pause() {
+      try {
+        if (!state.isPlaying) return;
+
+        state.isPlaying = false;
+
+        if (state.animationId) {
+          cancelAnimationFrame(state.animationId);
+          state.animationId = null;
+        }
+
+        if (state.startTime) {
+          state.pausedTime += performance.now() - state.startTime;
+        }
+
+        updatePlayButton();
+      } catch (error) {
+        console.error('Error pausing playback:', error);
+      }
+    }
+
+    /**
+     * Stops scrolling and resets to start
+     */
+    function stop() {
+      try {
+        state.isPlaying = false;
+
+        if (state.animationId) {
+          cancelAnimationFrame(state.animationId);
+          state.animationId = null;
+        }
+
+        state.startTime = 0;
+        state.pausedTime = 0;
+
+        if (elements.scrollContainer) {
+          elements.scrollContainer.scrollTop = 0;
+        }
+
+        updatePlayButton();
+      } catch (error) {
+        console.error('Error stopping playback:', error);
+      }
+    }
+
+    /**
+     * Toggles play/pause state
+     */
+    function togglePlayPause() {
+      if (state.isPlaying) {
+        pause();
+      } else {
+        play(currentProgress());
+      }
+    }
     /*********************************
-     * Playback controls
+     * UI Update Functions
      *********************************/
-    btns.pause.addEventListener("click", () => pauseScrolling());
-    btns.resume.addEventListener("click", () => resumeScrolling());
-    btns.faster.addEventListener("click", () => {
-      wpm = clamp(wpm + 20, 60, 300);
-      wpmRange.value = wpmNumber.value = wpm;
-      refreshMaintainingProgress();
-    });
-    btns.slower.addEventListener("click", () => {
-      wpm = clamp(wpm - 20, 60, 300);
-      wpmRange.value = wpmNumber.value = wpm;
-      refreshMaintainingProgress();
-    });
-    btns.plus.addEventListener("click", () => {
-      fontSize = clamp(fontSize + 4, 16, 96);
-      fontSizeRange.value = fontSizeNumber.value = fontSize;
-      refreshMaintainingProgress();
-    });
-    btns.minus.addEventListener("click", () => {
-      fontSize = clamp(fontSize - 4, 16, 96);
-      fontSizeRange.value = fontSizeNumber.value = fontSize;
-      refreshMaintainingProgress();
-    });
-    btns.highlight.addEventListener("click", () => {
-      highlight = !highlight;
-      highlightCheckbox.checked = highlight;
-      refreshMaintainingProgress();
-    });
-    btns.mirror.addEventListener("click", () => {
-      mirrored = !mirrored;
-      refreshMaintainingProgress();
-    });
-    btns.restart.addEventListener("click", () => {
-      pauseScrolling();
-      prepareScroll(0);
-      updateInfo(0);
-      startScrolling(0);
-    });
-    btns.fwd.addEventListener("click", () => jump(0.10));
-    btns.back.addEventListener("click", () => jump(-0.10));
+
+    /**
+     * Updates play/pause button text and state
+     */
+    function updatePlayButton() {
+      try {
+        if (elements.playButton) {
+          elements.playButton.textContent = state.isPlaying ? 'Pause' : 'Play';
+          elements.playButton.setAttribute('aria-pressed', state.isPlaying.toString());
+        }
+      } catch (error) {
+        console.error('Error updating play button:', error);
+      }
+    }
+
+    /**
+     * Updates toggle button text and state
+     */
+    function updateToggleButton(button, isActive, label) {
+      try {
+        if (button) {
+          button.textContent = `${label}: ${isActive ? 'ON' : 'OFF'}`;
+          button.setAttribute('aria-pressed', isActive.toString());
+          button.classList.toggle('active', isActive);
+        }
+      } catch (error) {
+        console.error('Error updating toggle button:', error);
+      }
+    }
+
+    /**
+     * Jumps to a relative position in the content
+     * @param {number} delta - Relative jump amount (-1 to 1)
+     */
     function jump(delta) {
-      const p0 = currentProgress();
-      const p = clamp(p0 + delta, 0, 1);
-      const running = isRunning();
-      pauseScrolling();
-      prepareScroll(p);
-      updateInfo(p);
-      if (running) startScrolling(p);
+      try {
+        const currentPos = currentProgress();
+        const newPos = clamp(currentPos + delta, 0, 1);
+        const wasPlaying = state.isPlaying;
+
+        if (wasPlaying) {
+          pause();
+        }
+
+        prepareScroll(newPos);
+
+        if (wasPlaying) {
+          play(newPos);
+        }
+      } catch (error) {
+        console.error('Error jumping:', error);
+      }
     }
 
-    document.addEventListener('keydown', evt => {
-      const tag = evt.target.tagName;
-      if (tag === 'TEXTAREA' || tag === 'INPUT') return;
+    /**
+     * Updates content while maintaining current progress
+     */
+    const refreshMaintainingProgress = debounce(() => {
+      try {
+        const currentPos = currentProgress();
+        const wasPlaying = state.isPlaying;
 
-      if (evt.code === 'Space') {
-        evt.preventDefault();
-        if (isRunning()) pauseScrolling();
-        else resumeScrolling();
+        if (wasPlaying) {
+          pause();
+        }
+
+        prepareScroll(currentPos);
+
+        if (wasPlaying) {
+          play(currentPos);
+        }
+      } catch (error) {
+        console.error('Error refreshing content:', error);
       }
-    });
+    }, 100);
+
+    /*********************************
+     * Input Synchronization Functions
+     *********************************/
+
+    /**
+     * Synchronizes range and number inputs
+     * @param {HTMLElement} rangeEl - Range input element
+     * @param {HTMLElement} numberEl - Number input element
+     * @param {Function} updateFn - Function to call when value changes
+     */
+    function syncInputs(rangeEl, numberEl, updateFn) {
+      if (!rangeEl || !numberEl) return;
+
+      const handler = (e) => {
+        try {
+          updateFn(e.target.value);
+          rangeEl.value = numberEl.value;
+        } catch (error) {
+          console.error('Error in input handler:', error);
+        }
+      };
+
+      rangeEl.addEventListener('input', handler);
+      numberEl.addEventListener('input', handler);
+    }
+
+    /**
+     * Updates speed setting
+     * @param {string|number} value - New speed value
+     */
+    function updateSpeed(value) {
+      state.speed = validateNumber(value, 0, 10, 1);
+      elements.speedRange.value = elements.speedNumber.value = state.speed;
+      refreshMaintainingProgress();
+      saveSettings();
+    }
+
+    /**
+     * Updates font size setting
+     * @param {string|number} value - New font size value
+     */
+    function updateFontSize(value) {
+      state.fontSize = validateNumber(value, 16, 80, 32);
+      elements.fontRange.value = elements.fontNumber.value = state.fontSize;
+      refreshMaintainingProgress();
+      saveSettings();
+    }
+
+    /**
+     * Updates text width setting (desktop only)
+     * @param {string|number} value - New width percentage value
+     */
+    function updateTextWidth(value) {
+      state.textWidth = validateNumber(value, 60, 100, 100);
+      elements.widthRange.value = elements.widthNumber.value = state.textWidth;
+      refreshMaintainingProgress();
+      saveSettings();
+    }
+
+    /**
+     * Toggles fullscreen mode
+     */
+    function toggleFullscreen() {
+      try {
+        if (!document.fullscreenElement) {
+          document.documentElement.requestFullscreen().catch(error => {
+            console.error('Error entering fullscreen:', error);
+          });
+        } else {
+          document.exitFullscreen().catch(error => {
+            console.error('Error exiting fullscreen:', error);
+          });
+        }
+      } catch (error) {
+        console.error('Error toggling fullscreen:', error);
+      }
+    }
+
+    /**
+     * Определяет текущую ориентацию экрана
+     */
+    function getOrientation() {
+      return window.innerHeight > window.innerWidth ? 'portrait' : 'landscape';
+    }
+
+    /**
+     * Управляет видимостью кнопок в зависимости от ориентации
+     */
+    function updateButtonVisibility() {
+      const orientation = getOrientation();
+      const isPortrait = orientation === 'portrait';
+
+      console.log('Current orientation:', orientation, 'window:', window.innerWidth + 'x' + window.innerHeight);
+
+      // Портретная ориентация: показываем только основные кнопки
+      const portraitButtons = ['play-button', 'settings-toggle'];
+
+      // Альбомная ориентация: показываем все кнопки
+      const landscapeButtons = ['play-button', 'settings-toggle'];
+
+      // Дополнительные кнопки только для альбомной ориентации
+      const landscapeOnlyButtons = [
+        'fullscreen-button'
+      ];
+
+      // Кнопки, которые есть через onclick (нужно найти по тексту)
+      const allButtons = document.querySelectorAll('#control-row button, #control-row .input-group button');
+
+      allButtons.forEach(button => {
+        const buttonId = button.id;
+        const buttonText = button.textContent.trim();
+
+        // Основные кнопки видны всегда
+        if (portraitButtons.includes(buttonId) ||
+          buttonText === 'Stop' ||
+          buttonText === 'Play' ||
+          buttonText === 'Pause') {
+          button.style.display = 'inline-block';
+        }
+        // Дополнительные кнопки только в альбомной ориентации
+        else if (buttonText === '+10%' ||
+          buttonText === '-10%' ||
+          buttonText === 'Fullscreen' ||
+          buttonText === 'Highlight' ||
+          buttonText === 'Mirror' ||
+          landscapeOnlyButtons.includes(buttonId)) {
+          button.style.display = isPortrait ? 'none' : 'inline-block';
+        }
+      });
+
+      // Также скрываем/показываем элементы с классами desktop-only
+      const desktopElements = document.querySelectorAll('.desktop-only');
+      desktopElements.forEach(el => {
+        el.style.display = isPortrait ? 'none' : 'inline-block';
+      });
+    }
+
+    /**
+     * Toggles advanced settings visibility (mobile and desktop)
+     */
+    function toggleAdvancedSettings() {
+      try {
+        if (!elements.advancedSettings || !elements.settingsToggle) {
+          console.error('Missing elements:', {
+            advancedSettings: !!elements.advancedSettings,
+            settingsToggle: !!elements.settingsToggle
+          });
+          return;
+        }
+
+        const isVisible = elements.advancedSettings.classList.contains('show');
+        console.log('Toggling fullscreen settings - isVisible:', isVisible);
+
+        if (isVisible) {
+          closeAdvancedSettings();
+        } else {
+          openAdvancedSettings();
+        }
+      } catch (error) {
+        console.error('Error toggling settings:', error);
+      }
+    }
+
+    /**
+     * Opens fullscreen settings on mobile
+     */
+    function openAdvancedSettings() {
+      const container = document.querySelector('.container');
+
+      elements.advancedSettings.classList.add('show');
+      elements.settingsToggle.classList.add('active');
+      elements.settingsToggle.textContent = 'Settings';
+      elements.settingsToggle.setAttribute('aria-expanded', 'true');
+
+      if (container) container.classList.add('settings-expanded');
+
+      // Block body scroll when settings are open
+      document.body.style.overflow = 'hidden';
+    }
+
+    /**
+     * Closes fullscreen settings on mobile  
+     */
+    function closeAdvancedSettings() {
+      const container = document.querySelector('.container');
+
+      elements.advancedSettings.classList.remove('show');
+      elements.settingsToggle.classList.remove('active');
+      elements.settingsToggle.textContent = 'Settings';
+      elements.settingsToggle.setAttribute('aria-expanded', 'false');
+
+      if (container) container.classList.remove('settings-expanded');
+
+      // Restore body scroll
+      document.body.style.overflow = '';
+    }
+
+    /*********************************
+     * Event Listeners Setup
+     *********************************/
+    function setupEventListeners() {
+      try {
+        // Play/Pause button
+        if (elements.playButton) {
+          elements.playButton.addEventListener('click', togglePlayPause);
+        }
+
+        // Fullscreen button
+        if (elements.fullscreenButton) {
+          elements.fullscreenButton.addEventListener('click', toggleFullscreen);
+        }
+
+        // Settings toggle button (mobile)
+        if (elements.settingsToggle) {
+          elements.settingsToggle.addEventListener('click', toggleAdvancedSettings);
+        }
+
+        // Close settings button (mobile fullscreen)
+        const closeSettingsBtn = $('close-settings');
+        if (closeSettingsBtn) {
+          closeSettingsBtn.addEventListener('click', closeAdvancedSettings);
+        }
+
+        // Input synchronization
+        syncInputs(elements.speedRange, elements.speedNumber, updateSpeed);
+        syncInputs(elements.fontRange, elements.fontNumber, updateFontSize);
+        syncInputs(elements.widthRange, elements.widthNumber, updateTextWidth);
+
+        // Toggle buttons
+        if (elements.highlightButton) {
+          elements.highlightButton.addEventListener('click', () => {
+            state.highlight = !state.highlight;
+            updateToggleButton(elements.highlightButton, state.highlight, 'Highlight');
+            refreshMaintainingProgress();
+            saveSettings();
+          });
+        }
+
+        if (elements.mirrorButton) {
+          elements.mirrorButton.addEventListener('click', () => {
+            state.mirrored = !state.mirrored;
+            updateToggleButton(elements.mirrorButton, state.mirrored, 'Mirror');
+            refreshMaintainingProgress();
+            saveSettings();
+          });
+        }
+
+        // Share button with context menu support
+        const shareButton = $('share-button');
+        if (shareButton) {
+          shareButton.addEventListener('click', shareViaURL);
+
+          // Add context menu for advanced sharing options
+          shareButton.addEventListener('contextmenu', (event) => {
+            event.preventDefault();
+            showShareOptions(event.pageX, event.pageY);
+          });
+        }
+
+        // Text input changes
+        if (elements.inputText) {
+          elements.inputText.addEventListener('input', () => {
+            refreshMaintainingProgress();
+            saveSettings();
+          });
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (event) => {
+          // Don't interfere with input fields
+          if (event.target.matches('input, textarea')) return;
+
+          switch (event.code) {
+            case 'Space':
+              event.preventDefault();
+              togglePlayPause();
+              break;
+            case 'Escape':
+              event.preventDefault();
+              // If settings are open on mobile, close them
+              if (elements.advancedSettings && elements.advancedSettings.classList.contains('show') && window.innerWidth <= 768) {
+                closeAdvancedSettings();
+              } else {
+                stop();
+              }
+              break;
+            case 'ArrowLeft':
+              event.preventDefault();
+              jump(-0.1);
+              break;
+            case 'ArrowRight':
+              event.preventDefault();
+              jump(0.1);
+              break;
+            case 'KeyH':
+              event.preventDefault();
+              // Toggle highlight
+              state.highlight = !state.highlight;
+              if (elements.highlightButton) {
+                updateToggleButton(elements.highlightButton, state.highlight, 'Highlight');
+              }
+              refreshMaintainingProgress();
+              saveSettings();
+              break;
+            case 'KeyM':
+              event.preventDefault();
+              // Toggle mirror
+              state.mirrored = !state.mirrored;
+              if (elements.mirrorButton) {
+                updateToggleButton(elements.mirrorButton, state.mirrored, 'Mirror');
+              }
+              refreshMaintainingProgress();
+              saveSettings();
+              break;
+          }
+        });
+
+        // Fullscreen change events
+        document.addEventListener('fullscreenchange', () => {
+          state.isFullscreen = !!document.fullscreenElement;
+          if (elements.fullscreenButton) {
+            elements.fullscreenButton.textContent = state.isFullscreen ? 'Exit Fullscreen' : 'Fullscreen';
+          }
+        });
+
+        // Window resize events - reapply width settings and update button visibility
+        window.addEventListener('resize', debounce(() => {
+          applyTextWidth();
+          // Re-initialize mobile scroll prevention if needed
+          initializeMobileScrollPrevention();
+          // Update button visibility based on new orientation
+          updateButtonVisibility();
+        }, 250));
+
+        // Orientation change events
+        window.addEventListener('orientationchange', () => {
+          setTimeout(() => {
+            updateButtonVisibility();
+          }, 100); // Небольшая задержка для корректного определения размеров
+        });
+
+        // Initialize mobile scroll prevention
+        initializeMobileScrollPrevention();
+
+      } catch (error) {
+        console.error('Error setting up event listeners:', error);
+      }
+    }
+
+    /*********************************
+     * Initialization
+     *********************************/
+    function init() {
+      try {
+        // Debug: Log all elements
+        console.log('Elements found:', elements);
+
+        // Check for required elements
+        const requiredElements = ['inputText', 'contentColumn', 'scrollContainer', 'playButton'];
+        const missing = requiredElements.filter(key => !elements[key]);
+
+        if (missing.length > 0) {
+          console.error('Missing required DOM elements:', missing);
+          console.log('Available elements:', Object.keys(elements).filter(key => elements[key]));
+          return;
+        }
+
+        // Check for shared settings in URL first, then load saved settings
+        if (!loadFromURL()) {
+          loadSettings();
+        }
+
+        // Setup event listeners
+        setupEventListeners();
+
+        // Initialize UI state
+        updatePlayButton();
+
+        // Initialize settings toggle state
+        if (elements.settingsToggle) {
+          elements.settingsToggle.setAttribute('aria-expanded', 'false');
+        }
+
+        // Initialize button visibility based on orientation
+        updateButtonVisibility();
+
+        // Initialize toggle buttons
+        if (elements.highlightButton) {
+          updateToggleButton(elements.highlightButton, state.highlight, 'Highlight');
+        }
+        if (elements.mirrorButton) {
+          updateToggleButton(elements.mirrorButton, state.mirrored, 'Mirror');
+        }
+
+        prepareScroll(0);
+
+        // Add default text only if no saved text exists
+        if (!elements.inputText.value.trim()) {
+          elements.inputText.value = "Добро пожаловать в телепромптер! Это тестовый текст для демонстрации работы скрола. Вы можете заменить этот текст на свой собственный.";
+          saveSettings(); // Save the default text
+        } console.log('Teleprompter initialized successfully');
+        console.log('Current state:', state);
+      } catch (error) {
+        console.error('Error during initialization:', error);
+      }
+    }
+
+    // Global functions for inline event handlers
+    window.stop = stop;
+    window.jump = jump;
+    window.clearSettings = clearSettings; // For debugging purposes
+
+    // Initialize when DOM is ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
   </script>
 </body>
 
