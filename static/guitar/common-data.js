@@ -93,6 +93,18 @@
       strings: [{ name: 'E', oct: 3 }, { name: 'A', oct: 3 }, { name: 'D', oct: 4 }, { name: 'G', oct: 4 }, { name: 'B', oct: 4 }, { name: 'E', oct: 5 }],
       pcs: [4, 9, 2, 7, 11, 4],
       midi: [52, 57, 62, 67, 71, 76]
+    },
+    'FACGCE Math Rock': {
+      name: 'FACGCE',
+      strings: [{ name: 'F', oct: 2 }, { name: 'A', oct: 2 }, { name: 'C', oct: 3 }, { name: 'G', oct: 3 }, { name: 'C', oct: 4 }, { name: 'E', oct: 4 }],
+      pcs: [5, 9, 0, 7, 0, 4],
+      midi: [41, 45, 48, 55, 60, 64]
+    },
+    'DAEAC#E Math Rock': {
+      name: 'DAEAC#E',
+      strings: [{ name: 'D', oct: 2 }, { name: 'A', oct: 2 }, { name: 'E', oct: 3 }, { name: 'A', oct: 3 }, { name: 'C#', oct: 4 }, { name: 'E', oct: 4 }],
+      pcs: [2, 9, 4, 9, 1, 4],
+      midi: [38, 45, 52, 57, 61, 64]
     }
   };
 

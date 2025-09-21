@@ -199,14 +199,43 @@
 
         // Chord diagram renderer (adapted from chords.js). Returns an SVG element.
         function renderDiagram(voicing, rootPc, tuningPcs, labelMode) {
-            const width = 140, height = 170, strings = 6, fretsVisible = 5, margin = 16;
+            const width = 180, height = 220, strings = 6, fretsVisible = 5, margin = 35;
             const innerW = width - margin * 2, innerH = height - margin * 2;
             const dx = innerW / (strings - 1), dy = innerH / (fretsVisible - 1);
-            const played = voicing.frets.filter(f => typeof f === 'number');
-            const minF = played.length ? Math.min(...played) : 0;
-            const start = Math.max(0, Math.min(minF, 12 - fretsVisible + 1));
+
+            // find fretted notes (excluding open strings) to determine position
+            const frettedNotes = voicing.frets.filter(f => typeof f === 'number' && f > 0);
+
+            let start;
+            if (frettedNotes.length === 0) {
+                // no fretted notes, show from nut
+                start = 0;
+            } else {
+                const minFretted = Math.min(...frettedNotes);
+                const maxFretted = Math.max(...frettedNotes);
+
+                // always try to show all fretted notes
+                if (maxFretted - minFretted < fretsVisible) {
+                    // all notes fit in one view
+                    if (minFretted <= 3 && maxFretted <= fretsVisible - 1) {
+                        start = 0; // show nut only if all notes are in first 4 frets
+                    } else {
+                        start = Math.max(1, minFretted - 1); // start one fret before first note
+                    }
+                } else {
+                    // notes span more than visible frets, center on the range
+                    start = Math.max(1, minFretted - 1);
+                }
+            }
             const end = Math.min(start + fretsVisible - 1, 12);
-            const stringX = s => margin + s * dx, fretY = f => margin + (f - start) * dy;
+
+
+            const stringX = s => margin + s * dx, fretY = f => {
+                const baseY = margin + (f - start) * dy;
+                // don't offset open strings (fret 0), keep them on the nut
+                // for fretted notes, move back by half to center them in the fret space
+                return f === 0 ? baseY : baseY - dy / 2;
+            };
             const svgNS = 'http://www.w3.org/2000/svg';
             const svg = document.createElementNS(svgNS, 'svg');
             svg.setAttribute('width', width);
@@ -235,17 +264,88 @@
                 line.setAttribute('y1', margin); line.setAttribute('y2', height - margin);
                 line.setAttribute('stroke', 'var(--string)'); svg.appendChild(line);
             }
-            // top markers (X / O)
-            voicing.frets.forEach((f, i) => {
+
+            // fret numbers on the left
+            for (let k = 1; k < fretsVisible; k++) {
+                const fretNum = start + k;
+                if (fretNum > 12) break; // don't show numbers beyond 12th fret
+
                 const text = document.createElementNS(svgNS, 'text');
-                text.setAttribute('x', stringX(i)); text.setAttribute('y', margin - 6);
+                text.setAttribute('x', margin - 20);
+                text.setAttribute('y', margin + k * dy - dy / 2 + 4); // center between frets
+                text.setAttribute('text-anchor', 'middle');
+                text.setAttribute('font-size', '10');
+                text.setAttribute('fill', 'var(--muted)');
+                text.textContent = fretNum;
+                svg.appendChild(text);
+            }
+            // top markers (X / note names/intervals for open strings)
+            voicing.frets.forEach((f, i) => {
+                const centerY = margin - 12; // common center level for all symbols
+                const text = document.createElementNS(svgNS, 'text');
+                text.setAttribute('x', stringX(i));
                 text.setAttribute('text-anchor', 'middle'); text.setAttribute('font-size', '12');
                 text.setAttribute('fill', 'var(--muted)');
-                text.textContent = f === 'X' ? '×' : (f === 0 ? '○' : ''); svg.appendChild(text);
+
+                if (f === 'X') {
+                    text.setAttribute('y', centerY + 4); // raise × symbol slightly
+                    text.textContent = '×';
+                } else if (f === 0) {
+                    if (start === 0) {
+                        // don't show anything above open strings when nut is visible - 
+                        // the open string circles on the diagram are sufficient
+                        text.textContent = '';
+                    } else {
+                        // show note/interval name for open string when nut is not visible
+                        // create a styled circle like the fretted notes
+                        const pc = tuningPcs[i]; // pitch class of open string
+                        const isRoot = pc === rootPc;
+
+                        // create a group for circle + text
+                        const g = document.createElementNS(svgNS, 'g');
+
+                        // background circle
+                        const circle = document.createElementNS(svgNS, 'circle');
+                        circle.setAttribute('cx', stringX(i));
+                        circle.setAttribute('cy', centerY); // same center level as × symbols
+                        circle.setAttribute('r', 9);
+                        circle.setAttribute('fill', isRoot ? 'var(--note)' : 'var(--nut)');
+                        g.appendChild(circle);
+
+                        // text label
+                        const noteText = document.createElementNS(svgNS, 'text');
+                        noteText.setAttribute('x', stringX(i));
+                        noteText.setAttribute('y', centerY + 4); // +4 for vertical centering
+                        noteText.setAttribute('text-anchor', 'middle');
+                        noteText.setAttribute('font-size', '10');
+                        noteText.setAttribute('fill', '#fff');
+                        const label = (labelMode === 'notes') ? nameForPC(pc) : intervalName((pc - rootPc + 12) % 12);
+                        noteText.textContent = label;
+                        g.appendChild(noteText);
+
+                        svg.appendChild(g);
+
+                        // clear the original text element
+                        text.textContent = '';
+                    }
+                } else {
+                    text.textContent = '';
+                }
+                svg.appendChild(text);
             });
             // note circles and labels
             for (let i = 0; i < voicing.frets.length; i++) {
-                const f = voicing.frets[i]; if (f === 'X') continue;
+                const f = voicing.frets[i];
+
+                if (f === 'X') continue;
+
+                // skip drawing circles for open strings when nut is not visible (start > 0)
+                if (f === 0 && start > 0) continue;
+
+                // skip notes outside the visible range
+                if (typeof f === 'number' && (f < start || f > end)) {
+                    continue;
+                }
                 const x = stringX(i), y = fretY(f);
                 const pc = (tuningPcs[i] + f) % 12; const isRoot = pc === rootPc;
                 const g = document.createElementNS(svgNS, 'g');
@@ -257,9 +357,6 @@
                 t.textContent = label; g.appendChild(t);
                 svg.appendChild(g);
             }
-            const pos = document.createElementNS(svgNS, 'text'); pos.setAttribute('x', width - 8); pos.setAttribute('y', height - 6);
-            pos.setAttribute('text-anchor', 'end'); pos.setAttribute('font-size', '10'); pos.setAttribute('fill', 'var(--muted)');
-            pos.textContent = `${start}-${Math.min(end, 12)} ` + (t('posFretsSuffix') || 'pos'); svg.appendChild(pos);
             return svg;
         }
 
@@ -405,7 +502,19 @@
         }
 
         function postProcessVoicing(frets, tuningPcs) {
-            const played = frets.map((f, i) => ({ i, f })).filter(x => x.f !== 'X'); const only = played.map(x => x.f); const minF = Math.min(...only); const maxF = Math.max(...only); const span = maxF - minF;
+            const played = frets.map((f, i) => ({ i, f })).filter(x => x.f !== 'X');
+            const only = played.map(x => x.f);
+
+            // calculate span only from fretted notes (excluding open strings)
+            const frettedOnly = only.filter(f => f > 0);
+            let span = 0;
+            if (frettedOnly.length > 1) {
+                const minF = Math.min(...frettedOnly);
+                const maxF = Math.max(...frettedOnly);
+                span = maxF - minF;
+            }
+
+            const minF = only.length > 0 ? Math.min(...only) : 0;
             const intervals = frets.map((f, i) => f === 'X' ? null : (tuningPcs[i] + f) % 12);
             const score = scoreVoicing(frets, span);
             return { frets, span, posStart: Math.max(1, minF), intervals, _score: score };
@@ -430,7 +539,7 @@
                 try { const nd = document.getElementById && document.getElementById('noDuplicateNotes'); if (nd && nd.checked) { if (hasDuplicateExactNotes(curFrets, tuningMidi)) return; } } catch (e) { }
                 const fingerings = enumerateFingerings(curFrets, 12); if (!fingerings || fingerings.length === 0) return; const v = postProcessVoicing(curFrets, tuningPcs); v._fingers = fingerings[0]; if (fingerings.length > 1) v._altFingerings = fingerings.slice(1); results.push(v);
             }
-            function tryNumericOptions(i, curFrets, usedPcs, playedIdxs, minFret, maxFret) { if (results.length >= maxResults) return; for (const f of validByString[i]) { if (!allowOpens && f === 0) continue; let nMin = minFret, nMax = maxFret; if (nMin === Infinity) nMin = f; nMin = Math.min(nMin, f); nMax = Math.max(nMax, f); if (nMax - nMin > maxSpan) continue; const pc = (tuningPcs[i] + f) % 12; const used = new Set(usedPcs); used.add(pc); dfs(i + 1, curFrets.concat(f), used, playedIdxs.concat(i), nMin, nMax); if (results.length >= maxResults) return; } }
+            function tryNumericOptions(i, curFrets, usedPcs, playedIdxs, minFret, maxFret) { if (results.length >= maxResults) return; for (const f of validByString[i]) { let nMin = minFret, nMax = maxFret; if (nMin === Infinity) nMin = f; if (f > 0) { nMin = Math.min(nMin, f); nMax = Math.max(nMax, f); } else { nMin = (nMin === Infinity) ? f : nMin; nMax = Math.max(nMax, f); } if (f > 0 && nMin > 0 && nMax - nMin > maxSpan) continue; const pc = (tuningPcs[i] + f) % 12; const used = new Set(usedPcs); used.add(pc); dfs(i + 1, curFrets.concat(f), used, playedIdxs.concat(i), nMin, nMax); if (results.length >= maxResults) return; } }
             function tryMutedOption(i, curFrets, usedPcs, playedIdxs, minFret, maxFret) { dfs(i + 1, curFrets.concat('X'), usedPcs, playedIdxs, minFret, maxFret); }
             function dfs(i, curFrets, usedPcs, playedIdxs, minFret, maxFret) { if (results.length >= maxResults) return; if (!canRemainingCover(i, usedPcs)) return; if (i === N) { finalizeCandidate(curFrets, usedPcs, playedIdxs); return; } tryNumericOptions(i, curFrets, usedPcs, playedIdxs, minFret, maxFret); if (results.length >= maxResults) return; tryMutedOption(i, curFrets, usedPcs, playedIdxs, minFret, maxFret); }
             dfs(0, [], new Set(), [], Infinity, -Infinity);
@@ -537,20 +646,23 @@
                         const none = document.createElement('div'); none.className = 'muted'; none.textContent = t('nothing') || 'No results'; resultsDiv.appendChild(none);
                         return;
                     }
-                    // group voicings by position ranges
+                    // group voicings by position ranges based on first fretted note
                     const groups = {
-                        open: { title: t('posOpen') || 'Open position', items: [] },
-                        '1-5': { title: '1–5', items: [] },
-                        '5-9': { title: '5–9', items: [] },
-                        '10-12': { title: '10–12', items: [] }
+                        '1-4': { title: '1–4', items: [] },
+                        '5-8': { title: '5–8', items: [] },
+                        '9-12': { title: '9–12', items: [] }
                     };
                     function categorize(v) {
-                        // if any open string present -> open group
-                        if (v.frets.some(f => f === 0)) return 'open';
-                        const minF = Math.min(...v.frets.filter(f => typeof f === 'number'));
-                        if (minF >= 1 && minF <= 5) return '1-5';
-                        if (minF >= 5 && minF <= 9) return '5-9';
-                        return '10-12';
+                        // find first fretted note (excluding open strings)
+                        const frettedNotes = v.frets.filter(f => typeof f === 'number' && f > 0);
+                        if (frettedNotes.length === 0) {
+                            // if no fretted notes, put in first group
+                            return '1-4';
+                        }
+                        const minF = Math.min(...frettedNotes);
+                        if (minF >= 1 && minF <= 4) return '1-4';
+                        if (minF >= 5 && minF <= 8) return '5-8';
+                        return '9-12';
                     }
                     voicings.slice(0, 200).forEach(v => { const k = categorize(v); if (!groups[k]) groups[k] = { title: k, items: [] }; groups[k].items.push(v); });
                     // render groups with headings and grids
@@ -891,8 +1003,8 @@
         populateTopChordForm();
 
         // --- persistence: save/load user preferences (chord selection, tuning, display mode, extensions)
-        const PREF_KEY = 'gt_user_prefs_v1';
-        let APPLYING_PREFS = false;
+        var PREF_KEY = 'gt_user_prefs_v1';
+        var APPLYING_PREFS = false;
         function loadUserPrefs() {
             try {
                 const raw = localStorage.getItem(PREF_KEY);
