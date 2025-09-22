@@ -908,7 +908,8 @@
             let degreeNames = '';
             if (pcs && pcs.length) {
                 const rootPc = noteToIndex(root);
-                let intervals = pcs.map(pc => (pc - rootPc + 12) % 12);
+                // pcs уже содержит интервалы от buildChordIntervals, не нужно пересчитывать
+                let intervals = pcs.slice();
                 // ensure bass degree is shown first if bass is present
                 if (bass) {
                     const bassPc = noteToIndex(bass);
@@ -1169,6 +1170,7 @@
             const topRoot = (byId('rootSel') && byId('rootSel').value) || 'C';
             const topQual = (byId('qualitySel') && byId('qualitySel').value) || Object.keys(QUALITIES)[0] || 'maj';
             const topExts = (byId('extWrap') && Array.from(byId('extWrap').querySelectorAll('input:checked')).map(i => i.value)) || [];
+            const topBass = (byId('bassSel') && byId('bassSel').value) || '';
             const topRootPc = noteToIndex(topRoot);
             const topIntervals = buildChordIntervals(topRoot, topQual, topExts) || [0, 4, 7];
 
@@ -1187,8 +1189,17 @@
                 return;
             }
 
-            // Spell the chord notes
-            const chordPcs = topIntervals.map(iv => mod12(topRootPc + iv));
+            // Spell the chord notes (include bass if specified)
+            let chordPcs = topIntervals.map(iv => mod12(topRootPc + iv));
+            let finalIntervals = topIntervals.slice();
+            if (topBass) {
+                const bassPc = noteToIndex(topBass);
+                const bassInterval = mod12(bassPc - topRootPc);
+                if (!chordPcs.includes(bassPc)) {
+                    chordPcs = [bassPc, ...chordPcs]; // bass note first
+                    finalIntervals = [bassInterval, ...finalIntervals]; // bass interval first
+                }
+            }
             const spelled = chordPcs.map(pc => (PC_NAMES[pc] && PC_NAMES[pc][0]) || nameForPC(pc));
 
             arpeggioPatterns.forEach(pattern => {
@@ -1197,7 +1208,8 @@
                 const titleBox = document.createElement('div');
 
                 const title = document.createElement('div'); title.className = 'scale-title';
-                title.textContent = `${topRoot}${(QUALITIES[topQual] && QUALITIES[topQual].name) || topQual} - ${pattern.name}`;
+                const chordName = topBass ? `${topRoot}${(QUALITIES[topQual] && QUALITIES[topQual].name) || topQual}/${topBass}` : `${topRoot}${(QUALITIES[topQual] && QUALITIES[topQual].name) || topQual}`;
+                title.textContent = `${chordName} - ${pattern.name}`;
 
                 const sub = document.createElement('div'); sub.className = 'scale-sub';
                 sub.textContent = `${spelled.join(' · ')}  •  ${pattern.minFret === 0 ? 'Open' : 'Frets'} ${pattern.minFret}–${pattern.maxFret}`;
@@ -1218,7 +1230,7 @@
                 // render fretboard with arpeggio pattern immediately
                 const tuningName = (byId('tuningSel') && byId('tuningSel').value) || tuneSel.value || 'E Standard';
                 const labelMode = (byId('labelMode') && byId('labelMode').value) || dispSel.value || 'notes';
-                renderArpeggioFretboard(fbWrap, tuningName, topRoot, topIntervals, topRoot, labelMode, pattern.minFret, pattern.maxFret);
+                renderArpeggioFretboard(fbWrap, tuningName, topRoot, finalIntervals, topRoot, labelMode, pattern.minFret, pattern.maxFret);
 
                 // Setup play button after rendering
                 btnPlay.addEventListener('click', () => playArpeggio(fbWrap));
@@ -1248,6 +1260,24 @@
 
             // helper to re-render all arpeggio fretboards (they are always visible)
             function rerenderOpenFretboards() {
+                // Get current chord selection (fresh values each time)
+                const currentRoot = (byId('rootSel') && byId('rootSel').value) || 'C';
+                const currentQual = (byId('qualitySel') && byId('qualitySel').value) || Object.keys(QUALITIES)[0] || 'maj';
+                const currentExts = (byId('extWrap') && Array.from(byId('extWrap').querySelectorAll('input:checked')).map(i => i.value)) || [];
+                const currentBass = (byId('bassSel') && byId('bassSel').value) || '';
+                const currentRootPc = noteToIndex(currentRoot);
+                const currentIntervals = buildChordIntervals(currentRoot, currentQual, currentExts) || [0, 4, 7];
+
+                // Include bass if specified
+                let finalIntervals = [...currentIntervals];
+                if (currentBass) {
+                    const bassPc = noteToIndex(currentBass);
+                    const bassInterval = mod12(bassPc - currentRootPc);
+                    if (!finalIntervals.includes(bassInterval)) {
+                        finalIntervals = [bassInterval, ...finalIntervals]; // bass note first
+                    }
+                }
+
                 const items = list.querySelectorAll('.fret-wrap');
                 items.forEach(fb => {
                     if (!fb) return;
@@ -1255,7 +1285,7 @@
                     const labelMode = (byId('labelMode') && byId('labelMode').value) || dispSel.value || 'notes';
                     const minFret = parseInt(fb.dataset.minFret) || 0;
                     const maxFret = parseInt(fb.dataset.maxFret) || 4;
-                    renderArpeggioFretboard(fb, tuningName, topRoot, topIntervals, topRoot, labelMode, minFret, maxFret);
+                    renderArpeggioFretboard(fb, tuningName, currentRoot, finalIntervals, currentRoot, labelMode, minFret, maxFret);
                 });
             }
         }
@@ -1666,7 +1696,7 @@
             const trigger = debounce(() => { try { if (window.generate) window.generate(); } catch (e) { } }, 250);
             [rootSel, qualitySel, bassSel].forEach(s => { if (s) s.addEventListener('change', trigger); });
             // also refresh scales and arpeggios panels when chord selection changes so supported marks update
-            [rootSel, qualitySel, extWrapEl].forEach(s => { if (s) s.addEventListener('change', debounce(() => { try { buildScalesPanel(); buildArpeggiosPanel(); } catch (e) { } }, 300)); });
+            [rootSel, qualitySel, bassSel, extWrapEl].forEach(s => { if (s) s.addEventListener('change', debounce(() => { try { buildScalesPanel(); buildArpeggiosPanel(); } catch (e) { } }, 300)); });
             // also wire tuning selector (if built) and extension checkboxes
             try { const topTuning = byId('tuningSel'); if (topTuning) topTuning.addEventListener('change', trigger); } catch (e) { }
             if (extWrapEl) extWrapEl.addEventListener('change', trigger);
