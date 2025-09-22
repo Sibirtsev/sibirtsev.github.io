@@ -39,6 +39,7 @@
                 try {
                     const tabCh = byId('tab-chords'); if (tabCh) tabCh.textContent = t('tabChords') || tabCh.textContent || 'Fingerings';
                     const tabSc = byId('tab-scales'); if (tabSc) tabSc.textContent = t('tabScales') || tabSc.textContent || 'Scales';
+                    const tabAr = byId('tab-arpeggios'); if (tabAr) tabAr.textContent = t('tabArpeggios') || tabAr.textContent || 'Arpeggios';
                     const foot = byId('footer'); if (foot) foot.innerHTML = t('footer') || foot.innerHTML;
                 } catch (e) { }
             } catch (e) { console.error('updateUITexts error', e); }
@@ -48,6 +49,7 @@
                 if (typeof populateTopChordForm === 'function') populateTopChordForm();
                 if (typeof buildChordsPanel === 'function') buildChordsPanel();
                 if (typeof buildScalesPanel === 'function') buildScalesPanel();
+                if (typeof buildArpeggiosPanel === 'function') buildArpeggiosPanel();
                 if (typeof window.generate === 'function') window.generate();
             } catch (e) { /* ignore rebuild errors */ }
         }
@@ -101,35 +103,8 @@
             return { notes: names, relMap: mapRel };
         }
 
-        // SCALES (copied)
-        const SCALES = {
-            "ionian": { name_en: "Ionian (major)", name_ru: "Ионийский (мажор)", degrees_en: "1 2 3 4 5 6 7", degrees_ru: "1 2 3 4 5 6 7", intervals: [0, 2, 4, 5, 7, 9, 11] },
-            "dorian": { name_en: "Dorian", name_ru: "Дорийский", degrees_en: "1 2 ♭3 4 5 6 ♭7", degrees_ru: "1 2 ♭3 4 5 6 ♭7", intervals: [0, 2, 3, 5, 7, 9, 10] },
-            "phrygian": { name_en: "Phrygian", name_ru: "Фригийский", degrees_en: "1 ♭2 ♭3 4 5 ♭6 ♭7", degrees_ru: "1 ♭2 ♭3 4 5 ♭6 ♭7", intervals: [0, 1, 3, 5, 7, 8, 10] },
-            "lydian": { name_en: "Lydian", name_ru: "Лидийский", degrees_en: "1 2 3 #4 5 6 7", degrees_ru: "1 2 3 #4 5 6 7", intervals: [0, 2, 4, 6, 7, 9, 11] },
-            "mixolydian": { name_en: "Mixolydian", name_ru: "Миксолидийский", degrees_en: "1 2 3 4 5 6 ♭7", degrees_ru: "1 2 3 4 5 6 ♭7", intervals: [0, 2, 4, 5, 7, 9, 10] },
-            "aeolian": { name_en: "Aeolian (natural minor)", name_ru: "Эолийский (нат. минор)", degrees_en: "1 2 ♭3 4 5 ♭6 ♭7", degrees_ru: "1 2 ♭3 4 5 ♭6 ♭7", intervals: [0, 2, 3, 5, 7, 8, 10] },
-            "locrian": { name_en: "Locrian", name_ru: "Локрийский", degrees_en: "1 ♭2 ♭3 4 ♭5 ♭6 ♭7", degrees_ru: "1 ♭2 ♭3 4 ♭5 ♭6 ♭7", intervals: [0, 1, 3, 5, 6, 8, 10] },
-            "maj_pent": { name_en: "Major pentatonic", name_ru: "Мажорная пентатоника", degrees_en: "1 2 3 5 6", degrees_ru: "1 2 3 5 6", intervals: [0, 2, 4, 7, 9], parent: "ionian" },
-            "min_pent": { name_en: "Minor pentatonic", name_ru: "Минорная пентатоника", degrees_en: "1 ♭3 4 5 ♭7", degrees_ru: "1 ♭3 4 5 ♭7", intervals: [0, 3, 5, 7, 10], parent: "aeolian" },
-            "harm_minor": { name_en: "Harmonic minor", name_ru: "Гармонический минор", degrees_en: "1 2 ♭3 4 5 ♭6 7", degrees_ru: "1 2 ♭3 4 5 ♭6 7", intervals: [0, 2, 3, 5, 7, 8, 11] },
-            "mel_minor": { name_en: "Melodic minor (asc)", name_ru: "Мелодический минор (вверх)", degrees_en: "1 2 ♭3 4 5 6 7", degrees_ru: "1 2 ♭3 4 5 6 7", intervals: [0, 2, 3, 5, 7, 9, 11] },
-            "lyd_dom": { name_en: "Lydian dominant (MM4)", name_ru: "Лидийский доминант (MM4)", degrees_en: "1 2 3 #4 5 6 ♭7", degrees_ru: "1 2 3 #4 5 6 ♭7", intervals: [0, 2, 4, 6, 7, 9, 10] },
-            "mix_b9b13": { name_en: "Mixolydian ♭9 ♭13 (HM5)", name_ru: "Миксолидийский ♭9 ♭13 (HM5)", degrees_en: "1 ♭2 3 4 5 ♭6 ♭7", degrees_ru: "1 ♭2 3 4 5 ♭6 ♭7", intervals: [0, 1, 4, 5, 7, 8, 10] },
-            "altered": { name_en: "Altered (Super Locrian)", name_ru: "Альтерированная (Super Locrian)", degrees_en: "1 ♭2 ♭3 ♭4 ♭5 ♭6 ♭7", degrees_ru: "1 ♭2 ♭3 ♭4 ♭5 ♭6 ♭7", intervals: [0, 1, 3, 4, 6, 8, 10] },
-            "whole_half_dim": { name_en: "Whole–half diminished", name_ru: "Цел-пол уменьш.", degrees_en: "1 2 ♭3 4 ♭5 ♭6 6 7", degrees_ru: "1 2 ♭3 4 ♭5 ♭6 6 7", intervals: [0, 2, 3, 5, 6, 8, 9, 11] },
-            "half_whole_dim": { name_en: "Half–whole diminished", name_ru: "Пол-цел уменьш.", degrees_en: "1 ♭2 ♭3 3 #4 5 6 ♭7", degrees_ru: "1 ♭2 ♭3 3 #4 5 6 ♭7", intervals: [0, 1, 3, 4, 6, 7, 9, 10] },
-            "whole_tone": { name_en: "Whole tone", name_ru: "Целотоновый", degrees_en: "1 2 3 #4 #5 ♭7", degrees_ru: "1 2 3 #4 #5 ♭7", intervals: [0, 2, 4, 6, 8, 10] },
-            "locrian_nat2": { name_en: "Locrian nat2 (MM6)", name_ru: "Локрийский nat2 (MM6)", degrees_en: "1 2 ♭3 4 ♭5 ♭6 ♭7", degrees_ru: "1 2 ♭3 4 ♭5 ♭6 ♭7", intervals: [0, 2, 3, 5, 6, 8, 10] },
-            "blues": { name_en: "Blues Scale", name_ru: "Блюзовая", degrees_en: "1 ♭3 4 ♭5 5 ♭7", degrees_ru: "1 ♭3 4 ♭5 5 ♭7", intervals: [0, 3, 5, 6, 7, 10] },
-            "harmonic_major": { name_en: "Harmonic Major", name_ru: "Гармонический мажор", degrees_en: "1 2 3 4 5 ♭6 7", degrees_ru: "1 2 3 4 5 ♭6 7", intervals: [0, 2, 4, 5, 7, 8, 11] },
-            "double_harmonic": { name_en: "Double Harmonic", name_ru: "Двойной гармонический", degrees_en: "1 ♭2 3 4 5 ♭6 7", degrees_ru: "1 ♭2 3 4 5 ♭6 7", intervals: [0, 1, 4, 5, 7, 8, 11] },
-            "hungarian_minor": { name_en: "Hungarian Minor", name_ru: "Венгерский минор", degrees_en: "1 2 ♭3 #4 5 ♭6 7", degrees_ru: "1 2 ♭3 #4 5 ♭6 7", intervals: [0, 2, 3, 6, 7, 8, 11] },
-            "bebop_dominant": { name_en: "Bebop Dominant", name_ru: "Бибоп доминант", degrees_en: "1 2 3 4 5 ♭6 ♭7 7", degrees_ru: "1 2 3 4 5 ♭6 ♭7 7", intervals: [0, 2, 4, 5, 7, 8, 10, 11] },
-            "bebop_major": { name_en: "Bebop Major", name_ru: "Бибоп мажор", degrees_en: "1 2 3 4 5 6 ♭7 7", degrees_ru: "1 2 3 4 5 6 ♭7 7", intervals: [0, 2, 4, 5, 7, 9, 10, 11] },
-            "persian": { name_en: "Persian", name_ru: "Персидский", degrees_en: "1 ♭2 3 ♭4 5 ♭6 ♭7", degrees_ru: "1 ♭2 3 ♭4 5 ♭6 ♭7", intervals: [0, 1, 4, 6, 7, 8, 10] },
-            "enigmatic": { name_en: "Enigmatic", name_ru: "Энигматический", degrees_en: "1 ♯2 ♯4 ♯5 ♯6 7", degrees_ru: "1 ♯2 ♯4 ♯5 ♯6 7", intervals: [0, 1, 3, 6, 8, 10, 11] }
-        };
+        // Use scales from common-data.js
+        const SCALES = window.COMMON_SCALES || {};
 
         // Audio: Karplus-Strong pluck
         const Audio = (() => {
@@ -145,11 +120,46 @@
             function playScale(noteNames, baseOct = 4, step = 0.5) {
                 console.log('Playing scale with notes:', noteNames);
 
-                // Создаем правильную последовательность
-                const upperTonic = noteNames[0]
-                const ascending = [...noteNames, upperTonic]; // восходящая гамма
-                const descending = [...noteNames].reverse(); // нисходящая (с повтором верхней ноты)
-                const fullSequence = [...ascending, ...descending];
+                // Создаем правильную последовательность с октавами
+                const ascending = [];
+                let currentOct = baseOct;
+
+                // Добавляем ноты восходящей гаммы
+                for (let i = 0; i < noteNames.length; i++) {
+                    const noteName = noteNames[i];
+
+                    // Если это не первая нота и текущая нота "меньше" предыдущей по высоте, увеличиваем октаву
+                    if (i > 0) {
+                        const prevNoteIndex = noteToIndex(noteNames[i - 1]);
+                        const currNoteIndex = noteToIndex(noteName);
+                        if (currNoteIndex < prevNoteIndex) {
+                            currentOct++;
+                        }
+                    }
+
+                    ascending.push(noteName + currentOct);
+                }
+
+                // Добавляем верхнюю тонику - определяем правильную октаву
+                const tonicIndex = noteToIndex(noteNames[0]);
+                const lastNoteOctave = currentOct;
+                const lastNoteIndex = noteToIndex(noteNames[noteNames.length - 1]);
+
+                let upperTonicOct;
+                if (tonicIndex <= lastNoteIndex) {
+                    // Если тоника <= последней ноты, верхняя тоника в следующей октаве
+                    upperTonicOct = lastNoteOctave + 1;
+                } else {
+                    // Если тоника > последней ноты, верхняя тоника в той же октаве что последняя нота
+                    upperTonicOct = lastNoteOctave;
+                }
+
+                const upperTonic = noteNames[0] + upperTonicOct;
+                ascending.push(upperTonic);
+
+                // Нисходящая - просто обратный порядок восходящей
+                const descending = [...ascending].reverse();
+                const fullSequence = [...ascending, ...descending.slice(1)]; // убираем дублирование верхней ноты
 
                 console.log('Ascending:', ascending);
                 console.log('Descending:', descending);
@@ -157,47 +167,16 @@
 
                 const noteDur = 0.6;
 
-                // Вычисляем октавы для каждой ноты заранее
-                const noteOctaves = [];
-
-                // Восходящая часть - начинаем с baseOct, повышаем октаву когда нота "возвращается к началу"
-                let currentOctave = baseOct;
-                let lastPitchClass = -1;
-
-                for (let i = 0; i < ascending.length; i++) {
-                    const currentPitchClass = pitchClass(ascending[i]);
-
-                    // Если текущая нота имеет меньший pitch class чем предыдущая, значит мы "обернулись" - повышаем октаву
-                    if (i > 0 && currentPitchClass < lastPitchClass) {
-                        currentOctave++;
+                // Проигрываем все ноты (уже с октавами в названии)
+                fullSequence.forEach((noteWithOctave, i) => {
+                    const match = noteWithOctave.match(/^([A-G][#b]?)(\d+)$/);
+                    if (match) {
+                        const [, noteName, octaveStr] = match;
+                        const octave = parseInt(octaveStr);
+                        const freq = freqFromMidi(midiFromSpelled(noteName, octave));
+                        console.log(`${i + 1}. ${noteWithOctave} (${freq.toFixed(1)} Hz) at ${(i * step).toFixed(1)}s`);
+                        playFreq(freq, noteDur, i * step);
                     }
-
-                    noteOctaves.push(currentOctave);
-                    lastPitchClass = currentPitchClass;
-                }
-
-                // Нисходящая часть - начинаем с той же октавы что последняя восходящая, понижаем при "обертывании"
-                lastPitchClass = pitchClass(descending[0]);
-
-                for (let i = 0; i < descending.length; i++) {
-                    const currentPitchClass = pitchClass(descending[i]);
-
-                    // Если текущая нота имеет больший pitch class чем предыдущая, значит мы "обернулись" - понижаем октаву
-                    if (i > 0 && currentPitchClass > lastPitchClass) {
-                        currentOctave--;
-                    }
-
-                    noteOctaves.push(currentOctave);
-                    lastPitchClass = currentPitchClass;
-                }
-
-                // Проигрываем все ноты
-                fullSequence.forEach((noteName, i) => {
-                    const octave = noteOctaves[i];
-                    const freq = freqFromMidi(midiFromSpelled(noteName, octave));
-                    console.log(`${i + 1}. ${noteName}${octave} (${freq.toFixed(1)} Hz) at ${(i * step).toFixed(1)}s`);
-
-                    playFreq(freq, noteDur, i * step);
                 });
             }
             return { playNoteName, playScale, playFreq, freqFromMidi: freqFromMidi, ac };
@@ -442,24 +421,74 @@
 
         function buildChordIntervals(rootName, qualityKey, extensions) {
             const q = QUALITIES[qualityKey] || { intervals: [0, 4, 7] };
-            const base = q.intervals || q.offsets || [];
-            let ints = base.slice(); (extensions || []).forEach(e => { if (EXT_MAP[e] !== undefined) ints.push(EXT_MAP[e]); });
+            let baseIntervals = q.intervals || q.offsets || [];
+            let ints = baseIntervals.slice();
+
+            // Обрабатываем расширения с новой логикой
+            (extensions || []).forEach(extId => {
+                // Ищем расширение в новом формате
+                const ext = (window.COMMON_EXTENSIONS || []).find(e => e.id === extId);
+
+                if (ext) {
+                    if (ext.replaceBase && ext.intervals) {
+                        // Если это расширение заменяет базовый аккорд (например, maj7)
+                        ints = ext.intervals.slice();
+                    } else if (ext.offsets && ext.offsets.length > 0) {
+                        // Множественные тоны (для сложных расширений)
+                        ext.offsets.forEach(offset => ints.push(offset));
+                    } else if (ext.offset !== undefined) {
+                        // Одиночный тон
+                        ints.push(ext.offset);
+                    }
+                } else if (EXT_MAP[extId] !== undefined) {
+                    // Фоллбэк на старую карту расширений
+                    ints.push(EXT_MAP[extId]);
+                }
+            });
+
             const uniq = [...new Map(ints.map(v => [mod12(v), v])).values()].sort((a, b) => a - b);
             return uniq.map(v => mod12(v));
         }
 
-        // essential pitch-classes for a chord (ported from chords.js)
+        // essential pitch-classes for a chord (updated for new structure)
         function essentialPcs(rootPc, qualityId, selectedExts, allowOmitRoot, allowOmitFifth) {
             const essentials = new Set();
             if (!allowOmitRoot) essentials.add(rootPc);
-            if (qualityId === 'maj') essentials.add((rootPc + 4) % 12);
-            if (qualityId === 'min') essentials.add((rootPc + 3) % 12);
-            if (qualityId === 'sus2') essentials.add((rootPc + 2) % 12);
-            if (qualityId === 'sus4') essentials.add((rootPc + 5) % 12);
-            if (qualityId === 'dim') essentials.add((rootPc + 3) % 12);
-            if (!allowOmitFifth) { const fifth = qualityId === 'dim' ? (rootPc + 6) % 12 : (rootPc + 7) % 12; essentials.add(fifth); }
-            if (selectedExts && selectedExts.includes('7')) essentials.add((rootPc + 10) % 12);
-            if (selectedExts && selectedExts.includes('maj7')) essentials.add((rootPc + 11) % 12);
+
+            // Получаем качество аккорда
+            const quality = QUALITIES[qualityId];
+            if (quality && quality.intervals) {
+                // Добавляем все интервалы качества как обязательные (кроме корня и квинты, которые обрабатываются отдельно)
+                quality.intervals.forEach(interval => {
+                    if (interval === 0 && allowOmitRoot) return; // пропускаем корень если разрешено
+                    if ((interval === 7 || interval === 6 || interval === 8) && allowOmitFifth) return; // пропускаем квинту если разрешено
+                    essentials.add((rootPc + interval) % 12);
+                });
+            } else {
+                // Фоллбэк для старой логики
+                if (qualityId === 'maj') essentials.add((rootPc + 4) % 12);
+                if (qualityId === 'min') essentials.add((rootPc + 3) % 12);
+                if (qualityId === 'sus2') essentials.add((rootPc + 2) % 12);
+                if (qualityId === 'sus4') essentials.add((rootPc + 5) % 12);
+                if (qualityId === 'dim') essentials.add((rootPc + 3) % 12);
+                if (qualityId === 'aug') essentials.add((rootPc + 4) % 12);
+
+                // Квинта для фоллбэка
+                if (!allowOmitFifth) {
+                    let fifth = (rootPc + 7) % 12; // обычная квинта
+                    if (qualityId === 'dim') fifth = (rootPc + 6) % 12; // уменьшенная квинта
+                    if (qualityId === 'aug') fifth = (rootPc + 8) % 12; // увеличенная квинта
+                    essentials.add(fifth);
+                }
+            }
+
+            // Обрабатываем расширения (теперь только простые добавления)
+            (selectedExts || []).forEach(extId => {
+                // Старая логика для совместимости
+                if (extId === '7') essentials.add((rootPc + 10) % 12);
+                if (extId === 'maj7') essentials.add((rootPc + 11) % 12);
+            });
+
             return essentials;
         }
 
@@ -606,12 +635,41 @@
         // UI wiring: elements from index.html
         const tabChords = byId('tab-chords');
         const tabScales = byId('tab-scales');
+        const tabArpeggios = byId('tab-arpeggios');
         const panelChords = byId('panel-chords');
         const panelScales = byId('panel-scales');
+        const panelArpeggios = byId('panel-arpeggios');
         const chordsRoot = byId('chordsRoot');
         const scalesRoot = byId('scalesRoot');
+        const arpeggiosRoot = byId('arpeggiosRoot');
 
         function setActive(tabBtn, panel) { document.querySelectorAll('.tab-btn').forEach(b => b.setAttribute('aria-selected', 'false')); document.querySelectorAll('.panel').forEach(p => p.hidden = true); tabBtn.setAttribute('aria-selected', 'true'); panel.hidden = false; }
+
+        // Unified function to populate tuning selector with groups
+        function populateTuningSelector(selectElement) {
+            if (!window.COMMON_TUNINGS || !window.TUNING_GROUPS) return;
+
+            selectElement.innerHTML = ''; // Clear existing options
+
+            window.TUNING_GROUPS.forEach(group => {
+                const optGroup = document.createElement('optgroup');
+                optGroup.label = t(group.key) || group.key;
+
+                group.tunings.forEach(tuningKey => {
+                    if (window.COMMON_TUNINGS[tuningKey]) {
+                        const option = document.createElement('option');
+                        option.value = tuningKey;
+                        const tuning = window.COMMON_TUNINGS[tuningKey];
+                        option.textContent = `${tuningKey} — ${(tuning.strings || []).map(s => s.name + s.oct).join(' ')}`;
+                        optGroup.appendChild(option);
+                    }
+                });
+
+                if (optGroup.children.length > 0) {
+                    selectElement.appendChild(optGroup);
+                }
+            });
+        }
 
         // build chords panel: include tuning selector, constraints, and results area
         function buildChordsPanel() {
@@ -647,14 +705,39 @@
             // results (place inside the same card so settings + results form a single block)
             const rbody = document.createElement('div'); rbody.className = 'body'; const summary = document.createElement('div'); summary.id = 'summary'; rbody.appendChild(summary); const resultsDiv = document.createElement('section'); resultsDiv.id = 'results'; rbody.appendChild(resultsDiv);
             card.appendChild(body); card.appendChild(rbody); container.appendChild(card);
-            // populate tuning options
-            const tuningSel = sel; if (window.COMMON_TUNINGS) { Object.keys(window.COMMON_TUNINGS).forEach(k => { const o = opt(k, k); o.textContent = `${k} — ${(window.COMMON_TUNINGS[k].strings || []).map(s => s.name + s.oct).join(' ')}`; tuningSel.appendChild(o); }); }
-            if (!tuningSel.value) tuningSel.value = Object.keys(window.COMMON_TUNINGS || { 'E Standard': 1 })[0] || 'E Standard';
+            // populate tuning options using unified function
+            const tuningSel = sel;
+            populateTuningSelector(tuningSel);
+
+            // Load saved preferences for tuning and labelMode
+            const savedPrefs = (typeof loadUserPrefs === 'function') ? loadUserPrefs() : null;
+
+            // Set tuning from saved prefs or default
+            if (savedPrefs && savedPrefs.tuning) {
+                tuningSel.value = savedPrefs.tuning;
+            } else if (!tuningSel.value) {
+                tuningSel.value = Object.keys(window.COMMON_TUNINGS || { 'E Standard': 1 })[0] || 'E Standard';
+            }
+
+            // Set labelMode from saved prefs
+            const lm = document.getElementById('labelMode');
+            if (lm && savedPrefs && savedPrefs.labelMode) {
+                lm.value = savedPrefs.labelMode;
+            }
             // wire controls to regenerate when changed (debounced)
             const trigger = debounce(() => { try { if (window.generate) window.generate(); } catch (e) { console.error('trigger generate failed', e); } }, 180);
-            try { tuningSel.addEventListener('change', trigger); } catch (e) { }
+            try {
+                tuningSel.addEventListener('change', trigger);
+                tuningSel.addEventListener('change', () => { try { saveUserPrefs(); } catch (e) { } });
+            } catch (e) { }
             // wire display mode control
-            try { const lm = document.getElementById('labelMode'); if (lm) lm.addEventListener('change', trigger); } catch (e) { }
+            try {
+                const lm = document.getElementById('labelMode');
+                if (lm) {
+                    lm.addEventListener('change', trigger);
+                    lm.addEventListener('change', () => { try { saveUserPrefs(); } catch (e) { } });
+                }
+            } catch (e) { }
             // hook checkboxes by id (they were created above inside chips)
             ['omitRoot', 'omitFifth', 'allowOpens', 'contiguous', 'noDuplicateNotes'].forEach(id => {
                 try { const el = document.getElementById(id); if (el) el.addEventListener('change', trigger); } catch (e) { }
@@ -793,6 +876,13 @@
 
             // Notes line (one line) - block with margin
             const tonesLine = document.createElement('div'); tonesLine.className = 'muted chord-notes--block';
+
+            // Add header label for notes
+            const notesLabel = document.createElement('span');
+            notesLabel.className = 'chord-notes-label';
+            notesLabel.textContent = t('chordNotes') + ': ';
+            tonesLine.appendChild(notesLabel);
+
             let toneNames = '';
             if (spelled && spelled.length) toneNames = spelled.join(' · ');
             else if (pcs && pcs.length) toneNames = pcs.map(p => ((PC_NAMES[p] && PC_NAMES[p][0]) || nameForPC(p))).join(' · ');
@@ -807,8 +897,39 @@
                 }
                 toneNames = toneNames ? (bassName + ' · ' + toneNames) : bassName;
             }
-            tonesLine.textContent = toneNames;
+
+            const notesSpan = document.createElement('span');
+            notesSpan.textContent = toneNames;
+            tonesLine.appendChild(notesSpan);
             card.appendChild(tonesLine);
+
+            // Degrees line (chord structure in degrees) - block with margin
+            const degreesLine = document.createElement('div'); degreesLine.className = 'muted chord-degrees--block';
+            let degreeNames = '';
+            if (pcs && pcs.length) {
+                const rootPc = noteToIndex(root);
+                let intervals = pcs.map(pc => (pc - rootPc + 12) % 12);
+                // ensure bass degree is shown first if bass is present
+                if (bass) {
+                    const bassPc = noteToIndex(bass);
+                    const bassInterval = (bassPc - rootPc + 12) % 12;
+                    // remove existing occurrence of bass interval
+                    intervals = intervals.filter(iv => iv !== bassInterval);
+                    // add bass interval at the beginning
+                    intervals = [bassInterval, ...intervals];
+                }
+                degreeNames = intervals.map(iv => intervalName(iv)).join(' · ');
+            } else {
+                degreeNames = t('no_notes') || '—';
+            }
+            const degreesLabel = document.createElement('span');
+            degreesLabel.className = 'chord-degrees-label';
+            degreesLabel.textContent = (t('chordDegrees') || 'Degrees') + ': ';
+            degreesLine.appendChild(degreesLabel);
+            const degreesText = document.createElement('span');
+            degreesText.textContent = degreeNames;
+            degreesLine.appendChild(degreesText);
+            card.appendChild(degreesLine);
 
             // Play button: own block
             const playWrap = document.createElement('div'); playWrap.className = 'chord-play-wrap';
@@ -858,8 +979,8 @@
             const controlsBar = document.createElement('div'); controlsBar.className = 'controls-bar chips';
             const tuneLabel = document.createElement('label'); tuneLabel.className = 'chip'; tuneLabel.innerHTML = `<span>${t('tuningTitle') || 'Tuning'}:</span>`;
             const tuneSel = document.createElement('select'); tuneSel.className = 'scale-tuning-sel';
-            // fill options from COMMON_TUNINGS (reuse same list as chords)
-            if (window.COMMON_TUNINGS) { Object.keys(window.COMMON_TUNINGS).forEach(k => { const o = opt(k, k); o.textContent = `${k} — ${(window.COMMON_TUNINGS[k].strings || []).map(s => s.name + s.oct).join(' ')}`; tuneSel.appendChild(o); }); }
+            // fill options using unified function
+            populateTuningSelector(tuneSel);
             // if a global tuningSel exists, sync initial value
             try { const globalT = byId('tuningSel'); if (globalT && globalT.value) tuneSel.value = globalT.value; else if (byId('tuningSel')) tuneSel.value = byId('tuningSel').value; } catch (e) { }
             tuneLabel.appendChild(tuneSel); controlsBar.appendChild(tuneLabel);
@@ -938,7 +1059,9 @@
                 const head = document.createElement('div'); head.className = 'scale-head';
                 const titleBox = document.createElement('div');
                 const scName = LANG === 'en' ? (sc.name_en || key) : (sc.name_ru || sc.name_en || key);
-                const title = document.createElement('div'); title.className = 'scale-title'; title.textContent = `${topRoot} ${scName}`;
+                const familyName = sc.family ? t(`scaleFamily${sc.family.charAt(0).toUpperCase() + sc.family.slice(1)}`) || sc.family : '';
+                const displayName = familyName ? `${scName} (${familyName})` : scName;
+                const title = document.createElement('div'); title.className = 'scale-title'; title.textContent = `${topRoot} ${displayName}`;
                 const sub = document.createElement('div'); sub.className = 'scale-sub'; sub.textContent = `${spelled.join(' · ')}  •  ${(LANG === 'en' ? sc.degrees_en : sc.degrees_ru) || ''}`;
                 titleBox.appendChild(title); titleBox.appendChild(sub);
                 const actions = document.createElement('div'); actions.className = 'actions';
@@ -1011,6 +1134,434 @@
             }
         }
 
+        // build arpeggios panel: show chord arpeggios in different positions
+        function buildArpeggiosPanel() {
+            const container = arpeggiosRoot; container.innerHTML = '';
+            const card = document.createElement('section'); card.className = 'card';
+            const body = document.createElement('div'); body.className = 'body';
+            const h2 = document.createElement('h2'); h2.textContent = t('arpeggios') || 'Chord arpeggios'; body.appendChild(h2);
+
+            // mirrored controls: reuse global tuning and labelMode from chords panel (keep in sync)
+            const controlsBar = document.createElement('div'); controlsBar.className = 'controls-bar chips';
+            const tuneLabel = document.createElement('label'); tuneLabel.className = 'chip'; tuneLabel.innerHTML = `<span>${t('tuningTitle') || 'Tuning'}:</span>`;
+            const tuneSel = document.createElement('select'); tuneSel.className = 'arpeggio-tuning-sel';
+
+            // fill options using unified function
+            populateTuningSelector(tuneSel);
+
+            // if a global tuningSel exists, sync initial value
+            try { const globalT = byId('tuningSel'); if (globalT && globalT.value) tuneSel.value = globalT.value; else if (byId('tuningSel')) tuneSel.value = byId('tuningSel').value; } catch (e) { }
+            tuneLabel.appendChild(tuneSel); controlsBar.appendChild(tuneLabel);
+
+            const dispLabel = document.createElement('label'); dispLabel.className = 'chip'; dispLabel.innerHTML = `<span>${t('displayMode') || 'Display'}:</span>`;
+            const dispSel = document.createElement('select'); dispSel.className = 'arpeggio-labelmode-sel';
+            dispSel.appendChild(opt(t('notes') || 'Notes', 'notes'));
+            dispSel.appendChild(opt(t('intervals') || 'Intervals', 'intervals'));
+
+            // sync with global labelMode if present
+            try { const globalLM = byId('labelMode'); if (globalLM && globalLM.value) dispSel.value = globalLM.value; } catch (e) { }
+            dispLabel.appendChild(dispSel); controlsBar.appendChild(dispLabel);
+            body.appendChild(controlsBar);
+
+            const list = document.createElement('div'); list.id = 'arpeggiosList'; list.className = 'arpeggio-list mt'; body.appendChild(list); card.appendChild(body); container.appendChild(card);
+
+            // determine current chord selection
+            const topRoot = (byId('rootSel') && byId('rootSel').value) || 'C';
+            const topQual = (byId('qualitySel') && byId('qualitySel').value) || Object.keys(QUALITIES)[0] || 'maj';
+            const topExts = (byId('extWrap') && Array.from(byId('extWrap').querySelectorAll('input:checked')).map(i => i.value)) || [];
+            const topRootPc = noteToIndex(topRoot);
+            const topIntervals = buildChordIntervals(topRoot, topQual, topExts) || [0, 4, 7];
+
+            // Create different arpeggio patterns - different positions on the fretboard
+            const arpeggioPatterns = [
+                { name: t('posOpen') || 'Open position', minFret: 0, maxFret: 4 },
+                { name: 'Position II-V', minFret: 2, maxFret: 6 },
+                { name: 'Position V-VII', minFret: 5, maxFret: 9 },
+                { name: 'Position VII-X', minFret: 7, maxFret: 11 },
+                { name: 'Position X-XII', minFret: 10, maxFret: 14 },
+                { name: 'Position XII+', minFret: 12, maxFret: 16 }
+            ];
+
+            if (topIntervals.length === 0) {
+                const none = document.createElement('div'); none.className = 'muted'; none.textContent = t('nothing') || 'No chord selected'; list.appendChild(none);
+                return;
+            }
+
+            // Spell the chord notes
+            const chordPcs = topIntervals.map(iv => mod12(topRootPc + iv));
+            const spelled = chordPcs.map(pc => (PC_NAMES[pc] && PC_NAMES[pc][0]) || nameForPC(pc));
+
+            arpeggioPatterns.forEach(pattern => {
+                const item = document.createElement('div'); item.className = 'scale-item card';
+                const head = document.createElement('div'); head.className = 'scale-head';
+                const titleBox = document.createElement('div');
+
+                const title = document.createElement('div'); title.className = 'scale-title';
+                title.textContent = `${topRoot}${(QUALITIES[topQual] && QUALITIES[topQual].name) || topQual} - ${pattern.name}`;
+
+                const sub = document.createElement('div'); sub.className = 'scale-sub';
+                sub.textContent = `${spelled.join(' · ')}  •  ${pattern.minFret === 0 ? 'Open' : 'Frets'} ${pattern.minFret}–${pattern.maxFret}`;
+
+                titleBox.appendChild(title); titleBox.appendChild(sub);
+
+                const actions = document.createElement('div'); actions.className = 'actions';
+                const btnPlay = document.createElement('button'); btnPlay.className = 'btn'; btnPlay.textContent = t('play') || 'Play';
+                actions.appendChild(btnPlay);
+
+                head.appendChild(titleBox); head.appendChild(actions);
+
+                // arpeggio content - show immediately, no collapse
+                const fbWrap = document.createElement('div'); fbWrap.className = 'fret-wrap';
+                fbWrap.dataset.minFret = pattern.minFret;
+                fbWrap.dataset.maxFret = pattern.maxFret;
+
+                // render fretboard with arpeggio pattern immediately
+                const tuningName = (byId('tuningSel') && byId('tuningSel').value) || tuneSel.value || 'E Standard';
+                const labelMode = (byId('labelMode') && byId('labelMode').value) || dispSel.value || 'notes';
+                renderArpeggioFretboard(fbWrap, tuningName, topRoot, topIntervals, topRoot, labelMode, pattern.minFret, pattern.maxFret);
+
+                // Setup play button after rendering
+                btnPlay.addEventListener('click', () => playArpeggio(fbWrap));
+
+                item.appendChild(head); item.appendChild(fbWrap); list.appendChild(item);
+            });
+
+            // Keep mirrored controls in sync with the chords panel controls
+            try {
+                const globalT = byId('tuningSel');
+                if (globalT) {
+                    globalT.addEventListener('change', () => { try { tuneSel.value = globalT.value; rerenderOpenFretboards(); } catch (e) { } });
+                    tuneSel.addEventListener('change', () => { try { globalT.value = tuneSel.value; globalT.dispatchEvent(new Event('change')); rerenderOpenFretboards(); } catch (e) { } });
+                } else {
+                    tuneSel.addEventListener('change', () => { rerenderOpenFretboards(); });
+                }
+            } catch (e) { }
+            try {
+                const globalLM = byId('labelMode');
+                if (globalLM) {
+                    globalLM.addEventListener('change', () => { try { dispSel.value = globalLM.value; rerenderOpenFretboards(); } catch (e) { } });
+                    dispSel.addEventListener('change', () => { try { globalLM.value = dispSel.value; globalLM.dispatchEvent(new Event('change')); rerenderOpenFretboards(); } catch (e) { } });
+                } else {
+                    dispSel.addEventListener('change', () => { rerenderOpenFretboards(); });
+                }
+            } catch (e) { }
+
+            // helper to re-render all arpeggio fretboards (they are always visible)
+            function rerenderOpenFretboards() {
+                const items = list.querySelectorAll('.fret-wrap');
+                items.forEach(fb => {
+                    if (!fb) return;
+                    const tuningName = (byId('tuningSel') && byId('tuningSel').value) || tuneSel.value || 'E Standard';
+                    const labelMode = (byId('labelMode') && byId('labelMode').value) || dispSel.value || 'notes';
+                    const minFret = parseInt(fb.dataset.minFret) || 0;
+                    const maxFret = parseInt(fb.dataset.maxFret) || 4;
+                    renderArpeggioFretboard(fb, tuningName, topRoot, topIntervals, topRoot, labelMode, minFret, maxFret);
+                });
+            }
+        }
+
+        // render arpeggio fretboard - shows only chord notes within the specified fret range
+        function renderArpeggioFretboard(mount, tuningName, scaleRoot, scaleIntervals, tonicName, labelMode = 'notes', minFret = 0, maxFret = 4) {
+            if (!mount) return;
+            mount.innerHTML = '';
+
+            const tuning = COMMON_TUNINGS[tuningName];
+            if (!tuning || !tuning.strings) return;
+
+            const strings = tuning.strings;
+            const numStrings = strings.length;
+
+            // Always show 5 frets for consistency
+            const displayMinFret = minFret;
+            const displayMaxFret = minFret + 4; // Always show 5 frets
+            const fretRange = 5;
+
+            // Calculate chord pitch classes
+            const rootPc = noteToIndex(scaleRoot);
+            const chordPcs = new Set(scaleIntervals.map(iv => mod12(rootPc + iv)));
+
+            // Create SVG with larger dimensions
+            const fretWidth = 60;
+            const stringHeight = 40;
+            const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            svg.setAttribute('viewBox', `0 0 ${fretRange * fretWidth + 120} ${(numStrings - 1) * stringHeight + 80}`);
+            svg.setAttribute('width', '100%');
+            svg.setAttribute('height', 'auto');
+
+            // Draw frets (always 5 frets)
+            for (let fret = displayMinFret; fret <= displayMaxFret; fret++) {
+                const x = (fret - displayMinFret) * fretWidth + 60;
+                const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                line.setAttribute('x1', x);
+                line.setAttribute('y1', 30);
+                line.setAttribute('x2', x);
+                line.setAttribute('y2', 30 + (numStrings - 1) * stringHeight);
+                line.setAttribute('stroke', 'var(--fret)');
+                line.setAttribute('stroke-width', (fret === 0 && minFret === 0) ? '4' : '2');
+                svg.appendChild(line);
+            }
+
+            // Draw right border to "close" the diagram
+            const rightBorderX = 60 + fretRange * fretWidth;
+            const rightBorder = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            rightBorder.setAttribute('x1', rightBorderX);
+            rightBorder.setAttribute('y1', 30);
+            rightBorder.setAttribute('x2', rightBorderX);
+            rightBorder.setAttribute('y2', 30 + (numStrings - 1) * stringHeight);
+            rightBorder.setAttribute('stroke', 'var(--fret)');
+            rightBorder.setAttribute('stroke-width', '2');
+            svg.appendChild(rightBorder);
+
+            // Draw strings (reversed - low E string at bottom)
+            for (let str = 0; str < numStrings; str++) {
+                const y = 30 + (numStrings - 1 - str) * stringHeight; // Reverse string order
+                const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                line.setAttribute('x1', 60);
+                line.setAttribute('y1', y);
+                line.setAttribute('x2', 60 + fretRange * fretWidth);
+                line.setAttribute('y2', y);
+                line.setAttribute('stroke', 'var(--string)');
+                line.setAttribute('stroke-width', '2');
+                svg.appendChild(line);
+            }
+
+            // Draw fret numbers
+            for (let fret = displayMinFret; fret <= displayMaxFret; fret++) {
+                if (fret === 0 && minFret === 0) continue; // Skip open string label for open position
+
+                let x;
+                if (minFret === 0) {
+                    // For open position, place labels at center of fret spaces (fret 1 = between fret 0 and 1, etc.)
+                    x = 60 + fret * fretWidth - (fretWidth / 2);
+                } else {
+                    // For closed positions, place labels at center of fret spaces
+                    x = 60 + (fret - displayMinFret + 0.5) * fretWidth;
+                }
+
+                const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                text.setAttribute('x', x);
+                text.setAttribute('y', 30 + (numStrings - 1) * stringHeight + 35);
+                text.setAttribute('text-anchor', 'middle');
+                text.setAttribute('font-size', '16');
+                text.setAttribute('fill', 'var(--muted)');
+                text.textContent = fret;
+                svg.appendChild(text);
+            }
+
+            // Collect notes for playback
+            const notesForPlayback = [];
+
+            // Draw chord notes only within the position range
+            for (let str = 0; str < numStrings; str++) {
+                const openPc = noteToIndex(strings[str].name);
+
+                for (let fret = minFret; fret <= maxFret; fret++) {
+                    const notePc = mod12(openPc + fret);
+
+                    // Only show if it's a chord note
+                    if (!chordPcs.has(notePc)) continue;
+
+                    // Position calculation: ноты точно в середине ладов
+                    let x;
+                    if (fret === 0 && minFret === 0) {
+                        // Открытые струны - слева от нулевого лада (только для открытой позиции)
+                        x = 30;
+                    } else {
+                        // Зажатые струны - в середине лада между двумя ладовыми линиями
+                        let fretPosition;
+                        if (minFret === 0) {
+                            // Для открытой позиции: лад 1 = позиция 0 (между 0 и 1 ладом), лад 2 = позиция 1, etc.
+                            fretPosition = fret - 1;
+                        } else {
+                            // Для закрытых позиций: стандартное вычисление
+                            fretPosition = fret - displayMinFret;
+                        }
+                        x = 60 + fretPosition * fretWidth + (fretWidth / 2);
+                    }
+                    // Reversed Y coordinate (low E string at bottom)
+                    const y = 30 + (numStrings - 1 - str) * stringHeight;
+
+                    // Create a group for the note (circle + text + click area)
+                    const noteGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                    noteGroup.style.cursor = 'pointer';
+
+                    // Calculate note with octave for sound
+                    const noteOctave = calculateNoteOctave(strings[str].name, strings[str].oct, fret);
+                    const noteForSound = ((PC_NAMES[notePc] && PC_NAMES[notePc][0]) || nameForPC(notePc)) + noteOctave;
+
+                    // Create invisible larger click area
+                    const clickArea = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                    clickArea.setAttribute('cx', x);
+                    clickArea.setAttribute('cy', y);
+                    clickArea.setAttribute('r', '20'); // Larger clickable area
+                    clickArea.setAttribute('fill', 'transparent');
+                    clickArea.style.cursor = 'pointer';
+
+                    // Create visible note circle
+                    const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                    circle.setAttribute('cx', x);
+                    circle.setAttribute('cy', y);
+                    circle.setAttribute('r', '14');
+
+                    // Check if it's the root note
+                    const isRoot = notePc === rootPc;
+                    circle.setAttribute('fill', isRoot ? 'var(--tonic)' : 'var(--note)');
+                    circle.setAttribute('stroke', 'white');
+                    circle.setAttribute('stroke-width', '1');
+
+                    // Add click handler to the group
+                    noteGroup.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        console.log('Clicked note:', noteForSound);
+                        if (window.Audio && Audio.playNoteName) {
+                            const match = noteForSound.match(/([A-G][#b]?)(\d+)/);
+                            if (match) {
+                                const noteName = match[1];
+                                const octave = parseInt(match[2]);
+                                Audio.playNoteName(noteName, octave);
+                            }
+                        } else if (window.Audio && Audio.playScale) {
+                            Audio.playScale([noteForSound]);
+                        }
+                    });
+
+                    // Add label
+                    const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                    text.setAttribute('x', x);
+                    text.setAttribute('y', y + 5);
+                    text.setAttribute('text-anchor', 'middle');
+                    text.setAttribute('font-size', '14');
+                    text.setAttribute('font-weight', '600');
+                    text.setAttribute('fill', 'white');
+                    text.style.pointerEvents = 'none'; // Prevent text from blocking clicks
+
+                    let noteName;
+                    if (labelMode === 'notes') {
+                        noteName = (PC_NAMES[notePc] && PC_NAMES[notePc][0]) || nameForPC(notePc);
+                        text.textContent = noteName;
+                    } else {
+                        // Calculate interval from root
+                        const interval = mod12(notePc - rootPc);
+                        const degreeLabels = ['1', '♭2', '2', '♭3', '3', '4', '♭5', '5', '♭6', '6', '♭7', '7'];
+                        text.textContent = degreeLabels[interval] || interval.toString();
+                        noteName = (PC_NAMES[notePc] && PC_NAMES[notePc][0]) || nameForPC(notePc);
+                    }
+
+                    // Add all elements to the group
+                    noteGroup.appendChild(clickArea);
+                    noteGroup.appendChild(circle);
+                    noteGroup.appendChild(text);
+
+                    // Add the group to SVG
+                    svg.appendChild(noteGroup);
+
+                    // Add note for playback (note name + octave)
+                    const playbackOctave = calculateNoteOctave(strings[str].name, strings[str].oct, fret);
+                    notesForPlayback.push({
+                        note: noteName + playbackOctave,
+                        fret: fret,
+                        string: str,
+                        pc: notePc
+                    });
+                }
+            }
+
+            // Store notes for playback in the mount element
+            mount.dataset.notes = JSON.stringify(notesForPlayback);
+
+            mount.appendChild(svg);
+        }
+
+        // play arpeggio with ascending then descending pattern
+        // Convert note name to absolute pitch value for sorting
+        function noteToAbsolutePitch(noteName) {
+            const match = noteName.match(/^([A-G][#b]?)(\d+)$/);
+            if (!match) return 0;
+
+            const [, note, octaveStr] = match;
+            const octave = parseInt(octaveStr);
+            const noteIndex = noteToIndex(note);
+
+            return octave * 12 + noteIndex;
+        }
+
+        // Calculate correct octave for a note on fretboard
+        function calculateNoteOctave(openNoteName, openOctave, fret) {
+            const openNoteIndex = noteToIndex(openNoteName);
+            const totalSemitones = openNoteIndex + fret;
+            const octaveOffset = Math.floor(totalSemitones / 12);
+            return openOctave + octaveOffset;
+        }
+
+        function playArpeggio(fretWrap) {
+            try {
+                const notesData = JSON.parse(fretWrap.dataset.notes || '[]');
+                if (notesData.length === 0) return;
+
+                // Sort notes by absolute pitch (frequency)
+                const sortedNotes = notesData.sort((a, b) => {
+                    return noteToAbsolutePitch(a.note) - noteToAbsolutePitch(b.note);
+                });
+
+                // Remove duplicates - keep only unique notes by pitch
+                const uniqueNotes = [];
+                const seenPitches = new Set();
+
+                for (const noteData of sortedNotes) {
+                    const pitch = noteToAbsolutePitch(noteData.note);
+                    if (!seenPitches.has(pitch)) {
+                        seenPitches.add(pitch);
+                        uniqueNotes.push(noteData.note);
+                    }
+                }
+
+                console.log('Unique notes for arpeggio:', uniqueNotes);
+
+                // Use playArpeggioSequence for proper sequential playback
+                playArpeggioSequence(uniqueNotes);
+
+            } catch (e) {
+                console.error('Error playing arpeggio:', e);
+            }
+        }
+
+        // play notes in sequence (ascending then descending)
+        function playArpeggioSequence(noteNames) {
+            if (!noteNames || noteNames.length === 0) return;
+
+            try {
+                console.log('Playing arpeggio sequence:', noteNames);
+
+                // Create ascending sequence
+                const ascending = [...noteNames];
+                const descending = [...noteNames].reverse();
+                const fullSequence = [...ascending, ...descending];
+
+                console.log('Full arpeggio sequence:', fullSequence);
+
+                // Play each note with timing
+                const noteDuration = 0.4; // Duration of each note
+                const noteStep = 0.5; // Time between note starts
+
+                fullSequence.forEach((noteWithOctave, i) => {
+                    const when = i * noteStep;
+                    // Parse note name and octave
+                    const match = noteWithOctave.match(/([A-G][#b]?)(\d+)/);
+                    if (match) {
+                        const noteName = match[1];
+                        const octave = parseInt(match[2]);
+                        setTimeout(() => {
+                            if (window.Audio && Audio.playNoteName) {
+                                Audio.playNoteName(noteName, octave, noteDuration);
+                            }
+                        }, when * 1000);
+                    }
+                });
+            } catch (e) {
+                console.error('Error in playArpeggioSequence:', e);
+            }
+        }
+
         // debounce helper
         function debounce(fn, wait) { let t = null; return function (...args) { if (t) clearTimeout(t); t = setTimeout(() => { fn.apply(this, args); t = null; }, wait); }; }
 
@@ -1023,31 +1574,99 @@
             const savedPrefsLocal = typeof loadUserPrefs === 'function' ? loadUserPrefs() : null;
             // roots (no empty option — user must pick a tonic)
             if (rootSel) { rootSel.innerHTML = ''; NOTE_NAMES_SHARP.forEach(n => rootSel.appendChild(opt(n, n))); if (savedPrefsLocal && savedPrefsLocal.root) rootSel.value = savedPrefsLocal.root; else if (!rootSel.value) rootSel.value = 'C'; rootSel.style.width = '100%'; rootSel.style.display = 'block'; }
-            // qualities (no empty option — must pick a quality)
-            if (qualitySel) { qualitySel.innerHTML = ''; Object.keys(QUALITIES).forEach(k => { const q = QUALITIES[k]; const label = (q && q.name_en) ? q.name_en : k; qualitySel.appendChild(opt(label, k)); }); if (savedPrefsLocal && savedPrefsLocal.quality) qualitySel.value = savedPrefsLocal.quality; else if (!qualitySel.value) qualitySel.value = Object.keys(QUALITIES)[0] || 'maj'; qualitySel.style.width = '100%'; qualitySel.style.display = 'block'; }
+            // qualities (no empty option — must pick a quality) - grouped by category
+            if (qualitySel) {
+                qualitySel.innerHTML = '';
+
+                // Группы для optgroup
+                const categories = {
+                    'triads': t('chordGroupTriads') || 'Triads',
+                    'seventh': t('chordGroupSeventh') || 'Seventh Chords',
+                    'sus': t('chordGroupSus') || 'Suspended'
+                };
+
+                // Создаем группы
+                Object.keys(categories).forEach(catKey => {
+                    const categoryItems = Object.keys(QUALITIES).filter(k => QUALITIES[k].category === catKey);
+                    if (categoryItems.length > 0) {
+                        const optGroup = document.createElement('optgroup');
+                        optGroup.label = categories[catKey];
+
+                        categoryItems.forEach(k => {
+                            const q = QUALITIES[k];
+                            const label = (q && q.name_en) ? q.name_en : k;
+                            optGroup.appendChild(opt(label, k));
+                        });
+
+                        qualitySel.appendChild(optGroup);
+                    }
+                });
+
+                if (savedPrefsLocal && savedPrefsLocal.quality) qualitySel.value = savedPrefsLocal.quality;
+                else if (!qualitySel.value) qualitySel.value = Object.keys(QUALITIES)[0] || 'maj';
+                qualitySel.style.width = '100%';
+                qualitySel.style.display = 'block';
+            }
             // set default to maj if present
             if (qualitySel && qualitySel.querySelector('option[value="maj"]') && !qualitySel.value) qualitySel.value = 'maj';
             // bass
             if (bassSel) { bassSel.innerHTML = ''; bassSel.appendChild(opt('-', '')); NOTE_NAMES_SHARP.forEach(n => bassSel.appendChild(opt(n, n))); if (savedPrefsLocal && savedPrefsLocal.bass) bassSel.value = savedPrefsLocal.bass; bassSel.style.width = '100%'; bassSel.style.display = 'block'; }
-            // extensions
+            // extensions - grouped and filtered by current chord quality
             if (extWrapEl) {
-                extWrapEl.innerHTML = '';
-                extWrapEl.classList.add('chips');
-                const prefsExts = (savedPrefsLocal && Array.isArray(savedPrefsLocal.exts)) ? savedPrefsLocal.exts : [];
-                (window.COMMON_EXTENSIONS || []).forEach(e => {
-                    const id = e.id;
-                    const lab = document.createElement('label'); lab.className = 'chip';
-                    const checkedAttr = prefsExts.includes(id) ? 'checked' : '';
-                    lab.innerHTML = `<input type="checkbox" value="${id}" id="ext_${id}" ${checkedAttr}><span>${id}</span>`;
-                    extWrapEl.appendChild(lab);
-                });
+                const updateExtensions = () => {
+                    extWrapEl.innerHTML = '';
+                    extWrapEl.classList.add('chips');
+                    const prefsExts = (savedPrefsLocal && Array.isArray(savedPrefsLocal.exts)) ? savedPrefsLocal.exts : [];
+                    const currentQuality = qualitySel ? qualitySel.value : 'maj';
+
+                    // Группы расширений
+                    const extCategories = {
+                        'basic': t('extGroupBasic') || 'Basic Extensions',
+                        'extended': t('extGroupExtended') || 'Extended Tones'
+                    };
+
+                    // Группируем по категориям и фильтруем по применимости
+                    Object.keys(extCategories).forEach(catKey => {
+                        const categoryExts = (window.COMMON_EXTENSIONS || []).filter(e => {
+                            if (e.category !== catKey) return false;
+                            if (!e.appliesTo) return true; // если не указано - применимо ко всем
+                            return e.appliesTo.includes(currentQuality);
+                        });
+
+                        if (categoryExts.length > 0) {
+                            // Добавляем заголовок группы
+                            const groupHeader = document.createElement('div');
+                            groupHeader.className = 'ext-group-header';
+                            groupHeader.textContent = extCategories[catKey];
+                            extWrapEl.appendChild(groupHeader);
+
+                            // Добавляем расширения группы
+                            categoryExts.forEach(e => {
+                                const id = e.id;
+                                const label = e.name_en || id;
+                                const lab = document.createElement('label');
+                                lab.className = 'chip';
+                                const checkedAttr = prefsExts.includes(id) ? 'checked' : '';
+                                lab.innerHTML = `<input type="checkbox" value="${id}" id="ext_${id}" ${checkedAttr}><span title="${label}">${id}</span>`;
+                                extWrapEl.appendChild(lab);
+                            });
+                        }
+                    });
+                };
+
+                updateExtensions();
+
+                // Обновляем расширения при смене качества аккорда
+                if (qualitySel) {
+                    qualitySel.addEventListener('change', updateExtensions);
+                }
             }
 
             // wire change events -> debounced generate
             const trigger = debounce(() => { try { if (window.generate) window.generate(); } catch (e) { } }, 250);
             [rootSel, qualitySel, bassSel].forEach(s => { if (s) s.addEventListener('change', trigger); });
-            // also refresh scales panel when chord selection changes so supported marks update
-            [rootSel, qualitySel, extWrapEl].forEach(s => { if (s) s.addEventListener('change', debounce(() => { try { buildScalesPanel(); } catch (e) { } }, 300)); });
+            // also refresh scales and arpeggios panels when chord selection changes so supported marks update
+            [rootSel, qualitySel, extWrapEl].forEach(s => { if (s) s.addEventListener('change', debounce(() => { try { buildScalesPanel(); buildArpeggiosPanel(); } catch (e) { } }, 300)); });
             // also wire tuning selector (if built) and extension checkboxes
             try { const topTuning = byId('tuningSel'); if (topTuning) topTuning.addEventListener('change', trigger); } catch (e) { }
             if (extWrapEl) extWrapEl.addEventListener('change', trigger);
@@ -1067,6 +1686,7 @@
                 const raw = localStorage.getItem(PREF_KEY);
                 if (!raw) return null;
                 const obj = JSON.parse(raw);
+                console.log('Loaded preferences:', obj);
                 return obj;
             } catch (e) { console.error('loadUserPrefs failed', e); return null; }
         }
@@ -1080,6 +1700,7 @@
                 const labelMode = (byId('labelMode') && byId('labelMode').value) || null;
                 const exts = (byId('extWrap') && Array.from(byId('extWrap').querySelectorAll('input:checked')).map(i => i.value)) || [];
                 const obj = { root, quality, bass, tuning, labelMode, exts };
+                console.log('Saving preferences:', obj);
                 localStorage.setItem(PREF_KEY, JSON.stringify(obj));
             } catch (e) { console.error('saveUserPrefs failed', e); }
         }
@@ -1123,12 +1744,15 @@
 
         // tab wiring
         const last = localStorage.getItem('gt_last_tab') || 'chords';
-        if (last === 'scales') { setActive(tabScales, panelScales); } else { setActive(tabChords, panelChords); }
+        if (last === 'scales') { setActive(tabScales, panelScales); }
+        else if (last === 'arpeggios') { setActive(tabArpeggios, panelArpeggios); }
+        else { setActive(tabChords, panelChords); }
         tabChords.addEventListener('click', () => { setActive(tabChords, panelChords); localStorage.setItem('gt_last_tab', 'chords'); });
         tabScales.addEventListener('click', () => { setActive(tabScales, panelScales); localStorage.setItem('gt_last_tab', 'scales'); });
+        tabArpeggios.addEventListener('click', () => { setActive(tabArpeggios, panelArpeggios); localStorage.setItem('gt_last_tab', 'arpeggios'); });
 
         // build UI
-        buildChordsPanel(); buildScalesPanel();
+        buildChordsPanel(); buildScalesPanel(); buildArpeggiosPanel();
         console.debug('[ui] panels built');
 
         // apply persisted prefs now that panels and listeners are built

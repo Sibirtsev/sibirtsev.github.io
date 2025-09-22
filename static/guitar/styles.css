@@ -346,6 +346,23 @@ button:hover {
   gap: 8px;
 }
 
+.ext-group-header {
+  width: 100%;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 12px;
+  margin-bottom: 4px;
+  padding-bottom: 2px;
+  border-bottom: 1px solid var(--border-muted);
+}
+
+.ext-group-header:first-child {
+  margin-top: 0;
+}
+
 .chip {
   display: inline-flex;
   align-items: center;
@@ -409,10 +426,34 @@ a {
   color: var(--brand-2);
 }
 
-/* Specific to scales.html */
-.scale-list {
+/* Specific to scales.html and arpeggios */
+.scale-list, .arpeggio-list {
   display: grid;
   gap: 8px;
+}
+
+/* Arpeggio-specific styles */
+.arpeggio-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 16px;
+}
+
+.arpeggio-list .scale-item {
+  margin-bottom: 0;
+}
+
+.arpeggio-list .scale-item .fret-wrap {
+  padding: 20px;
+  min-height: 250px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.arpeggio-list .scale-item .fret-wrap svg {
+  max-width: 100%;
+  height: auto;
 }
 
 .scale-item {
@@ -606,6 +647,9 @@ svg.fretboard {
 /* Chord info layout helpers (keep visual styles consistent) */
 .chord-title--block { margin: 0 0 6px 0; font-size: 16px; }
 .chord-notes--block { display: block; margin: 6px 0; color: var(--muted); }
+.chord-degrees--block { display: block; margin: 6px 0; color: var(--muted); font-size: 14px; }
+.chord-degrees-label { font-weight: 500; color: var(--text); }
+.chord-notes-label { font-weight: 500; color: var(--text); }
 .chord-play-wrap { display: block; margin: 8px 0; }
 .chord-play-btn { display: inline-block; }
 

@@ -13,7 +13,7 @@
         <div class="container header-row">
             <div>
                 <h1 id="title">Guitar Tools</h1>
-                <div class="sub" id="subtitle">Chord voicings • Scales & scale picker • Live fretboard • Audio playback
+                <div class="sub" id="subtitle">Chord voicings • Scales & arpeggios • Live fretboard • Audio playback
                 </div>
             </div>
             <div class="lang">
@@ -117,6 +117,8 @@
         <nav class="tabs" role="tablist" aria-selected="true">
             <button class="tab-btn" role="tab" aria-selected="true" data-target="chordsFrame"
                 id="tab-chords">Fingerings</button>
+            <button class="tab-btn" role="tab" aria-selected="false" data-target="arpeggiosFrame"
+                id="tab-arpeggios">Arpeggios</button>
             <button class="tab-btn" role="tab" aria-selected="false" data-target="scalesFrame"
                 id="tab-scales">Scales</button>
         </nav>
@@ -125,6 +127,11 @@
             <div class="panel" role="tabpanel" aria-labelledby="tab-chords" id="panel-chords">
                 <!-- chords content will be injected here (lazy-loaded, no iframe) -->
                 <div id="chordsRoot" class="embedded-root"></div>
+            </div>
+
+            <div class="panel" role="tabpanel" aria-labelledby="tab-arpeggios" id="panel-arpeggios" hidden>
+                <!-- arpeggios content will be injected here (lazy-loaded, no iframe) -->
+                <div id="arpeggiosRoot" class="embedded-root"></div>
             </div>
 
             <div class="panel" role="tabpanel" aria-labelledby="tab-scales" id="panel-scales" hidden>
