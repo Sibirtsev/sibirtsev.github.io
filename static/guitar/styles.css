@@ -1,6 +1,13 @@
-/* Common styles for both pages */
+/* ========================================
+   GUITAR TOOLS - ORGANIZED CSS STRUCTURE
+   ======================================== */
+
+/* ========================================
+   1. CSS VARIABLES & THEME TOKENS
+   ======================================== */
+
 :root {
-  /* Base palette (you provided) */
+  /* Base palette (Light theme) */
   --bg-dark: hsl(220 59% 91%);
   --bg: hsl(220 100% 97%);
   --bg-light: hsl(220 100% 100%);
@@ -16,7 +23,7 @@
   --success: hsl(147 19% 36%);
   --info: hsl(217 22% 41%);
 
-  /* Map existing app variables to palette tokens */
+  /* App-specific color mappings */
   --panel: var(--bg-light);
   --panel-2: var(--bg);
   --muted: var(--text-muted);
@@ -32,8 +39,9 @@
   --note: var(--brand);
   --tonic: var(--success);
   --open-note-bg: var(--highlight);
-  /* Base tokens (light theme) */
-  --base-foreground: var(--text); /* headings / stronger text */
+
+  /* Base design tokens */
+  --base-foreground: var(--text);
   --base-muted: var(--muted);
   --base-brand: var(--brand);
   --base-brand-2: var(--brand-2);
@@ -50,7 +58,8 @@
   --note-label-fill: #ffffff;
   --note-label-open-fill: var(--base-muted);
   --fret-num-fill: #64748b;
-  /* Map derived tokens to base tokens to minimize distinct colors */
+
+  /* Derived tokens for specific components */
   --heading: var(--base-foreground);
   --btn-grad-start: var(--base-brand);
   --btn-grad-end: var(--base-brand-2);
@@ -66,9 +75,9 @@
   --divider: var(--base-divider);
 }
 
-/* Dark theme (applied when documentElement has data-theme="dark") */
+/* Dark theme variables */
 :root[data-theme="dark"] {
-  /* derive darker surfaces from the light palette */
+  /* Dark palette */
   --bg: hsl(222 55% 5%);
   --bg-dark: hsl(228 79% 2%);
   --bg-light: hsl(220 35% 10%);
@@ -83,9 +92,10 @@
   --warning: hsl(52 19% 57%);
   --success: hsl(146 17% 59%);
   --info: hsl(217 28% 65%);
+
+  /* Dark theme mappings */
   --panel: var(--bg-light);
   --panel-2: var(--bg);
-  --text: hsl(220 100% 98%);
   --muted: var(--text-muted);
   --brand: var(--primary);
   --brand-2: var(--info);
@@ -100,7 +110,7 @@
   --tonic: var(--success);
   --open-note-bg: var(--highlight);
 
-  /* Base tokens (dark theme) */
+  /* Dark theme tokens */
   --base-foreground: var(--text);
   --base-muted: var(--muted);
   --base-brand: var(--brand);
@@ -120,7 +130,7 @@
   --fret-num-fill: var(--base-muted);
   --header-bg: var(--bg);
 
-  /* Map derived tokens to base tokens (reuse where sensible) */
+  /* Derived dark theme tokens */
   --btn-grad-start: var(--base-brand);
   --btn-grad-end: var(--base-brand-2);
   --btn-border: var(--base-brand-2);
@@ -131,17 +141,313 @@
   --dot-stroke: var(--base-dot-stroke);
 }
 
+/* Theme transition effects */
+html.theme-init, html[data-theme] {
+  transition: background 240ms ease, color 240ms ease;
+}
+
+/* ========================================
+   2. BASE & RESET STYLES
+   ======================================== */
+
+* {
+  box-sizing: border-box;
+  max-width: 100%;
+}
+
+html, body {
+  overflow-x: hidden;
+  max-width: 100vw;
+  height: 100%;
+  margin: 0;
+}
+
+html {
+  min-height: 100%;
+  background: var(--bg);
+}
+
+body {
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif;
+  color: var(--text);
+  min-height: 100%;
+  background: transparent;
+}
+
+img, video {
+  max-width: 100%;
+  height: auto;
+}
+
+svg {
+  max-width: 100%;
+}
+
+a {
+  color: var(--brand-2);
+}
+
+/* ========================================
+   3. LAYOUT COMPONENTS
+   ======================================== */
+
+/* Header */
+header {
+  padding: 16px;
+  position: sticky;
+  top: 0;
+  background: var(--panel);
+  border-bottom: 1px solid var(--fret);
+  z-index: 5;
+}
+
 header[data-theme="dark"], header[data-theme] {
   background: var(--header-bg);
 }
 
-/* theme toggle small style */
-.theme-chip input[type="checkbox"] { width: 18px; height: 18px; }
-
-/* Smooth transitions when theme changes (applied briefly at init) */
-html.theme-init, html[data-theme] {
-  transition: background 240ms ease, color 240ms ease;
+.header-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
 }
+
+.header-actions {
+  margin-top: 12px;
+}
+
+/* Container */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 16px;
+  width: 100%;
+  overflow-x: hidden;
+}
+
+/* Grid layouts */
+.grid {
+  display: grid;
+  grid-template-columns: minmax(300px, 600px) 1fr;
+  gap: 16px;
+  margin: 16px 0 24px;
+  width: 100%;
+  max-width: 100%;
+}
+
+.two-column-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  width: 100%;
+  max-width: 100%;
+}
+
+.row3 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 12px;
+  width: 100%;
+  max-width: 100%;
+}
+
+/* Cards */
+.card {
+  background: var(--panel);
+  border: 1px solid var(--fret);
+  border-radius: 16px;
+  box-shadow: 0 6px 20px var(--card-shadow-color);
+  padding: 20px;
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+
+.card .body {
+  padding: 16px;
+}
+
+/* ========================================
+   4. TYPOGRAPHY
+   ======================================== */
+
+h1 {
+  font-size: 24px;
+  margin: 0 0 4px;
+  letter-spacing: .2px;
+  font-weight: 600;
+}
+
+h2, .card h2 {
+  font-size: 18px;
+  margin: 0 0 16px;
+  font-weight: 600;
+  color: var(--heading);
+}
+
+.sub {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.mono {
+  font-family: monospace;
+}
+
+label {
+  display: block;
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+
+/* ========================================
+   5. FORM ELEMENTS & CONTROLS
+   ======================================== */
+
+/* Base form elements */
+select,
+button,
+input[type="text"] {
+  appearance: none;
+  background: var(--panel-2);
+  color: var(--text);
+  border: 1px solid var(--fret);
+  padding: 10px 16px;
+  border-radius: 12px;
+  font-size: 15px;
+  transition: all 0.2s;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* Select-specific styles */
+.row select,
+.row3 select {
+  width: 100%;
+}
+
+/* Input-specific styles */
+input[type="checkbox"],
+input[type="radio"] {
+  width: auto !important;
+  margin: 0;
+  accent-color: var(--brand);
+}
+
+/* Button styles */
+button, .btn {
+  background: linear-gradient(180deg, var(--btn-grad-start), var(--btn-grad-end));
+  border: 1px solid var(--btn-border);
+  font-weight: 500;
+  cursor: pointer;
+  color: var(--highlight);
+  width: auto;
+}
+
+button:hover, .btn:hover {
+  background: linear-gradient(180deg, var(--btn-grad-end), var(--btn-border));
+}
+
+/* Focus states */
+select:focus,
+button:focus,
+input:focus {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+
+/* Toggle buttons */
+.toggle-btn {
+  appearance: none;
+  background: var(--panel-2);
+  color: var(--text-muted);
+  border: 1px solid var(--border-muted);
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+  width: auto;
+}
+
+.toggle-btn:hover {
+  background: var(--bg-dark);
+  border-color: var(--border);
+}
+
+.toggle-btn.active {
+  background: var(--brand);
+  color: var(--highlight);
+  border-color: var(--brand);
+}
+
+.toggle-btn.active:hover {
+  background: var(--brand-2);
+  border-color: var(--brand-2);
+}
+
+/* Language toggle */
+.lang {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.lang-toggle-btn {
+  background: var(--bg-light);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 40px;
+  text-align: center;
+}
+
+.lang-toggle-btn:hover {
+  background: var(--bg-dark);
+  border-color: var(--border-muted);
+}
+
+.lang-toggle-btn:active {
+  transform: translateY(1px);
+}
+
+/* Play button */
+.play-btn {
+  margin-top: 12px;
+  width: 100%;
+  padding: 12px 16px;
+  font-size: 14px;
+  min-height: 44px;
+}
+
+.chord-play-btn {
+  display: inline-block;
+  width: auto !important;
+}
+
+/* ========================================
+   6. THEME CONTROLS
+   ======================================== */
 
 .theme-control select {
   padding: 6px 8px;
@@ -149,8 +455,14 @@ html.theme-init, html[data-theme] {
   font-size: 13px;
 }
 
-.theme-control svg { color: var(--muted); }
-.theme-control select:focus { outline: 2px solid var(--brand); outline-offset: 2px; }
+.theme-control svg {
+  color: var(--muted);
+}
+
+.theme-control select:focus {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
 
 .theme-seg {
   display: inline-flex;
@@ -160,6 +472,7 @@ html.theme-init, html[data-theme] {
   border-radius: 10px;
   border: 1px solid var(--fret);
 }
+
 .theme-seg .seg-btn {
   display: inline-flex;
   align-items: center;
@@ -172,195 +485,101 @@ html.theme-init, html[data-theme] {
   color: var(--muted);
   cursor: pointer;
 }
-.theme-seg .seg-btn svg { width: 22px; height: 22px; }
+
+.theme-seg .seg-btn svg {
+  width: 22px;
+  height: 22px;
+}
+
 .theme-seg .seg-btn.active {
   background: var(--brand-2);
   color: white;
 }
+
 .theme-seg .seg-btn:focus {
   outline: 2px solid var(--brand);
   outline-offset: 2px;
 }
 
-* {
-  box-sizing: border-box;
+.theme-chip input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
 }
 
-html,
-body {
-  height: 100%;
-}
+/* ========================================
+   7. TABS & NAVIGATION
+   ======================================== */
 
-html {
-  min-height: 100%;
-  background: var(--bg);
-}
-
-body {
-  margin: 0;
-  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif;
-  color: var(--text);
-  min-height: 100%;
-  background: transparent;
-}
-
-header {
-  padding: 16px;
-  position: sticky;
-  top: 0;
-  background: var(--panel);
-  border-bottom: 1px solid var(--fret);
-  z-index: 5;
-}
-
-.container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 16px;
-}
-
-h1 {
-  font-size: 24px;
-  margin: 0 0 4px;
-  letter-spacing: .2px;
-  font-weight: 600;
-}
-
-.sub {
-  color: var(--muted);
-  font-size: 13px;
-}
-
-.header-row {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-}
-
-.lang {
+.tabs {
   display: flex;
   gap: 8px;
   align-items: center;
+  padding: 8px 0;
+  margin-bottom: 12px;
+  max-width: 100%;
+  flex-wrap: wrap;
+  justify-content: flex-start;
 }
 
-.grid {
-  display: grid;
-  grid-template-columns: 600px 1fr;
-  gap: 16px;
-  margin: 16px 0 24px;
-}
-
-@media (max-width: 980px) {
-  .grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-.card {
-  background: var(--panel);
-  border: 1px solid var(--fret);
-  border-radius: 16px;
-  box-shadow: 0 6px 20px var(--card-shadow-color);
-  padding: 20px;
-}
-
-.card h2 {
-  font-size: 18px;
-  margin: 0 0 16px;
-  font-weight: 600;
-  color: var(--heading);
-}
-
-.card .body {
-  padding: 16px;
-}
-
-label {
-  display: block;
-  font-size: 12px;
-  color: var(--muted);
-  margin-bottom: 6px;
-}
-
-select,
-button,
-input[type="text"],
-.chip {
+.tab-btn {
   appearance: none;
-  background: var(--panel-2);
-  color: var(--text);
-  border: 1px solid var(--fret);
-  padding: 10px 16px;
-  border-radius: 12px;
-  font-size: 15px;
-  transition: all 0.2s;
-}
-
-button {
-  color: var(--highlight);
-}
-
-select:focus,
-button:focus,
-input:focus {
-  outline: 2px solid var(--brand);
-  outline-offset: 2px;
-}
-
-button {
-  background: linear-gradient(180deg, var(--btn-grad-start), var(--btn-grad-end));
   border: 1px solid var(--btn-border);
+  color: var(--highlight);
+  font-size: 13px;
   font-weight: 500;
   cursor: pointer;
+  position: relative;
+  z-index: 1;
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 
-button:hover {
-  background: linear-gradient(180deg, var(--btn-grad-end), var(--btn-border));
+.tab-btn[aria-selected="true"] {
+  background: var(--success);
+  color: var(--highlight);
+  border-color: var(--btn-border);
 }
 
-.row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
+.tab-btn:not([aria-selected="true"]) {
+  opacity: 0.95;
 }
 
-.row3 {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 12px;
+.tab-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--brand) 14%, transparent 86%);
 }
 
-.mt {
-  margin-top: 12px;
+.tab-btn svg {
+  vertical-align: middle;
+  margin-right: 8px;
+  height: 14px;
+  width: 14px;
 }
 
-.muted {
-  color: var(--muted);
+.tab-panels {
+  margin-top: 0;
 }
+
+.tab-panels .panel {
+  border-top: 1px solid var(--fret);
+  padding-top: 26px;
+  margin-top: 0;
+}
+
+/* ========================================
+   8. CHIPS & PILLS
+   ======================================== */
 
 .chips {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
+  max-width: 100%;
 }
 
-.ext-group-header {
-  width: 100%;
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-top: 12px;
-  margin-bottom: 4px;
-  padding-bottom: 2px;
-  border-bottom: 1px solid var(--border-muted);
-}
-
-.ext-group-header:first-child {
-  margin-top: 0;
+.chips .chip {
+  width: auto;
+  flex-shrink: 0;
 }
 
 .chip {
@@ -369,17 +588,20 @@ button:hover {
   gap: 8px;
   cursor: pointer;
   padding-right: 8px;
+  background: var(--panel-2);
+  color: var(--text);
+  border: 1px solid var(--fret);
+  padding: 10px 16px;
+  border-radius: 12px;
+  font-size: 15px;
+  transition: all 0.2s;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .chip input {
   margin: 0;
   accent-color: var(--brand);
-}
-
-.info {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
 }
 
 .pill {
@@ -391,48 +613,17 @@ button:hover {
   font-size: 12px;
 }
 
-.legend {
-  display: flex;
-  gap: 8px;
-  font-size: 12px;
-  color: var(--muted);
-  padding: 0 16px 12px;
-}
+/* ========================================
+   9. SCALES & ARPEGGIOS
+   ======================================== */
 
-.legend .dot {
-  width: 12px;
-  height: 12px;
-  border-radius: 999px;
-  display: inline-block;
-  border: 1px solid var(--dot-border);
-}
-
-.legend .tonic {
-  background: var(--tonic);
-}
-
-.legend .scale {
-  background: var(--note);
-}
-
-.foot {
-  padding: 20px 16px;
-  color: var(--muted);
-  font-size: 12px;
-  text-align: center;
-}
-
-a {
-  color: var(--brand-2);
-}
-
-/* Specific to scales.html and arpeggios */
-.scale-list, .arpeggio-list {
+/* Scales (гаммы) - не трогаем десктопную версию */
+.scale-list {
   display: grid;
   gap: 8px;
 }
 
-/* Arpeggio-specific styles */
+/* Arpeggios (арпеджио) - адаптивная сетка */
 .arpeggio-list {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
@@ -449,6 +640,8 @@ a {
   display: flex;
   align-items: center;
   justify-content: center;
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
 }
 
 .arpeggio-list .scale-item .fret-wrap svg {
@@ -483,26 +676,6 @@ a {
   color: var(--muted);
 }
 
-.actions {
-  display: flex;
-  gap: 8px;
-}
-
-.btn {
-  background: linear-gradient(180deg, var(--btn-grad-start), var(--btn-grad-end));
-  border: 1px solid var(--btn-border);
-  padding: 10px 16px;
-  border-radius: 12px;
-  font-size: 15px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.btn:hover {
-  background: linear-gradient(180deg, var(--btn-grad-end), var(--btn-border));
-}
-
 .collapse {
   display: none;
   border-top: 1px dashed var(--divider);
@@ -520,53 +693,55 @@ a {
   flex-wrap: wrap;
 }
 
-/* Tabs styling: make .tab-btn look like pill buttons (inactive + active state) */
-.tabs {
+.actions {
   display: flex;
   gap: 8px;
-  align-items: center;
-  padding: 8px 0;
-  margin-bottom: 12px;
-}
-.tab-btn {
-  appearance: none;
-  border: 1px solid var(--btn-border);
-  color: var(--highlight);
-  font-size: 13px;
-  font-weight: 500;
-  cursor: pointer;
-  position: relative;
-  z-index: 1;
-}
-.tab-btn[aria-selected="true"] {
-  /* active looks like a pressed Play button with slight elevation */
-  background: var(--success);
-  color: var(--highlight);
-  border-color: var(--btn-border);
-  z-index: 6;
-}
-.tab-btn:not([aria-selected="true"]) { opacity: 0.95; }
-.tab-btn:focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 4px color-mix(in srgb, var(--brand) 14%, transparent 86%);
 }
 
-/* small icon spacing if tabs include inline svgs */
-.tab-btn svg { vertical-align: middle; margin-right: 8px; height: 14px; width: 14px; }
+.pos-title {
+  font-weight: 600;
+  margin: 24px 0 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--divider);
+}
 
-/* make the panel area visually connected to active tab */
-.tab-panels { margin-top: 0; }
-.tab-panels .panel { border-top: 1px solid var(--fret); padding-top: 26px; margin-top: 0; }
+/* ========================================
+   10. FRETBOARD & MUSICAL ELEMENTS
+   ======================================== */
 
-/* Fretboard */
+/* Fretboard container */
 .fret-wrap {
-  overflow: auto;
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  max-width: 100%;
   padding: 16px;
   background: var(--panel-2);
   border-radius: 12px;
   margin-top: 12px;
+  -webkit-overflow-scrolling: touch;
 }
 
+.fret-wrap .fretboard {
+  max-width: none;
+}
+
+/* Ensure scroll works for arpeggio containers only */
+.arpeggio-list .scale-item .fret-wrap {
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+}
+
+/* Fretboard scrollbar styling */
+.fret-wrap::-webkit-scrollbar {
+  height: 6px;
+}
+
+.fret-wrap::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+
+/* SVG fretboard */
 svg.fretboard {
   background: linear-gradient(180deg, var(--panel), var(--panel-2));
   border: 1px solid var(--fret);
@@ -574,6 +749,7 @@ svg.fretboard {
   box-shadow: inset 0 1px 0 var(--fretboard-inset);
 }
 
+/* Musical notation elements */
 .note-label {
   font-size: 11px;
   fill: var(--note-label-fill);
@@ -617,19 +793,152 @@ svg.fretboard {
   stroke: var(--dot-stroke);
 }
 
-/* Specific to chords.html */
-.header-actions {
-  margin-top: 12px;
+/* Legend */
+.legend {
+  display: flex;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--muted);
+  padding: 0 16px 12px;
 }
 
-.controls-section {
-  margin-top: 20px;
+.legend .dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 999px;
+  display: inline-block;
+  border: 1px solid var(--dot-border);
 }
 
-.two-column-grid {
+.legend .tonic {
+  background: var(--tonic);
+}
+
+.legend .scale {
+  background: var(--note);
+}
+
+/* ========================================
+   11. CHORD DIAGRAMS & GRID
+   ======================================== */
+
+/* Chord grid layout - 5 columns on desktop */
+.cards {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 20px;
+  margin-top: 12px;
+  justify-items: center;
+}
+
+/* Individual chord card */
+.voicing {
+  position: relative;
+  border: 1px solid var(--fret);
+  border-radius: 12px;
+  padding: 20px;
+  background: var(--panel);
+  text-align: center;
+  width: 100%;
+  max-width: 240px;
+  min-width: 180px;
+}
+
+/* SVG container */
+.svgwrap {
+  margin-bottom: 16px;
+  display: inline-block;
+  width: 100%;
+  max-width: 200px;
+}
+
+/* Chord diagram SVG */
+.chord-diagram {
+  max-width: 100%;
+  height: auto;
+  width: 100% !important;
+}
+
+.svgwrap svg,
+.svgwrap .chord-diagram {
+  max-width: 100%;
+}
+
+/* Chord metadata */
+.meta2 {
+  margin-bottom: 12px;
+  font-size: 14px;
+}
+
+.meta-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.meta-label {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.meta-value {
+  font-weight: 500;
+  font-size: 13px;
+}
+
+/* Chord info layout */
+.chord-title--block {
+  margin: 0 0 6px 0;
+  font-size: 16px;
+}
+
+.chord-notes--block {
+  display: block;
+  margin: 6px 0;
+  color: var(--muted);
+}
+
+.chord-degrees--block {
+  display: block;
+  margin: 6px 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.chord-degrees-label {
+  font-weight: 500;
+  color: var(--text);
+}
+
+.chord-notes-label {
+  font-weight: 500;
+  color: var(--text);
+}
+
+.chord-play-wrap {
+  display: block;
+  margin: 8px 0;
+}
+
+#chordInfo {
+  display: block;
+}
+
+#chordInfo > * {
+  display: block;
+  margin-bottom: 8px;
+}
+
+#chordInfo .muted {
+  color: var(--muted);
+}
+
+/* ========================================
+   12. UTILITY CLASSES
+   ======================================== */
+
+.mt {
+  margin-top: 12px;
 }
 
 .mt-10 {
@@ -640,130 +949,18 @@ svg.fretboard {
   flex-wrap: wrap;
 }
 
-.mono {
-  font-family: monospace;
-}
-
-/* Chord info layout helpers (keep visual styles consistent) */
-.chord-title--block { margin: 0 0 6px 0; font-size: 16px; }
-.chord-notes--block { display: block; margin: 6px 0; color: var(--muted); }
-.chord-degrees--block { display: block; margin: 6px 0; color: var(--muted); font-size: 14px; }
-.chord-degrees-label { font-weight: 500; color: var(--text); }
-.chord-notes-label { font-weight: 500; color: var(--text); }
-.chord-play-wrap { display: block; margin: 8px 0; }
-.chord-play-btn { display: inline-block; }
-
-/* Ensure chordInfo container renders its children on separate lines
-   without changing the generic .info behavior elsewhere. */
-#chordInfo {
-  display: block;
-}
-#chordInfo > * {
-  display: block;
-  margin-bottom: 8px;
-}
-#chordInfo .muted {
-  color: var(--muted);
-}
-
-header[data-theme="dark"], header[data-theme] {
-  background: var(--header-bg);
-}
-
-/* theme toggle small style */
-.theme-chip input[type="checkbox"] { width: 18px; height: 18px; }
-
-/* Smooth transitions when theme changes (applied briefly at init) */
-html.theme-init, html[data-theme] {
-  transition: background 240ms ease, color 240ms ease;
-}
-
-.theme-control select {
-  padding: 6px 8px;
-  border-radius: 8px;
-  font-size: 13px;
-}
-
-.theme-control svg { color: var(--muted); }
-.theme-control select:focus { outline: 2px solid var(--brand); outline-offset: 2px; }
-
-.theme-seg {
-  display: inline-flex;
-  gap: 8px;
-  background: var(--panel-2);
-  padding: 6px;
-  border-radius: 10px;
-  border: 1px solid var(--fret);
-}
-.theme-seg .seg-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 44px;
-  height: 40px;
-  background: transparent;
-  border: none;
-  border-radius: 8px;
-  color: var(--muted);
-  cursor: pointer;
-}
-.theme-seg .seg-btn svg { width: 22px; height: 22px; }
-.theme-seg .seg-btn.active {
-  background: var(--brand-2);
-  color: white;
-}
-.theme-seg .seg-btn:focus {
-  outline: 2px solid var(--brand);
-  outline-offset: 2px;
-}
-
-.voicing {
-  position: relative;
-  border: 1px solid var(--fret);
-  border-radius: 12px;
-  padding: 16px;
-  background: var(--panel);
-}
-
-.svgwrap {
-  margin-bottom: 12px;
-}
-
-.meta2 {
-  margin-bottom: 10px;
-}
-
-.meta-row {
+.info {
   display: flex;
-  justify-content: space-between;
-  margin-bottom: 4px;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
-.meta-label {
-  color: var(--muted);
+.controls-section {
+  margin-top: 20px;
 }
 
-.meta-value {
-  font-weight: 500;
-}
-
-.play-btn {
-  margin-top: 10px;
-  width: 100%;
-}
-
-.cards {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 16px;
-  margin-top: 12px;
-}
-
-.pos-title {
-  font-weight: 600;
-  margin: 24px 0 12px;
-  padding-bottom: 8px;
-  border-bottom: 1px solid var(--divider);
+.generate-section {
+  margin: 20px 0;
 }
 
 .results-info {
@@ -772,6 +969,716 @@ html.theme-init, html[data-theme] {
   color: var(--muted);
 }
 
-.generate-section {
-  margin: 20px 0;
+.ext-group-header {
+  width: 100%;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 12px;
+  margin-bottom: 4px;
+  padding-bottom: 2px;
+  border-bottom: 1px solid var(--border-muted);
+}
+
+.ext-group-header:first-child {
+  margin-top: 0;
+}
+
+.foot {
+  padding: 20px 16px;
+  color: var(--muted);
+  font-size: 12px;
+  text-align: center;
+}
+
+/* ========================================
+   13. RESPONSIVE DESIGN - MEDIA QUERIES
+   ======================================== */
+
+/* Extra large screens - bigger chord diagrams */
+@media (min-width: 1400px) {
+  .voicing {
+    max-width: 280px;
+    padding: 24px;
+  }
+  
+  .svgwrap {
+    max-width: 240px;
+    margin-bottom: 20px;
+  }
+  
+  .cards {
+    gap: 24px;
+  }
+  
+  .meta2 {
+    font-size: 15px;
+  }
+  
+  .meta-label,
+  .meta-value {
+    font-size: 14px;
+  }
+  
+  .play-btn {
+    font-size: 15px;
+    padding: 14px 18px;
+  }
+}
+
+/* Large screens (tablets) */
+@media (max-width: 980px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+  
+  /* Chord grid - 4 columns on tablets */
+  .cards {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+  }
+  
+  .voicing {
+    max-width: 200px;
+  }
+}
+
+/* Medium screens */
+@media (max-width: 900px) {
+  /* Chord grid - 3 columns on medium screens */
+  .cards {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+  }
+  
+  .voicing {
+    max-width: 180px;
+  }
+}
+
+/* Very small screens */
+@media (max-width: 480px) {
+  .container {
+    padding: 0 8px;
+  }
+  
+  .card {
+    padding: 16px;
+  }
+  
+  .row3 {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  
+  .row {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  
+  select, button, input[type="text"] {
+    padding: 8px 12px;
+    font-size: 14px;
+  }
+  
+  .chips .chip {
+    font-size: 13px;
+    padding: 6px 10px;
+  }
+  
+  /* Арпеджио на маленьких экранах */
+  .arpeggio-list {
+    grid-template-columns: 1fr !important;
+    gap: 6px;
+  }
+  
+  .arpeggio-list .scale-item .fret-wrap {
+    padding: 6px;
+    min-height: 130px;
+  }
+  
+  .arpeggio-list .scale-item .fret-wrap svg {
+    max-width: 260px;
+  }
+  
+  /* Chord diagrams on small screens */
+  .voicing {
+    padding: 8px;
+    min-width: 100px;
+  }
+  
+  .chord-diagram {
+    max-width: 120px;
+  }
+}
+
+/* Extra small screens */
+@media (max-width: 320px) {
+  .container {
+    padding: 0 4px;
+  }
+  
+  .card {
+    padding: 12px;
+  }
+  
+  select, button, input[type="text"] {
+    padding: 6px 8px;
+    font-size: 13px;
+  }
+  
+  .chips .chip {
+    font-size: 12px;
+    padding: 4px 8px;
+  }
+  
+  h1 {
+    font-size: 20px;
+  }
+  
+  h2 {
+    font-size: 16px;
+  }
+  
+  .fret-wrap {
+    padding-bottom: 8px;
+  }
+  
+  /* Арпеджио на экстремально маленьких экранах */
+  .arpeggio-list .scale-item .fret-wrap {
+    padding: 4px;
+    min-height: 110px;
+  }
+  
+  .arpeggio-list .scale-item .fret-wrap svg {
+    max-width: 240px;
+  }
+  
+  /* Chord diagrams on extra small screens */
+  .voicing {
+    padding: 6px;
+    min-width: 80px;
+  }
+  
+  .chord-diagram {
+    max-width: 100px;
+  }
+  
+  .voicing .meta2 {
+    font-size: 10px;
+  }
+  
+  .voicing .meta-label,
+  .voicing .meta-value {
+    font-size: 8px;
+  }
+  
+  .voicing .play-btn {
+    font-size: 9px;
+    padding: 4px 6px;
+    min-height: 24px;
+  }
+}
+
+/* Mobile devices */
+@media (max-width: 768px) {
+  /* Layout adjustments */
+  .row3 {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  
+  .two-column-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .two-column-grid .card:nth-child(2),
+  #chordPickArea .card:nth-child(2) {
+    display: none !important;
+  }
+  
+  /* Mobile-friendly controls */
+  .chips {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .chips .chip {
+    margin-bottom: 8px;
+    width: auto;
+  }
+  
+  .toggle-btn {
+    min-height: 44px;
+    padding: 12px 16px;
+    font-size: 16px;
+    margin-bottom: 8px;
+  }
+  
+  .container {
+    padding: 0 12px;
+  }
+  
+  .lang-toggle-btn {
+    padding: 8px 16px;
+    min-width: 48px;
+    min-height: 44px;
+    font-size: 14px;
+  }
+  
+  .card .body {
+    padding: 16px;
+  }
+  
+  .btn, .tab-btn {
+    min-height: 44px;
+    padding: 12px 16px;
+    font-size: 16px;
+  }
+  
+  select {
+    min-height: 44px;
+    font-size: 16px;
+    padding: 8px 12px;
+  }
+  
+  label {
+    font-size: 16px;
+    margin-bottom: 4px;
+  }
+  
+  .fretboard {
+    max-width: none;
+  }
+  
+  /* Скролл только для арпеджио */
+  .arpeggio-list .scale-item .fret-wrap {
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .arpeggio-list .fret-wrap::-webkit-scrollbar {
+    height: 8px;
+  }
+  
+  .arpeggio-list .fret-wrap::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 4px;
+  }
+  
+  /* Мобильная адаптивная сетка для арпеджио */
+  .arpeggio-list {
+    grid-template-columns: 1fr !important;
+    gap: 12px;
+  }
+  
+  .arpeggio-list .scale-item {
+    max-width: 100%;
+  }
+  
+  .arpeggio-list .scale-item .fret-wrap {
+    padding: 12px;
+    min-height: 200px;
+  }
+  
+  /* Chord diagrams mobile base styles */
+  .voicing {
+    min-width: 120px;
+    max-width: 180px;
+    padding: 12px;
+  }
+  
+  .svgwrap {
+    margin-bottom: 10px;
+  }
+  
+  .voicing .meta2 {
+    font-size: 12px;
+  }
+  
+  .voicing .meta-label {
+    font-size: 10px;
+  }
+  
+  .voicing .meta-value {
+    font-size: 11px;
+  }
+  
+  .voicing .play-btn {
+    font-size: 12px;
+    padding: 6px 10px;
+    min-height: 32px;
+  }
+}
+
+/* Mobile portrait orientation */
+@media (max-width: 768px) and (orientation: portrait) {
+  /* Chord grid - 2 columns in portrait */
+  .cards {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 8px;
+  }
+  
+  .voicing {
+    min-width: 100px;
+    max-width: none;
+    padding: 8px;
+  }
+  
+  .svgwrap {
+    max-width: 100%;
+    margin-bottom: 8px;
+  }
+  
+  .chord-diagram {
+    width: 100% !important;
+    max-width: 140px;
+    height: auto;
+  }
+  
+  .fretboard {
+    max-width: none !important;
+  }
+  
+  /* Портретная ориентация - арпеджио в 1 колонку с уменьшенными диаграммами */
+  .arpeggio-list {
+    grid-template-columns: 1fr !important;
+    gap: 8px;
+  }
+  
+  .arpeggio-list .scale-item .fret-wrap {
+    padding: 8px;
+    min-height: 150px;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .arpeggio-list .scale-item .fret-wrap svg {
+    max-width: 280px;
+    height: auto;
+  }
+  
+  .arpeggio-list .fret-wrap::-webkit-scrollbar {
+    height: 6px;
+  }
+  
+  .arpeggio-list .fret-wrap::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 3px;
+  }
+  
+  .sub {
+    display: none;
+  }
+  
+}
+
+/* Mobile landscape orientation */
+@media (max-width: 768px) and (orientation: landscape) {
+  /* Chord grid - 4 columns in landscape */
+  .cards {
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 6px;
+  }
+  
+  .voicing {
+    min-width: 80px;
+    max-width: none;
+    padding: 6px;
+  }
+  
+  .svgwrap {
+    max-width: 100%;
+    margin-bottom: 6px;
+  }
+  
+  .chord-diagram {
+    width: 100% !important;
+    max-width: 120px;
+    height: auto;
+  }
+  
+  .voicing .meta2 {
+    font-size: 10px;
+  }
+  
+  .voicing .meta-label,
+  .voicing .meta-value {
+    font-size: 9px;
+  }
+  
+  .voicing .play-btn {
+    font-size: 10px;
+    padding: 4px 6px;
+    min-height: 28px;
+  }
+  
+  .two-column-grid .card:nth-child(2) {
+    display: none !important;
+  }
+  
+  .tab-btn {
+    z-index: 1;
+  }
+  
+  /* Альбомная ориентация - арпеджио в 2 колонки */
+  .arpeggio-list {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 8px;
+  }
+  
+  .arpeggio-list .scale-item .fret-wrap {
+    padding: 8px;
+    min-height: 120px;
+  }
+  
+  .arpeggio-list .scale-item .fret-wrap svg {
+    max-width: 250px;
+    height: auto;
+  }
+}
+
+/* Small landscape screens */
+@media screen and (max-height: 500px) and (orientation: landscape) {
+  header {
+    padding: 4px 12px;
+    position: relative;
+  }
+  
+  .header-row {
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  
+  h1 {
+    font-size: 16px;
+    margin: 0;
+    line-height: 1.2;
+  }
+  
+  .sub {
+    font-size: 10px;
+    line-height: 1.2;
+  }
+  
+  #chordPickArea {
+    margin: 8px 0;
+  }
+  
+  .two-column-grid {
+    grid-template-columns: 1fr !important;
+  }
+  
+  .card {
+    margin-bottom: 6px;
+  }
+  
+  .card .body {
+    padding: 8px;
+  }
+  
+  .row3 {
+    grid-template-columns: 1fr 1fr 1fr !important;
+    gap: 4px;
+  }
+  
+  .mt {
+    margin-top: 6px;
+  }
+  
+  .btn, .tab-btn {
+    min-height: 32px;
+    padding: 4px 8px;
+    font-size: 12px;
+    line-height: 1.2;
+  }
+  
+  .lang-toggle-btn {
+    padding: 4px 8px;
+    min-height: 32px;
+    font-size: 12px;
+  }
+  
+  select {
+    min-height: 32px;
+    font-size: 12px;
+    padding: 4px 6px;
+  }
+  
+  label {
+    font-size: 12px;
+    margin-bottom: 2px;
+  }
+  
+  .tabs {
+    padding: 2px 0;
+    margin-bottom: 6px;
+    gap: 4px;
+  }
+  
+  .chips {
+    gap: 2px;
+    flex-direction: row !important;
+    flex-wrap: wrap;
+    align-items: flex-start;
+  }
+  
+  .chips .chip {
+    width: auto !important;
+    flex-shrink: 0;
+    margin-bottom: 0;
+    font-size: 11px;
+    padding: 2px 6px;
+  }
+  
+  .toggle-btn {
+    min-height: 32px;
+    padding: 6px 10px;
+    font-size: 11px;
+    margin-bottom: 0;
+    margin-right: 2px;
+  }
+  
+  h2 {
+    font-size: 14px;
+    margin-bottom: 4px;
+    line-height: 1.2;
+  }
+  
+  .container {
+    padding: 0 6px;
+  }
+  
+  .two-column-grid .card:nth-child(2) {
+    display: none !important;
+  }
+}
+
+/* Very small landscape screens */
+@media screen and (max-height: 400px) and (orientation: landscape) {
+  header {
+    padding: 2px 8px;
+  }
+  
+  h1 {
+    font-size: 14px;
+  }
+  
+  .sub {
+    display: none;
+  }
+  
+  .lang-toggle-btn {
+    padding: 2px 6px;
+    min-height: 28px;
+    font-size: 11px;
+  }
+  
+  .card .body {
+    padding: 6px;
+  }
+  
+  .btn, .tab-btn {
+    min-height: 28px;
+    padding: 2px 6px;
+    font-size: 11px;
+  }
+  
+  select {
+    min-height: 28px;
+    font-size: 11px;
+    padding: 2px 4px;
+  }
+  
+  label {
+    font-size: 10px;
+    margin-bottom: 1px;
+  }
+  
+  h2 {
+    font-size: 12px;
+    margin-bottom: 2px;
+  }
+  
+  .tabs {
+    padding: 1px 0;
+    margin-bottom: 4px;
+    gap: 2px;
+  }
+  
+  .mt {
+    margin-top: 4px;
+  }
+  
+  .row3 {
+    gap: 2px;
+  }
+  
+  .chips .chip {
+    font-size: 10px;
+    padding: 1px 4px;
+  }
+  
+  .toggle-btn {
+    min-height: 28px;
+    padding: 4px 8px;
+    font-size: 10px;
+    margin: 0 1px 0 0;
+  }
+  
+  .theme-control {
+    gap: 2px !important;
+    margin-left: 4px !important;
+  }
+  
+  .seg-btn {
+    width: 24px;
+    height: 24px;
+    padding: 2px;
+  }
+  
+  .seg-btn svg {
+    width: 12px;
+    height: 12px;
+  }
+  
+  .container {
+    padding: 0 4px;
+  }
+  
+  #chordPickArea {
+    margin: 4px 0;
+  }
+}
+
+/* Wide landscape screens (tablets) */
+@media screen and (min-width: 900px) and (max-height: 500px) and (orientation: landscape) {
+  .two-column-grid {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 8px;
+  }
+  
+  .two-column-grid .card:nth-child(2) {
+    display: block !important;
+  }
+  
+  .container {
+    max-width: 100%;
+  }
+  
+  header {
+    padding: 6px 16px;
+  }
+  
+  h1 {
+    font-size: 18px;
+  }
+  
+  .sub {
+    font-size: 12px;
+  }
 }

@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Guitar Tools — Index</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles.css?ver=29abbdf">
 </head>
 
 <body>
@@ -17,11 +17,7 @@
                 </div>
             </div>
             <div class="lang">
-                <label for="langSel" id="languageLabel">Language</label>
-                <select id="langSel">
-                    <option value="en">English</option>
-                    <option value="ru">Русский</option>
-                </select>
+                <button id="langToggle" class="lang-toggle-btn" data-lang="en" title="Switch language">EN</button>
                 <!-- hidden alias for pages that expect id="langSelect" -->
                 <select id="langSelect"
                     style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden;">
@@ -143,10 +139,10 @@
         <div class="foot" id="footer"></div>
     </main>
 
-    <script src="./common-i18n.js"></script>
-    <script src="./common-data.js"></script>
-    <script src="./theme.js"></script>
-    <script src="./scripts.js"></script>
+    <script src="./common-i18n.js?ver=29abbdf"></script>
+    <script src="./common-data.js?ver=29abbdf"></script>
+    <script src="./theme.js?ver=29abbdf"></script>
+    <script src="./scripts.js?ver=29abbdf"></script>
 </body>
 
 </html>

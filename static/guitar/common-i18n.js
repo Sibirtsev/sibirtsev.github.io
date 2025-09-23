@@ -205,9 +205,9 @@
     try { localStorage.setItem(LS_KEY, lang); } catch (e) { /* ignore */ }
   }
 
-  // Try to find the language select element (support several ids/classes)
-  function findLangSelect() {
-    return document.querySelector('#langSel, #langSelect, .lang-select');
+  // Try to find the language control element (button or select)
+  function findLangControl() {
+    return document.querySelector('#langToggle, #langSel, #langSelect, .lang-select');
   }
 
   function applySavedLangIfAny() {
@@ -223,42 +223,80 @@
         try { window.updateUITexts(); } catch (e) { /* ignore */ }
       }
     }
-    // Sync selector value if present
-    const sel = findLangSelect();
-    if (sel) sel.value = saved;
+    // Sync control value if present
+    const control = findLangControl();
+    if (control) {
+      if (control.tagName === 'BUTTON') {
+        control.setAttribute('data-lang', saved);
+        control.textContent = saved.toUpperCase();
+      } else {
+        control.value = saved;
+      }
+    }
     document.documentElement.lang = saved || document.documentElement.lang;
   }
 
-  // Wire selector to persist and apply language
-  function wireLangSelect() {
-    const sel = findLangSelect();
-    if (!sel) return;
-    // initialize selector from saved or current DEFAULT_LANG
+  // Wire language control (button or selector) to persist and apply language
+  function wireLangControl() {
+    const control = findLangControl();
+    if (!control) return;
+
+    // initialize control from saved or current DEFAULT_LANG
     const saved = getSavedLang();
-    if (saved) sel.value = saved;
-    sel.addEventListener('change', () => {
-      const v = sel.value;
-      saveLang(v);
-      if (typeof window.applyLang === 'function') {
-        try { window.applyLang(v); } catch (e) { /* ignore */ }
+    if (saved) {
+      if (control.tagName === 'BUTTON') {
+        control.setAttribute('data-lang', saved);
+        control.textContent = saved.toUpperCase();
       } else {
-        window.DEFAULT_LANG = v;
-        document.documentElement.lang = v;
-        if (typeof window.updateUITexts === 'function') {
-          try { window.updateUITexts(); } catch (e) { /* ignore */ }
-        }
+        control.value = saved;
       }
-    });
+    }
+
+    if (control.tagName === 'BUTTON') {
+      // Handle button toggle
+      control.addEventListener('click', () => {
+        const currentLang = control.getAttribute('data-lang') || 'en';
+        const newLang = currentLang === 'en' ? 'ru' : 'en';
+        control.setAttribute('data-lang', newLang);
+        control.textContent = newLang.toUpperCase();
+        saveLang(newLang);
+
+        if (typeof window.applyLang === 'function') {
+          try { window.applyLang(newLang); } catch (e) { /* ignore */ }
+        } else {
+          window.DEFAULT_LANG = newLang;
+          document.documentElement.lang = newLang;
+          if (typeof window.updateUITexts === 'function') {
+            try { window.updateUITexts(); } catch (e) { /* ignore */ }
+          }
+        }
+      });
+    } else {
+      // Handle select dropdown
+      control.addEventListener('change', () => {
+        const v = control.value;
+        saveLang(v);
+        if (typeof window.applyLang === 'function') {
+          try { window.applyLang(v); } catch (e) { /* ignore */ }
+        } else {
+          window.DEFAULT_LANG = v;
+          document.documentElement.lang = v;
+          if (typeof window.updateUITexts === 'function') {
+            try { window.updateUITexts(); } catch (e) { /* ignore */ }
+          }
+        }
+      });
+    }
   }
 
   // Run after DOM ready so selector exists
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
       applySavedLangIfAny();
-      wireLangSelect();
+      wireLangControl();
     });
   } else {
     applySavedLangIfAny();
-    wireLangSelect();
+    wireLangControl();
   }
 })();

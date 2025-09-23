@@ -235,9 +235,34 @@
 
         // Chord diagram renderer (adapted from chords.js). Returns an SVG element.
         function renderDiagram(voicing, rootPc, tuningPcs, labelMode) {
-            const width = 180, height = 220, strings = 6, fretsVisible = 5, margin = 35;
+            // Responsive sizing for mobile devices
+            const isMobile = window.innerWidth <= 768;
+            const isPortrait = window.innerHeight > window.innerWidth;
+
+            let width = 180, height = 220, margin = 35;
+
+            if (isMobile) {
+                if (isPortrait) {
+                    // Larger for mobile portrait
+                    width = 160;
+                    height = 190;
+                    margin = 30;
+                } else {
+                    // Compact for mobile landscape
+                    width = 150;
+                    height = 180;
+                    margin = 30;
+                }
+            }
+
+            const strings = 6, fretsVisible = 5;
             const innerW = width - margin * 2, innerH = height - margin * 2;
             const dx = innerW / (strings - 1), dy = innerH / (fretsVisible - 1);
+
+            // Responsive element sizing
+            const fontSize = isMobile ? (isPortrait ? '9' : '9') : '10';
+            const circleRadius = isMobile ? (isPortrait ? 8 : 8) : 9;
+            const fretNumFontSize = isMobile ? (isPortrait ? '9' : '9') : '10';
 
             // find fretted notes (excluding open strings) to determine position
             const frettedNotes = voicing.frets.filter(f => typeof f === 'number' && f > 0);
@@ -276,8 +301,10 @@
             const svg = document.createElementNS(svgNS, 'svg');
             svg.setAttribute('width', width);
             svg.setAttribute('height', height);
+            svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
+            svg.className = 'chord-diagram';
             svg.style.background = 'transparent';
-            svg.style.borderRadius = '12px';
+            svg.style.borderRadius = isMobile ? '8px' : '12px';
             svg.style.boxShadow = '0 1px 2px rgba(0,0,0,.04)';
             // horizontal fret lines
             for (let k = 0; k < fretsVisible; k++) {
@@ -310,7 +337,7 @@
                 text.setAttribute('x', margin - 20);
                 text.setAttribute('y', margin + k * dy - dy / 2 + 4); // center between frets
                 text.setAttribute('text-anchor', 'middle');
-                text.setAttribute('font-size', '10');
+                text.setAttribute('font-size', fretNumFontSize);
                 text.setAttribute('fill', 'var(--muted)');
                 text.textContent = fretNum;
                 svg.appendChild(text);
@@ -344,7 +371,7 @@
                         const circle = document.createElementNS(svgNS, 'circle');
                         circle.setAttribute('cx', stringX(i));
                         circle.setAttribute('cy', centerY); // same center level as × symbols
-                        circle.setAttribute('r', 9);
+                        circle.setAttribute('r', circleRadius);
                         circle.setAttribute('fill', isRoot ? 'var(--note)' : 'var(--nut)');
                         g.appendChild(circle);
 
@@ -353,7 +380,7 @@
                         noteText.setAttribute('x', stringX(i));
                         noteText.setAttribute('y', centerY + 4); // +4 for vertical centering
                         noteText.setAttribute('text-anchor', 'middle');
-                        noteText.setAttribute('font-size', '10');
+                        noteText.setAttribute('font-size', fontSize);
                         noteText.setAttribute('fill', '#fff');
                         const label = (labelMode === 'notes') ? nameForPC(pc) : intervalName((pc - rootPc + 12) % 12);
                         noteText.textContent = label;
@@ -385,10 +412,10 @@
                 const x = stringX(i), y = fretY(f);
                 const pc = (tuningPcs[i] + f) % 12; const isRoot = pc === rootPc;
                 const g = document.createElementNS(svgNS, 'g');
-                const c = document.createElementNS(svgNS, 'circle'); c.setAttribute('cx', x); c.setAttribute('cy', y); c.setAttribute('r', 9);
+                const c = document.createElementNS(svgNS, 'circle'); c.setAttribute('cx', x); c.setAttribute('cy', y); c.setAttribute('r', circleRadius);
                 c.setAttribute('fill', isRoot ? 'var(--note)' : 'var(--nut)'); g.appendChild(c);
                 const t = document.createElementNS(svgNS, 'text'); t.setAttribute('x', x); t.setAttribute('y', y + 4);
-                t.setAttribute('text-anchor', 'middle'); t.setAttribute('font-size', '10'); t.setAttribute('fill', '#fff');
+                t.setAttribute('text-anchor', 'middle'); t.setAttribute('font-size', fontSize); t.setAttribute('fill', '#fff');
                 const label = (labelMode === 'notes') ? nameForPC(pc) : intervalName((pc - rootPc + 12) % 12);
                 t.textContent = label; g.appendChild(t);
                 svg.appendChild(g);
@@ -622,7 +649,7 @@
             function hasDuplicateExactNotes(curFrets, tuningMidiArr) { const seen = new Set(); for (let s = 0; s < N; s++) { const f = curFrets[s]; if (f === 'X' || f === undefined) continue; if (tuningMidiArr && Array.isArray(tuningMidiArr) && tuningMidiArr.length === N) { const midi = tuningMidiArr[s] + f; if (seen.has(midi)) return true; seen.add(midi); } else { const pc = (tuningPcs[s] + f) % 12; if (seen.has(pc)) return true; seen.add(pc); } } return false; }
             function finalizeCandidate(curFrets, usedPcs, playedIdxs) {
                 if (playedIdxs.length < minStrings) return; if (!isContiguousPlayed(playedIdxs)) return; for (const e of essentialSet) if (!usedPcs.has(e)) return; if (requiredExtPcs && requiredExtPcs.size > 0) { for (const r of requiredExtPcs) if (!usedPcs.has(r)) return; } if (fingerCount(curFrets) > 5) return; if (!allowOpens && curFrets.some(f => f === 0)) return; if (!passesBassCheck(curFrets)) return;
-                try { const nd = document.getElementById && document.getElementById('noDuplicateNotes'); if (nd && nd.checked) { if (hasDuplicateExactNotes(curFrets, tuningMidi)) return; } } catch (e) { }
+                try { const nd = document.getElementById && document.getElementById('noDuplicateNotes'); if (nd && nd.classList.contains('active')) { if (hasDuplicateExactNotes(curFrets, tuningMidi)) return; } } catch (e) { }
                 const fingerings = enumerateFingerings(curFrets, 12); if (!fingerings || fingerings.length === 0) return; const v = postProcessVoicing(curFrets, tuningPcs); v._fingers = fingerings[0]; if (fingerings.length > 1) v._altFingerings = fingerings.slice(1); results.push(v);
             }
             function tryNumericOptions(i, curFrets, usedPcs, playedIdxs, minFret, maxFret) { if (results.length >= maxResults) return; for (const f of validByString[i]) { let nMin = minFret, nMax = maxFret; if (nMin === Infinity) nMin = f; if (f > 0) { nMin = Math.min(nMin, f); nMax = Math.max(nMax, f); } else { nMin = (nMin === Infinity) ? f : nMin; nMax = Math.max(nMax, f); } if (f > 0 && nMin > 0 && nMax - nMin > maxSpan) continue; const pc = (tuningPcs[i] + f) % 12; const used = new Set(usedPcs); used.add(pc); dfs(i + 1, curFrets.concat(f), used, playedIdxs.concat(i), nMin, nMax); if (results.length >= maxResults) return; } }
@@ -649,6 +676,7 @@
         function populateTuningSelector(selectElement) {
             if (!window.COMMON_TUNINGS || !window.TUNING_GROUPS) return;
 
+            const currentValue = selectElement.value; // Сохраняем текущее значение
             selectElement.innerHTML = ''; // Clear existing options
 
             window.TUNING_GROUPS.forEach(group => {
@@ -660,7 +688,13 @@
                         const option = document.createElement('option');
                         option.value = tuningKey;
                         const tuning = window.COMMON_TUNINGS[tuningKey];
-                        option.textContent = `${tuningKey} — ${(tuning.strings || []).map(s => s.name + s.oct).join(' ')}`;
+                        // В мобильной версии показываем только название, в десктопной - полный состав
+                        const isMobile = window.innerWidth <= 768;
+                        if (isMobile) {
+                            option.textContent = tuningKey;
+                        } else {
+                            option.textContent = `${tuningKey} — ${(tuning.strings || []).map(s => s.name + s.oct).join(' ')}`;
+                        }
                         optGroup.appendChild(option);
                     }
                 });
@@ -669,6 +703,13 @@
                     selectElement.appendChild(optGroup);
                 }
             });
+
+            // Восстанавливаем значение или устанавливаем по умолчанию
+            if (currentValue && selectElement.querySelector(`option[value="${currentValue}"]`)) {
+                selectElement.value = currentValue;
+            } else if (selectElement.value === '' || !selectElement.value) {
+                selectElement.value = 'E Standard';
+            }
         }
 
         // build chords panel: include tuning selector, constraints, and results area
@@ -694,11 +735,13 @@
             // constraints (placed below controls)
             const h22 = document.createElement('h2'); h22.textContent = t('constraintsTitle') || 'Constraints'; body.appendChild(h22);
             const chips = document.createElement('div'); chips.className = 'chips wrap';
-            const omitRoot = document.createElement('label'); omitRoot.className = 'chip'; omitRoot.innerHTML = `<input type="checkbox" id="omitRoot" checked><span>${t('omitRootLbl') || 'allow omit root'}</span>`; chips.appendChild(omitRoot);
-            const omitFifth = document.createElement('label'); omitFifth.className = 'chip'; omitFifth.innerHTML = `<input type="checkbox" id="omitFifth" checked><span>${t('omitFifthLbl') || 'allow omit fifth'}</span>`; chips.appendChild(omitFifth);
-            const allowOpens = document.createElement('label'); allowOpens.className = 'chip'; allowOpens.innerHTML = `<input type="checkbox" id="allowOpens" checked><span>${t('allowOpensLbl') || 'allow open strings'}</span>`; chips.appendChild(allowOpens);
-            const contiguous = document.createElement('label'); contiguous.className = 'chip'; contiguous.innerHTML = `<input type="checkbox" id="contiguous" checked><span>${t('contiguousLbl') || 'contiguous strings'}</span>`; chips.appendChild(contiguous);
-            const dup = document.createElement('label'); dup.className = 'chip'; dup.innerHTML = `<input type="checkbox" id="noDuplicateNotes" checked><span>${t('noDuplicateNotesLbl') || 'filter duplicate notes'}</span>`; chips.appendChild(dup);
+
+            // Create toggle buttons instead of checkboxes
+            const omitRoot = document.createElement('button'); omitRoot.className = 'toggle-btn active'; omitRoot.id = 'omitRoot'; omitRoot.textContent = t('omitRootLbl') || 'allow omit root'; chips.appendChild(omitRoot);
+            const omitFifth = document.createElement('button'); omitFifth.className = 'toggle-btn active'; omitFifth.id = 'omitFifth'; omitFifth.textContent = t('omitFifthLbl') || 'allow omit fifth'; chips.appendChild(omitFifth);
+            const allowOpens = document.createElement('button'); allowOpens.className = 'toggle-btn active'; allowOpens.id = 'allowOpens'; allowOpens.textContent = t('allowOpensLbl') || 'allow open strings'; chips.appendChild(allowOpens);
+            const contiguous = document.createElement('button'); contiguous.className = 'toggle-btn active'; contiguous.id = 'contiguous'; contiguous.textContent = t('contiguousLbl') || 'contiguous strings'; chips.appendChild(contiguous);
+            const dup = document.createElement('button'); dup.className = 'toggle-btn active'; dup.id = 'noDuplicateNotes'; dup.textContent = t('noDuplicateNotesLbl') || 'filter duplicate notes'; chips.appendChild(dup);
             // include the display select inside controls-bar already; keep 'chips' for other toggles
             body.appendChild(chips);
 
@@ -738,9 +781,18 @@
                     lm.addEventListener('change', () => { try { saveUserPrefs(); } catch (e) { } });
                 }
             } catch (e) { }
-            // hook checkboxes by id (they were created above inside chips)
+            // hook toggle buttons by id (they were created above inside chips)
             ['omitRoot', 'omitFifth', 'allowOpens', 'contiguous', 'noDuplicateNotes'].forEach(id => {
-                try { const el = document.getElementById(id); if (el) el.addEventListener('change', trigger); } catch (e) { }
+                try {
+                    const el = document.getElementById(id);
+                    if (el) {
+                        el.addEventListener('click', (e) => {
+                            e.preventDefault();
+                            el.classList.toggle('active');
+                            trigger();
+                        });
+                    }
+                } catch (e) { }
             });
             // minStrings control (optional)
             try { const ms = document.getElementById('minStrings'); if (ms) ms.addEventListener('change', trigger); } catch (e) { }
@@ -762,11 +814,11 @@
                     // calculate required extension pitch-classes
                     const requiredExtPcs = new Set((exts || []).map(e => (EXT_MAP[e] !== undefined ? mod12(rootPc + EXT_MAP[e]) : null)).filter(x => x !== null));
                     const requiredBassPc = bass ? mod12(noteToIndex(bass)) : null;
-                    const essentials = essentialPcs(noteToIndex(root), qual, exts, !!(byId('omitRoot') && byId('omitRoot').checked), !!(byId('omitFifth') && byId('omitFifth').checked));
+                    const essentials = essentialPcs(noteToIndex(root), qual, exts, !!(byId('omitRoot') && byId('omitRoot').classList.contains('active')), !!(byId('omitFifth') && byId('omitFifth').classList.contains('active')));
                     let voicings = [];
                     try {
                         console.debug('[generate] inputs', { tuningName, tuning, chordPcs: Array.from(chordPcs), essentials: Array.from(essentials), requiredExtPcs: Array.from(requiredExtPcs), requiredBassPc });
-                        voicings = generateVoicings({ tuningPcs: tuning.pcs, tuningMidi: tuning.midi, chordPcs, essentialSet: essentials, maxSpan: 4, minStrings: parseInt((byId('minStrings') && byId('minStrings').value) || '3', 10), contiguous: !!(byId('contiguous') && byId('contiguous').checked), allowOpens: !!(byId('allowOpens') && byId('allowOpens').checked), maxResults: 500, bassPc: requiredBassPc, requiredExtPcs });
+                        voicings = generateVoicings({ tuningPcs: tuning.pcs, tuningMidi: tuning.midi, chordPcs, essentialSet: essentials, maxSpan: 4, minStrings: parseInt((byId('minStrings') && byId('minStrings').value) || '3', 10), contiguous: !!(byId('contiguous') && byId('contiguous').classList.contains('active')), allowOpens: !!(byId('allowOpens') && byId('allowOpens').classList.contains('active')), maxResults: 500, bassPc: requiredBassPc, requiredExtPcs });
                         console.debug('[generate] voicings found', voicings.length);
                     } catch (genErr) {
                         console.error('[generate] generateVoicings threw', genErr);
@@ -1808,8 +1860,33 @@
         window.updateUITexts = updateUITexts;
 
         // language and theme wiring
-        const langSel = byId('langSel'); if (langSel) { langSel.addEventListener('change', () => { const v = langSel.value; try { if (typeof window.applyLang === 'function') window.applyLang(v); else { LANG = v; document.documentElement.lang = v; updateUITexts(); } } catch (e) { console.error('lang change handler', e); } }); }
+        // Language control is handled by common-i18n.js
         const themeSelect = byId('themeSelect'); if (themeSelect) { themeSelect.addEventListener('change', () => { document.documentElement.setAttribute('data-theme', themeSelect.value); }); }
+
+        // Responsive SVG update on window resize/orientation change
+        let resizeTimeout;
+        function handleResponsiveResize() {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+                try {
+                    // Re-generate chord diagrams if they exist
+                    if (window.generate && typeof window.generate === 'function') {
+                        console.debug('[responsive] Re-generating content for new screen size');
+                        window.generate();
+                    }
+
+                    // Re-render fretboards if they exist
+                    if (typeof rerenderOpenFretboards === 'function') {
+                        rerenderOpenFretboards();
+                    }
+                } catch (e) {
+                    console.error('Responsive resize update failed', e);
+                }
+            }, 250); // Debounce for 250ms
+        }
+
+        window.addEventListener('resize', handleResponsiveResize);
+        window.addEventListener('orientationchange', handleResponsiveResize);
 
     })();
 
