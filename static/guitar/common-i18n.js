@@ -155,7 +155,12 @@
       legend: '<span class="dot tonic"></span> — tonic · <span class="dot scale"></span> — scale notes',
       lang: 'Language',
       labNotes: 'Notes',
-      labDegrees: 'Degrees'
+      labDegrees: 'Degrees',
+      // Function abbreviations legend
+      functionT: 'T = Tonic',
+      functionS: 'S = Subdominant',
+      functionD: 'D = Dominant',
+      functionPD: 'PD = Predominant'
     },
     ru: {
       title: 'Гитарный помогатор',
@@ -305,7 +310,12 @@
       lang: 'Язык',
       labels: 'Подписи',
       labNotes: 'Ноты',
-      labDegrees: 'Ступени'
+      labDegrees: 'Ступени',
+      // Function abbreviations legend
+      functionT: 'T = Тоника',
+      functionS: 'S = Субдоминанта',
+      functionD: 'D = Доминанта',
+      functionPD: 'PD = Предоминанта'
     }
   };
 

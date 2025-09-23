@@ -305,69 +305,257 @@
             return_chords_after_pivot: [
                 chord("I", [1, 3, 5]) // C E G
             ]
-        }
+        },
 
-        // TODO: Add more modulations:
-        // - Neapolitan sixth relationships  
-        // - Tritone substitutions
-        // - Augmented sixth chords
-        // - Distant relationships
-        // - Enharmonic modulations
+        // ========================================
+        // NEAPOLITAN RELATIONSHIPS
+        // ========================================
+
+        neapolitan_sixth: {
+            name_en: "Neapolitan Sixth",
+            name_ru: "Неаполитанская секста",
+            from_mode: "minor",
+            to_mode: "major",
+            interval_semitones: 1, // bII degree
+            relationship: "bII",
+            category: "chromatic",
+            strength: "medium",
+
+            // Modulation via Neapolitan sixth (A minor → Bb major)
+            chords_before_pivot: [
+                chord("i", [1, 3, 5]) // A C E
+            ],
+            pivot_chord_from: chord("N6", [2, 4, 6]), // Bb D F - Neapolitan sixth in A minor
+            pivot_chord_to: chord("I", [1, 3, 5]),    // Same chord as I in Bb major
+            chords_after_pivot: [
+                chord("V", [5, 7, 2]),   // F A C
+                chord("I", [1, 3, 5])    // Bb D F
+            ],
+
+            // Return: Bb major → A minor
+            return_chords_before_pivot: [
+                chord("I", [1, 3, 5]) // Bb D F
+            ],
+            return_pivot_chord_from: chord("I", [1, 3, 5]),  // Bb D F
+            return_pivot_chord_to: chord("N6", [2, 4, 6]),   // Same chord as N6 in A minor
+            return_chords_after_pivot: [
+                chord("V", [5, 7, 2]),   // E G# B
+                chord("i", [1, 3, 5])    // A C E
+            ]
+        },
+
+        // ========================================
+        // TRITONE SUBSTITUTION
+        // ========================================
+
+        tritone_substitution: {
+            name_en: "Tritone Substitution",
+            name_ru: "Тритоновая замена",
+            from_mode: "major",
+            to_mode: "major",
+            interval_semitones: 6, // Tritone away
+            relationship: "bV/V",
+            category: "chromatic",
+            strength: "weak",
+
+            // Modulation via tritone substitution (C major → F# major)
+            chords_before_pivot: [
+                chord("I", [1, 3, 5]) // C E G
+            ],
+            pivot_chord_from: chord("bV7/V", [1, 3, 5, 7]), // Ab C Eb Gb (bV7 of G)
+            pivot_chord_to: chord("V7", [5, 7, 2, 4]),      // Enharmonically C# E# G# B
+            chords_after_pivot: [
+                chord("I", [1, 3, 5]) // F# A# C#
+            ],
+
+            // Return: F# major → C major  
+            return_chords_before_pivot: [
+                chord("I", [1, 3, 5]) // F# A# C#
+            ],
+            return_pivot_chord_from: chord("V7", [5, 7, 2, 4]),     // C# E# G# B
+            return_pivot_chord_to: chord("bV7/V", [1, 3, 5, 7]),    // Enharmonically Ab C Eb Gb
+            return_chords_after_pivot: [
+                chord("V", [5, 7, 2]),   // G B D
+                chord("I", [1, 3, 5])    // C E G
+            ]
+        },
+
+        // ========================================
+        // AUGMENTED SIXTH CHORDS
+        // ========================================
+
+        augmented_sixth_italian: {
+            name_en: "Italian Augmented Sixth",
+            name_ru: "Итальянская увеличенная секста",
+            from_mode: "minor",
+            to_mode: "major",
+            interval_semitones: 7, // Perfect fifth up (A minor → E major)
+            relationship: "V",
+            category: "chromatic",
+            strength: "medium",
+
+            // Modulation: A minor → E major via It+6
+            chords_before_pivot: [
+                chord("i", [1, 3, 5]) // A C E
+            ],
+            pivot_chord_from: chord("It+6"), // Italian +6 in A minor: F A C#
+            chords_after_pivot: [
+                chord("V", [5, 7, 2]),   // B D# F#
+                chord("I", [1, 3, 5])    // E G# B
+            ],
+
+            // Return: E major → A minor
+            return_chords_before_pivot: [
+                chord("I", [1, 3, 5]) // E G# B
+            ],
+            return_pivot_chord_from: chord("V7", [5, 7, 2, 4]), // B D# F# A
+            return_pivot_chord_to: chord("It+6"),               // Enharmonic It+6
+            return_chords_after_pivot: [
+                chord("V", [5, 7, 2]),   // E G# B
+                chord("i", [1, 3, 5])    // A C E
+            ]
+        },
+
+        augmented_sixth_french: {
+            name_en: "French Augmented Sixth",
+            name_ru: "Французская увеличенная секста",
+            from_mode: "minor",
+            to_mode: "major",
+            interval_semitones: 7, // Perfect fifth up (A minor → E major)
+            relationship: "V",
+            category: "chromatic",
+            strength: "medium",
+
+            // Modulation: A minor → E major via Fr+6
+            chords_before_pivot: [
+                chord("i", [1, 3, 5]) // A C E
+            ],
+            pivot_chord_from: chord("Fr+6"), // French +6 in A minor: F A B C#
+            chords_after_pivot: [
+                chord("V", [5, 7, 2]),   // B D# F#
+                chord("I", [1, 3, 5])    // E G# B
+            ],
+
+            // Return: E major → A minor
+            return_chords_before_pivot: [
+                chord("I", [1, 3, 5]) // E G# B
+            ],
+            return_pivot_chord_from: chord("V7", [5, 7, 2, 4]), // B D# F# A
+            return_pivot_chord_to: chord("Fr+6"),               // Enharmonic Fr+6
+            return_chords_after_pivot: [
+                chord("V", [5, 7, 2]),   // E G# B
+                chord("i", [1, 3, 5])    // A C E
+            ]
+        },
+
+        augmented_sixth_german: {
+            name_en: "German Augmented Sixth",
+            name_ru: "Немецкая увеличенная секста",
+            from_mode: "minor",
+            to_mode: "major",
+            interval_semitones: -6, // Tritone down (A minor → Eb major)
+            relationship: "♭V",
+            category: "chromatic",
+            strength: "medium",
+
+            // Modulation: A minor → Eb major via Gr+6 ↔ V7
+            chords_before_pivot: [
+                chord("i", [1, 3, 5]) // A C E
+            ],
+            pivot_chord_from: chord("Gr+6"), // German +6 in A minor: F Ab C D
+            chords_after_pivot: [
+                chord("I", [1, 3, 5])     // Eb G Bb
+            ],
+
+            // Return: Eb major → A minor
+            return_chords_before_pivot: [
+                chord("I", [1, 3, 5]) // Eb G Bb
+            ],
+            return_pivot_chord_from: chord("V7"),   // Bb D F Ab (V7 in Eb major)
+            return_pivot_chord_to: chord("Gr+6"),   // enharmonic German +6 in A minor
+            return_chords_after_pivot: [
+                chord("V", [5, 7, 2]),    // E G# B
+                chord("i", [1, 3, 5])     // A C E
+            ]
+        },
+
+        // ========================================
+        // DISTANT RELATIONSHIPS
+        // ========================================
+
+        chromatic_mediant_major_down: {
+            name_en: "Chromatic Mediant (Major 3rd down)",
+            name_ru: "Хроматическая медианта (большая терция вниз)",
+            from_mode: "major",
+            to_mode: "major",
+            interval_semitones: -4, // Major third down
+            relationship: "bVI",
+            category: "distant",
+            strength: "weak",
+
+            // Modulation: C major → Ab major
+            chords_before_pivot: [
+                chord("I", [1, 3, 5]) // C E G
+            ],
+            pivot_chord_from: chord("I", [1, 3, 5]),      // C E G - enharmonic reinterpretation
+            pivot_chord_to: chord("#III", [3, 5, 7]),     // Same pitches in Ab major context
+            chords_after_pivot: [
+                chord("IV", [4, 6, 1]),   // Db F Ab
+                chord("I", [1, 3, 5])     // Ab C Eb
+            ],
+
+            // Return: Ab major → C major
+            return_chords_before_pivot: [
+                chord("I", [1, 3, 5]) // Ab C Eb
+            ],
+            return_pivot_chord_from: chord("#III", [3, 5, 7]), // C E G in Ab major context
+            return_pivot_chord_to: chord("I", [1, 3, 5]),      // Same chord as I in C major
+            return_chords_after_pivot: [
+                chord("I", [1, 3, 5]) // C E G
+            ]
+        },
+
+        // ========================================
+        // ENHARMONIC MODULATIONS
+        // ========================================
+
+        enharmonic_diminished_seventh: {
+            name_en: "Enharmonic Diminished Seventh",
+            name_ru: "Энгармоническая модуляция через уменьшенный септаккорд",
+            from_mode: "minor",
+            to_mode: "minor",
+            interval_semitones: 3, // Can modulate to various keys
+            relationship: "vii°7",
+            category: "enharmonic",
+            strength: "medium",
+
+            // Modulation via enharmonic dim7 (A minor → C# minor)
+            chords_before_pivot: [
+                chord("i", [1, 3, 5]) // A C E
+            ],
+            pivot_chord_from: chord("vii°7", [7, 2, 4, 6]), // G# B D F in A minor
+            pivot_chord_to: chord("v°7", [5, 7, 2, 4]),     // Same notes in C# minor context
+            chords_after_pivot: [
+                chord("V", [5, 7, 2]),   // G# B# D#
+                chord("i", [1, 3, 5])    // C# E G#
+            ],
+
+            // Return: C# minor → A minor
+            return_chords_before_pivot: [
+                chord("i", [1, 3, 5]) // C# E G#
+            ],
+            return_pivot_chord_from: chord("v°7", [5, 7, 2, 4]),    // G# B D F
+            return_pivot_chord_to: chord("vii°7", [7, 2, 4, 6]),    // Same notes in A minor
+            return_chords_after_pivot: [
+                chord("V", [5, 7, 2]),   // E G# B
+                chord("i", [1, 3, 5])    // A C E
+            ]
+        }
     };
 
-    // Convert detailed format to legacy format for backward compatibility
-    function convertToLegacyFormat() {
-        const legacy = {};
 
-        Object.entries(window.DETAILED_MODULATIONS).forEach(([key, modulation]) => {
-            // Convert detailed chord progressions to simple roman numeral arrays
-            const modulation_rn = [];
-            const return_rn = [];
 
-            // Build forward progression
-            if (modulation.chords_before_pivot) {
-                modulation.chords_before_pivot.forEach(chord => modulation_rn.push(chord.roman));
-            }
-            if (modulation.pivot_chord_from) {
-                modulation_rn.push(modulation.pivot_chord_from.roman);
-            }
-            if (modulation.chords_after_pivot) {
-                modulation.chords_after_pivot.forEach(chord => modulation_rn.push(chord.roman));
-            }
-
-            // Build return progression  
-            if (modulation.return_chords_before_pivot) {
-                modulation.return_chords_before_pivot.forEach(chord => return_rn.push(chord.roman));
-            }
-            if (modulation.return_pivot_chord_from) {
-                return_rn.push(modulation.return_pivot_chord_from.roman);
-            }
-            if (modulation.return_chords_after_pivot) {
-                modulation.return_chords_after_pivot.forEach(chord => return_rn.push(chord.roman));
-            }
-
-            // Calculate pivot indices
-            const pivot_index = modulation.chords_before_pivot ? modulation.chords_before_pivot.length : 0;
-            const return_pivot_index = modulation.return_chords_before_pivot ? modulation.return_chords_before_pivot.length : 0;
-
-            // Create legacy format entry
-            legacy[key] = {
-                ...modulation, // Copy all new properties
-                modulation_rn: modulation_rn,
-                return_rn: return_rn,
-                pivot_index: pivot_index,
-                return_pivot_index: return_pivot_index,
-                common_chord: modulation.pivot_chord_from ? modulation.pivot_chord_from.roman : "unknown",
-                description_en: `${modulation.name_en} modulation`,
-                description_ru: `Модуляция в ${modulation.name_ru}`
-            };
-        });
-
-        return legacy;
-    }
-
-    // Export both old and new formats for compatibility
+    // Export only DETAILED_MODULATIONS (legacy COMMON_MODULATIONS no longer needed)
     // DETAILED_MODULATIONS already defined above
-    window.COMMON_MODULATIONS = convertToLegacyFormat();
 
 })();
