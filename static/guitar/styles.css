@@ -1370,7 +1370,7 @@ svg.fretboard {
     background: var(--border);
     border-radius: 3px;
   }
-  
+
   .sub {
     display: none;
   }
@@ -1680,5 +1680,335 @@ svg.fretboard {
   
   .sub {
     font-size: 12px;
+  }
+}
+
+/* ========================================
+   RESPONSIVE TABLE STYLES
+   ======================================== */
+
+/* Mobile responsive tables */
+@media (max-width: 768px) {
+  /* Make tables scroll horizontally on mobile */
+  .table-responsive {
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+  }
+  
+  .chords-table {
+    font-size: 12px !important;
+    min-width: 500px; /* Force horizontal scroll for readability */
+  }
+  
+  .chords-table th,
+  .chords-table td {
+    padding: 4px 6px !important;
+    white-space: nowrap;
+  }
+  
+  /* Smaller font for table headers */
+  .chords-table th {
+    font-size: 11px !important;
+    font-weight: 600;
+  }
+  
+  /* Compact table spacing */
+  .chords-table {
+    border-spacing: 0 4px !important;
+  }
+  
+  /* Generic table fallback */
+  table {
+    font-size: 12px !important;
+  }
+  
+  table th,
+  table td {
+    padding: 4px 6px !important;
+    white-space: nowrap;
+  }
+}
+
+/* Very small screens - more aggressive table compression */
+@media (max-width: 480px) {
+  .chords-table {
+    font-size: 11px !important;
+    min-width: 450px;
+  }
+  
+  .chords-table th,
+  .chords-table td {
+    padding: 3px 4px !important;
+  }
+  
+  .chords-table th {
+    font-size: 10px !important;
+  }
+  
+  /* Generic table fallback */
+  table {
+    font-size: 11px !important;
+  }
+  
+  table th,
+  table td {
+    padding: 3px 4px !important;
+  }
+}
+
+/* ========================================
+   RESPONSIVE MODULATION STYLES  
+   ======================================== */
+
+/* Mobile modulation cards */
+@media (max-width: 768px) {
+  /* More compact modulation details */
+  #related details {
+    padding: 8px 10px !important;
+    margin-bottom: 8px !important;
+    border-radius: 8px !important;
+  }
+  
+  /* Smaller text in modulation content */
+  #related details .small {
+    font-size: 11px !important;
+    line-height: 1.4;
+  }
+  
+  /* Stack modulation info vertically on mobile */
+  #related details summary {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 4px;
+  }
+  
+  #related details summary .small {
+    font-size: 10px !important;
+  }
+  
+  /* Better spacing for modulation progressions */
+  .modulation-progression {
+    margin: 6px 0 !important;
+  }
+  
+  .modulation-progression > div {
+    margin-bottom: 3px !important;
+  }
+  
+  /* Smaller play buttons */
+  .play-modulation-btn {
+    padding: 2px 6px !important;
+    font-size: 9px !important;
+    margin-top: 2px !important;
+  }
+  
+  .play-modulation-btn svg {
+    width: 8px !important;
+    height: 8px !important;
+  }
+  
+  /* Break long chord progressions */
+  .modulation-progression span {
+    word-break: break-all;
+    display: inline-block;
+  }
+}
+
+/* Very small screens - ultra compact */
+@media (max-width: 480px) {
+  #related details {
+    padding: 6px 8px !important;
+    margin-bottom: 6px !important;
+  }
+  
+  #related details .small {
+    font-size: 10px !important;
+  }
+  
+  #related details summary .small {
+    font-size: 9px !important;
+  }
+  
+  .modulation-progression {
+    margin: 4px 0 !important;
+  }
+  
+  .play-modulation-btn {
+    padding: 1px 4px !important;
+    font-size: 8px !important;
+  }
+  
+  .play-modulation-btn svg {
+    width: 6px !important;
+    height: 6px !important;
+  }
+}
+
+/* ========================================
+   RESPONSIVE CADENCES STYLES
+   ======================================== */
+
+/* Mobile cadence cards */
+@media (max-width: 768px) {
+  /* More compact cadence cards */
+  #cadences > div {
+    padding: 10px 12px !important;
+    margin-bottom: 8px !important;
+    border-radius: 8px !important;
+  }
+  
+  /* Stack cadence header vertically on mobile */
+  #cadences .title {
+    font-size: 14px !important;
+    margin-bottom: 8px !important;
+  }
+  
+  /* Reorganize cadence header layout */
+  #cadences > div > div:first-child {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 8px !important;
+  }
+  
+  /* Compact button and pill layout */
+  #cadences > div > div:first-child > div:last-child {
+    display: flex !important;
+    gap: 4px !important;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  
+  /* Smaller cadence content text */
+  #cadences .small {
+    font-size: 11px !important;
+    line-height: 1.4;
+    margin-bottom: 2px !important;
+  }
+  
+  /* Compact play buttons */
+  .play-cadence-btn {
+    padding: 4px 8px !important;
+    font-size: 10px !important;
+  }
+  
+  .play-cadence-btn svg {
+    width: 10px !important;
+    height: 10px !important;
+  }
+  
+  /* Smaller pills */
+  #cadences .pill {
+    padding: 1px 4px !important;
+    font-size: 9px !important;
+  }
+  
+  /* Break long progressions in cadences */
+  #cadences .small strong ~ text {
+    word-break: break-all;
+  }
+}
+
+/* Very small screens - ultra compact cadences */
+@media (max-width: 480px) {
+  #cadences > div {
+    padding: 8px 10px !important;
+    margin-bottom: 6px !important;
+  }
+  
+  #cadences .title {
+    font-size: 13px !important;
+  }
+  
+  #cadences .small {
+    font-size: 10px !important;
+  }
+  
+  .play-cadence-btn {
+    padding: 3px 6px !important;
+    font-size: 9px !important;
+  }
+  
+  .play-cadence-btn svg {
+    width: 8px !important;
+    height: 8px !important;
+  }
+  
+  #cadences .pill {
+    padding: 1px 3px !important;
+    font-size: 8px !important;
+  }
+  
+  /* Compact cadence header on very small screens */
+  #cadences > div:first-child {
+    padding: 6px 8px !important;
+    margin-bottom: 8px !important;
+  }
+  
+  #cadences > div:first-child .small {
+    font-size: 9px !important;
+  }
+}
+
+/* ========================================
+   MOBILE SECTIONS & GENERAL LAYOUT
+   ======================================== */
+
+/* Responsive section spacing */
+@media (max-width: 768px) {
+  /* Reduce margins between sections on mobile */
+  .mt {
+    margin-top: 16px !important;
+  }
+  
+  /* More compact card padding */
+  .card .body {
+    padding: 16px !important;
+  }
+  
+  /* Smaller section headings */
+  .card h2 {
+    font-size: 18px !important;
+    margin-bottom: 12px !important;
+  }
+}
+
+/* ========================================
+   MOBILE SCROLL INDICATORS
+   ======================================== */
+
+/* Add subtle scroll indicator for horizontal scrollable elements */
+@media (max-width: 768px) {
+  .table-responsive:after {
+    content: "← Scroll →";
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    background: var(--primary);
+    color: white;
+    font-size: 9px;
+    padding: 2px 6px;
+    border-radius: 3px;
+    pointer-events: none;
+    opacity: 0.7;
+    z-index: 10;
+  }
+  
+  .table-responsive {
+    position: relative;
+  }
+  
+  /* Hide scroll indicator when fully scrolled */
+  .table-responsive::-webkit-scrollbar {
+    height: 3px;
+  }
+  
+  .table-responsive::-webkit-scrollbar-track {
+    background: var(--border-muted);
+    border-radius: 2px;
+  }
+  
+  .table-responsive::-webkit-scrollbar-thumb {
+    background: var(--primary);
+    border-radius: 2px;
   }
 }
