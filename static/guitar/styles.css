@@ -1757,6 +1757,59 @@ svg.fretboard {
 }
 
 /* ========================================
+   MODULATION CHORD COLOR CODING
+   ======================================== */
+
+/* Color coding for modulation progressions */
+.source-key {
+  color: var(--accent);
+  font-weight: 500;
+  padding: 1px 3px;
+  border-radius: 3px;
+  background-color: var(--accent-bg);
+}
+
+.target-key {
+  color: #2563eb;
+  font-weight: 500;
+  padding: 1px 3px;
+  border-radius: 3px;
+  background-color: #dbeafe;
+}
+
+[data-theme="dark"] .target-key {
+  color: #60a5fa;
+  background-color: #1e3a8a;
+}
+
+/* Pivot chord styling */
+.pivot-chord {
+  display: inline-block;
+  padding: 2px 4px;
+  border-radius: 4px;
+  background-color: var(--surface-2);
+  border: 1px solid var(--divider);
+  font-weight: 600;
+}
+
+.pivot-separator {
+  color: var(--text-muted);
+  margin: 0 2px;
+  font-weight: bold;
+  font-size: 0.9em;
+}
+
+/* Better spacing in modulation progressions */
+.modulation-progression {
+  line-height: 1.6;
+  margin: 8px 0;
+}
+
+.modulation-progression span {
+  white-space: nowrap;
+}
+
+/* ========================================
    RESPONSIVE MODULATION STYLES  
    ======================================== */
 

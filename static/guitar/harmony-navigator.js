@@ -317,7 +317,7 @@ function t(key, ...args) {
 function updateUITexts() {
     document.title = t('harmonyNavigatorTitle') || 'Harmony Navigator — Guitar Tools';
     document.getElementById('title').textContent = t('harmonyNavigatorTitle') || 'Harmony Navigator';
-    document.getElementById('subtitle').textContent = t('harmonyNavigatorSubtitle') || 'Scales • Chord functions • Key relationships • Cadences';
+    document.getElementById('subtitle').textContent = t('harmonyNavigatorSubtitle') || 'Scales • Chord functions • Cadences • Key relationships';
 
     // New form labels
     document.getElementById('selectionFormLabel').textContent = t('selectionFormLabel') || 'Key Selection';
@@ -345,7 +345,7 @@ function updateUITexts() {
     const helpLabel = document.getElementById('helpLabel');
     if (helpLabel) helpLabel.textContent = t('helpLabel') || 'Quick Help';
     const helpText = document.getElementById('helpText');
-    if (helpText) helpText.textContent = t('helpText') || "Select tonic and mode. Below you'll see the scale, all diatonic chords with functions, related keys with modulations, and popular cadences.";
+    if (helpText) helpText.textContent = t('helpText') || "Select tonic and mode. Below you'll see the scale, all diatonic chords with functions, popular cadences, and related keys with modulations.";
     const keyInfoLabel = document.getElementById('keyInfoLabel');
     if (keyInfoLabel) keyInfoLabel.textContent = t('keyInfoLabel') || 'Key Information';
 
@@ -653,10 +653,15 @@ function relatedKeys(tonicStr, modeName) {
     // Determine current mode family for filtering
     const currentModeFamily = family === "major" ? "major" : "minor";
 
+    // Debug information
+
+
     // Filter modulations that are applicable from current mode
     const applicableModulations = Object.entries(modulations).filter(([key, mod]) => {
         return mod.from_mode === currentModeFamily || mod.from_mode === "both";
     });
+
+
 
     // Generate modulation relationships
     applicableModulations.forEach(([key, modulation]) => {
@@ -689,19 +694,34 @@ function relatedKeys(tonicStr, modeName) {
             const returnPivotIndex = modulation.return_pivot_index !== undefined ? modulation.return_pivot_index : -1;
             const returnExample = generateChordSequence(modulation.return_rn, targetScale, currentScale, targetChords, currentChords, returnPivotIndex);
 
-            // Generate chord names for display
-            const modulationChordNames = generateChordNames(modulation.modulation_rn, currentScale, targetScale, currentChords, targetChords, modulationPivotIndex);
-            // For return names: same logic - FROM target TO current
-            const returnChordNames = generateChordNames(modulation.return_rn, targetScale, currentScale, targetChords, currentChords, returnPivotIndex);
+            // Get pivot chord information from detailed library
+            const pivotFromChord = window.DETAILED_MODULATIONS && window.DETAILED_MODULATIONS[key] && window.DETAILED_MODULATIONS[key].pivot_chord_from ? window.DETAILED_MODULATIONS[key].pivot_chord_from.roman : null;
+            const pivotToChord = window.DETAILED_MODULATIONS && window.DETAILED_MODULATIONS[key] && window.DETAILED_MODULATIONS[key].pivot_chord_to ? window.DETAILED_MODULATIONS[key].pivot_chord_to.roman : null;
+            const returnPivotFromChord = window.DETAILED_MODULATIONS && window.DETAILED_MODULATIONS[key] && window.DETAILED_MODULATIONS[key].return_pivot_chord_from ? window.DETAILED_MODULATIONS[key].return_pivot_chord_from.roman : null;
+            const returnPivotToChord = window.DETAILED_MODULATIONS && window.DETAILED_MODULATIONS[key] && window.DETAILED_MODULATIONS[key].return_pivot_chord_to ? window.DETAILED_MODULATIONS[key].return_pivot_chord_to.roman : null;
+
+            // Generate chord names for display with color coding
+            const modulationChordNames = generateChordNames(modulation.modulation_rn, currentScale, targetScale, currentChords, targetChords, modulationPivotIndex, false, pivotFromChord, pivotToChord);
+
+            // For return names: determine correct scale order based on modulation direction
+            // Special handling for parallel modulations to ensure correct chord interpretation
+            let returnChordNames;
+            if (modulation.category === "modal" && (key.includes("parallel"))) {
+                // For parallel modulations (same root, different mode), use target key for all chords
+                // This ensures proper chord interpretation in the destination tonality
+                returnChordNames = generateChordNames(modulation.return_rn, targetScale, targetScale, targetChords, targetChords, returnPivotIndex, true, returnPivotFromChord, returnPivotToChord);
+            } else {
+                // Standard case: FROM target TO current
+                returnChordNames = generateChordNames(modulation.return_rn, targetScale, currentScale, targetChords, currentChords, returnPivotIndex, true, returnPivotFromChord, returnPivotToChord);
+            }
 
             const targetModeLabel = modulation.to_mode === "major" ? t('major') : t('minor');
             const relationshipDesc = LANG === 'ru' ?
                 `${modulation.name_ru} (${modulation.relationship})` :
                 `${modulation.name_en} (${modulation.relationship})`;
 
-            // Generate roman numerals with pivot highlighting
-            const modulationRNFormatted = generateFormattedRomanNumerals(modulation.modulation_rn, modulationPivotIndex);
-            const returnRNFormatted = generateFormattedRomanNumerals(modulation.return_rn, returnPivotIndex);
+            const modulationRNFormatted = generateFormattedRomanNumerals(modulation.modulation_rn, modulationPivotIndex, false, pivotFromChord, pivotToChord);
+            const returnRNFormatted = generateFormattedRomanNumerals(modulation.return_rn, returnPivotIndex, true, returnPivotFromChord, returnPivotToChord);
 
             out.push({
                 title: targetName + targetModeLabel,
@@ -738,6 +758,26 @@ function relatedKeys(tonicStr, modeName) {
     return out;
 }
 
+// Helper functions to get translated category and strength labels
+function getCategoryLabel(category) {
+    const categoryMap = {
+        'close': t('categoryClose') || 'Close relationship',
+        'secondary': t('categorySecondary') || 'Secondary dominant',
+        'modal': t('categoryModal') || 'Modal relationship',
+        'chromatic': t('categoryChromatic') || 'Chromatic relationship'
+    };
+    return categoryMap[category] || category;
+}
+
+function getStrengthLabel(strength) {
+    const strengthMap = {
+        'strong': t('strengthStrong') || 'Strong',
+        'medium': t('strengthMedium') || 'Medium',
+        'weak': t('strengthWeak') || 'Weak'
+    };
+    return strengthMap[strength] || strength;
+}
+
 // Helper function to generate chord sequence from roman numerals
 function generateChordSequence(romanNumerals, fromScale, toScale, fromChords, toChords, pivotIndex = -1) {
     const sequence = [];
@@ -763,17 +803,41 @@ function generateChordSequence(romanNumerals, fromScale, toScale, fromChords, to
 }
 
 // Helper function to format roman numerals with pivot highlighting
-function generateFormattedRomanNumerals(romanNumerals, pivotIndex = -1) {
+function generateFormattedRomanNumerals(romanNumerals, pivotIndex = -1, isReturnProgression = false, pivotFromChord = null, pivotToChord = null) {
     return romanNumerals.map((rn, index) => {
+        let className = '';
+        let content = rn;
+
         if (index === pivotIndex) {
-            return `<strong>${rn}</strong>`;
+            // Переходной аккорд - показываем двойную функцию
+            const fromKey = isReturnProgression ? 'target-key' : 'source-key';
+            const toKey = isReturnProgression ? 'source-key' : 'target-key';
+
+            // Используем информацию о переходных аккордах из детальной библиотеки
+            const fromChordRoman = pivotFromChord || rn;
+            const toChordRoman = pivotToChord || rn;
+
+            content = `<span class="pivot-chord">
+                <span class="${fromKey}">${fromChordRoman}</span>
+                <span class="pivot-separator">↔</span>
+                <span class="${toKey}">${toChordRoman}</span>
+            </span>`;
+        } else if (pivotIndex >= 0 && index > pivotIndex) {
+            // Аккорды после переходного - в конечной тональности
+            className = isReturnProgression ? 'source-key' : 'target-key';
+            content = `<span class="${className}">${rn}</span>`;
+        } else {
+            // Аккорды до переходного - в исходной тональности  
+            className = isReturnProgression ? 'target-key' : 'source-key';
+            content = `<span class="${className}">${rn}</span>`;
         }
-        return rn;
+
+        return content;
     }).join(" → ");
 }
 
-// Helper function to generate chord names from roman numerals with pivot highlighting
-function generateChordNames(romanNumerals, fromScale, toScale, fromChords, toChords, pivotIndex = -1) {
+// Helper function to generate chord names from roman numerals with color coding
+function generateChordNames(romanNumerals, fromScale, toScale, fromChords, toChords, pivotIndex = -1, isReturnProgression = false, pivotFromChord = null, pivotToChord = null) {
     const names = [];
 
     romanNumerals.forEach((rn, index) => {
@@ -791,12 +855,39 @@ function generateChordNames(romanNumerals, fromScale, toScale, fromChords, toCho
                 chordName = rn; // Fallback to roman numeral if parsing fails
             }
 
-            // Highlight pivot chord with bold formatting
+            // Apply color coding based on key context
+            let className = '';
+            let content = chordName;
+
             if (isPivotChord) {
-                chordName = `<strong>${chordName}</strong>`;
+                // Pivot chord shows both functional interpretations
+                const fromKey = isReturnProgression ? 'target-key' : 'source-key';
+                const toKey = isReturnProgression ? 'source-key' : 'target-key';
+
+                // For pivot chord, show the same chord name but with different functions
+                // The chord name should be the same (same physical chord)
+                const pivotChordName = chordName;
+
+                // Get function names (roman numerals) for both contexts
+                const fromFunction = pivotFromChord || rn; // Function in source key
+                const toFunction = pivotToChord || rn;     // Function in target key
+
+                content = `<span class="pivot-chord">
+                    ${pivotChordName} (<span class="${fromKey}">${fromFunction}</span>
+                    <span class="pivot-separator">↔</span>
+                    <span class="${toKey}">${toFunction}</span>)
+                </span>`;
+            } else if (isAfterPivot) {
+                // Chords after pivot - in target key
+                className = isReturnProgression ? 'source-key' : 'target-key';
+                content = `<span class="${className}">${chordName}</span>`;
+            } else {
+                // Chords before pivot - in source key
+                className = isReturnProgression ? 'target-key' : 'source-key';
+                content = `<span class="${className}">${chordName}</span>`;
             }
 
-            names.push(chordName);
+            names.push(content);
         } catch (error) {
             console.warn(`Could not generate chord name for "${rn}":`, error);
             names.push(rn);
@@ -808,12 +899,12 @@ function generateChordNames(romanNumerals, fromScale, toScale, fromChords, toCho
 
 // Helper function to parse roman numerals in modulation context
 function parseRomanNumeralToChord(rn, fromScale, toScale, fromChords, toChords, isLastChord = false, isPivotChord = false, isAfterPivot = false) {
-    console.log(`Parsing chord: ${rn}, isLastChord: ${isLastChord}, isPivotChord: ${isPivotChord}, isAfterPivot: ${isAfterPivot}`);
+    // console.log(`Parsing chord: ${rn}, isLastChord: ${isLastChord}, isPivotChord: ${isPivotChord}, isAfterPivot: ${isAfterPivot}`);
 
     // Handle compound roman numerals like "V/V", "i/vi", "I/♭VII", etc.
     if (rn.includes('/')) {
         const [secondary, primary] = rn.split('/');
-        console.log(`Compound parts: secondary="${secondary}", primary="${primary}"`);
+        // console.log(`Compound parts: secondary="${secondary}", primary="${primary}"`);
 
         // For compound chords, the secondary (left) is the chord to play
         // The primary (right) indicates the temporary tonic context
@@ -862,18 +953,35 @@ function parseRomanNumeralToChord(rn, fromScale, toScale, fromChords, toChords, 
             createFallbackChord(rn, toScale);
     }
 
-    // Pivot chord - for modal interchange, prefer target scale for modal chords
+    // Pivot chord - determine which scale to use based on chord type and modulation direction
     if (isPivotChord) {
-        // For modal chords (like iv in major context), try target scale first
-        if (rn === 'iv' || rn === 'ii°' || rn === '♭VII' || rn === '♭VI' || rn === '♭III') {
-            return getChordByRomanNumeral(rn, toScale, toChords) ||
-                getChordByRomanNumeral(rn, fromScale, fromChords) ||
-                createFallbackChord(rn, toScale);
+        // For pivot chords, prioritize the scale where the chord naturally belongs
+        // Minor chords (iv, ii°, vi) should be found in minor contexts
+        // Major chords (IV, II, VI) should be found in major contexts
+
+        if (rn.toLowerCase() === rn) {
+            // Lowercase = minor chord, try minor-friendly scale first
+            // In minor→major modulation: fromScale is minor, toScale is major
+            // In major→minor modulation: fromScale is major, toScale is minor
+            const minorScale = fromScale.mode.family === 'major' ? toScale : fromScale;
+            const minorChords = fromScale.mode.family === 'major' ? toChords : fromChords;
+            const majorScale = fromScale.mode.family === 'major' ? fromScale : toScale;
+            const majorChords = fromScale.mode.family === 'major' ? fromChords : toChords;
+
+            return getChordByRomanNumeral(rn, minorScale, minorChords) ||
+                getChordByRomanNumeral(rn, majorScale, majorChords) ||
+                createFallbackChord(rn, minorScale);
+        } else {
+            // Uppercase = major chord, try major-friendly scale first
+            const majorScale = fromScale.mode.family === 'major' ? fromScale : toScale;
+            const majorChords = fromScale.mode.family === 'major' ? fromChords : toChords;
+            const minorScale = fromScale.mode.family === 'major' ? toScale : fromScale;
+            const minorChords = fromScale.mode.family === 'major' ? toChords : fromChords;
+
+            return getChordByRomanNumeral(rn, majorScale, majorChords) ||
+                getChordByRomanNumeral(rn, minorScale, minorChords) ||
+                createFallbackChord(rn, majorScale);
         }
-        // For standard pivots, try original scale first
-        return getChordByRomanNumeral(rn, fromScale, fromChords) ||
-            getChordByRomanNumeral(rn, toScale, toChords) ||
-            createFallbackChord(rn, fromScale);
     }
 
     // Chords before the pivot chord should be in the original key
@@ -995,12 +1103,13 @@ function createAlteredChord(rn, fromScale, toScale) {
         const preferFlats = alteration === '♭';
         const alteredRoot = transposeName(scaleRoot, intervalFromTonic, preferFlats);
 
-        // Determine chord quality
-        const isMinor = roman === roman.toLowerCase() || quality.includes('°') || quality.includes('ø');
+        // Determine chord quality - quality can be undefined
+        const qualityStr = quality || '';
+        const isMinor = roman === roman.toLowerCase() || qualityStr.includes('°') || qualityStr.includes('ø');
         const isMajor = !isMinor;
-        const isDiminished = quality.includes('°');
-        const isHalfDiminished = quality.includes('ø');
-        const isSeventh = quality.includes('7');
+        const isDiminished = qualityStr.includes('°');
+        const isHalfDiminished = qualityStr.includes('ø');
+        const isSeventh = qualityStr.includes('7');
 
         // Build chord intervals
         let intervals = [];
@@ -1014,7 +1123,7 @@ function createAlteredChord(rn, fromScale, toScale) {
             if (isSeventh) intervals.push(10); // m7
         } else {
             intervals = [0, 4, 7]; // major triad
-            if (isSeventh) intervals.push(quality.includes('maj') ? 11 : 10); // maj7 or 7
+            if (isSeventh) intervals.push(qualityStr.includes('maj') ? 11 : 10); // maj7 or 7
         }
 
         // Generate chord notes
@@ -1316,9 +1425,23 @@ function cadences(scale) {
     return applicableCadences;
 }
 
+// Global variable to track current playing timeouts
+window.currentPlayingTimeouts = [];
+
+// Function to clear all playing timeouts (stop current playback)
+function stopCurrentPlayback() {
+    if (window.currentPlayingTimeouts) {
+        window.currentPlayingTimeouts.forEach(timeout => clearTimeout(timeout));
+        window.currentPlayingTimeouts = [];
+    }
+}
+
 // Function to play a modulation (sequence of chords)
 function playModulation(scale, chordSequence, modulationName) {
     if (!chordSequence || chordSequence.length === 0) return;
+
+    // Stop any current playback
+    stopCurrentPlayback();
 
     console.log(`Playing modulation "${modulationName}":`, chordSequence);
 
@@ -1338,11 +1461,17 @@ function playModulation(scale, chordSequence, modulationName) {
         const delay = index * (chordDuration + chordGap);
 
         // Play chord with slight delay
-        setTimeout(() => {
+        const timeout = setTimeout(() => {
             console.log(`Playing chord ${index + 1}/${validChords.length}: (${chordNotes.join('-')})`);
             HarmonyAudio.playChord(chordNotes, 4, chordDuration, false);
         }, delay * 200);
+
+        // Track timeout for potential cancellation
+        window.currentPlayingTimeouts.push(timeout);
     });
+
+    // Return the total duration for button timing
+    return ((validChords.length - 1) * (chordDuration + chordGap) + chordDuration) * 200 + 300;
 }
 
 // Function to play a cadence (sequence of chords)
@@ -1951,18 +2080,46 @@ function renderAll() {
     // Related keys safely
     if (related) {
         related.innerHTML = '';
+
+        // Add header with count
+        if (rels.length > 0) {
+            const header = document.createElement('div');
+            header.style.cssText = 'margin-bottom:16px; padding:8px 12px; background:var(--panel-1); border-radius:8px; border:1px solid var(--fret);';
+            header.innerHTML = `
+                <div class="small muted">
+                    ${LANG === 'ru'
+                    ? `Найдено ${rels.length} модуляций для текущего лада`
+                    : `Found ${rels.length} modulations for current mode`}
+                </div>
+            `;
+            related.appendChild(header);
+        }
+
         rels.forEach(r => {
             const details = document.createElement('details');
-            details.style.cssText = 'border:1px solid var(--fret); border-radius:12px; padding:12px 14px; background:var(--panel-2); margin-bottom:12px;';
+
+            // Style based on strength (same as cadences)
+            const strengthColors = {
+                strong: 'var(--primary)',
+                medium: 'var(--secondary)',
+                weak: 'var(--accent)'
+            };
+            const strengthColor = strengthColors[r.strength] || 'var(--fret)';
+
+            details.style.cssText = `border:1px solid var(--fret); border-left:4px solid ${strengthColor}; border-radius:12px; padding:12px 14px; background:var(--panel-2); margin-bottom:12px;`;
 
             const summary = document.createElement('summary');
             summary.style.cssText = 'display:flex; align-items:center; justify-content:space-between; cursor:pointer; list-style:none;';
             summary.innerHTML = `
-            <div>
-                <strong>${r.title}</strong><br>
+            <div style="flex: 1;">
+                <strong style="font-size:16px; font-weight:600; display:block; margin-bottom: 4px;">${r.title}</strong>
+                <div style="display: flex; gap: 6px; margin-bottom: 4px;">
+                    <span class="pill" style="background: ${strengthColor}; color: white; padding: 2px 6px; font-size: 10px; border-radius: 6px;">${getStrengthLabel(r.strength)}</span>
+                    <span class="pill" style="background: var(--muted); color: white; padding: 2px 6px; font-size: 10px; border-radius: 6px;">${getCategoryLabel(r.category)}</span>
+                </div>
                 <span class="small muted">${r.relation}</span>
             </div>
-            <span class="arrow" style="transition: transform .2s ease; color:var(--muted);">▼</span>
+            <span class="arrow" style="transition: transform .2s ease; color:var(--muted); margin-left: 8px;">▼</span>
         `;
 
             const content = document.createElement('div');
@@ -1979,9 +2136,9 @@ function renderAll() {
                     <span style="word-break: break-all;">${r.modulationChordNames}</span>
                 </div>
                 <button class="play-modulation-btn" data-modulation-type="to" 
-                        style="background:var(--primary); color:white; border:none; border-radius:4px; padding:4px 8px; cursor:pointer; font-size:10px; display:inline-flex; align-items:center; gap:2px; margin-top:4px;"
+                        style="background:var(--primary); color:white; border:none; border-radius:6px; padding:6px 10px; cursor:pointer; font-size:11px; display:inline-flex; align-items:center; gap:4px; margin-top:4px; transition: background-color 0.2s;"
                         title="${t('playCadenceTooltip') || 'Play modulation'}">
-                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <polygon points="5,3 19,12 5,21"></polygon>
                     </svg>
                     ${t('playCadenceBtn') || 'Play'}
@@ -1998,9 +2155,9 @@ function renderAll() {
                     <span style="word-break: break-all;">${r.returnChordNames}</span>
                 </div>
                 <button class="play-modulation-btn" data-modulation-type="back" 
-                        style="background:var(--secondary); color:white; border:none; border-radius:4px; padding:4px 8px; cursor:pointer; font-size:10px; display:inline-flex; align-items:center; gap:2px; margin-top:4px;"
+                        style="background:var(--secondary); color:white; border:none; border-radius:6px; padding:6px 10px; cursor:pointer; font-size:11px; display:inline-flex; align-items:center; gap:4px; margin-top:4px; transition: background-color 0.2s;"
                         title="${t('playCadenceTooltip') || 'Play return'}">
-                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <polygon points="5,3 19,12 5,21"></polygon>
                     </svg>
                     ${t('playCadenceBtn') || 'Play'}
@@ -2092,19 +2249,21 @@ function renderAll() {
 
             div.innerHTML = `
                 <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
-                    <div class="title" style="font-size:16px; font-weight:600; margin:0;">${c.name}</div>
-                    <div style="display: flex; gap: 6px;">
-                        <button class="play-cadence-btn" data-cadence-index="${cadenceIndex}" 
-                                style="background:var(--primary); color:white; border:none; border-radius:6px; padding:6px 10px; cursor:pointer; font-size:11px; display:inline-flex; align-items:center; gap:4px; transition: background-color 0.2s;"
-                                title="${t('playCadenceTooltip') || 'Play cadence'}">
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <polygon points="5,3 19,12 5,21"></polygon>
-                            </svg>
-                            ${t('playCadenceBtn') || 'Play'}
-                        </button>
-                        <span class="pill" style="background: ${strengthColor}; color: white; padding: 2px 6px; font-size: 10px; border-radius: 6px;">${strengthName}</span>
-                        <span class="pill" style="background: var(--muted); color: white; padding: 2px 6px; font-size: 10px; border-radius: 6px;">${categoryName}</span>
+                    <div>
+                        <div class="title" style="font-size:16px; font-weight:600; margin:0 0 4px 0;">${c.name}</div>
+                        <div style="display: flex; gap: 6px;">
+                            <span class="pill" style="background: ${strengthColor}; color: white; padding: 2px 6px; font-size: 10px; border-radius: 6px;">${strengthName}</span>
+                            <span class="pill" style="background: var(--muted); color: white; padding: 2px 6px; font-size: 10px; border-radius: 6px;">${categoryName}</span>
+                        </div>
                     </div>
+                    <button class="play-cadence-btn" data-cadence-index="${cadenceIndex}" 
+                            style="background:var(--primary); color:white; border:none; border-radius:6px; padding:6px 10px; cursor:pointer; font-size:11px; display:inline-flex; align-items:center; gap:4px; transition: background-color 0.2s;"
+                            title="${t('playCadenceTooltip') || 'Play cadence'}">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polygon points="5,3 19,12 5,21"></polygon>
+                        </svg>
+                        ${t('playCadenceBtn') || 'Play'}
+                    </button>
                 </div>
                 <div class="small cadence-progression" style="margin-bottom: 4px;">
                     <strong>${t('romanNumerals')}:</strong> 
@@ -2155,6 +2314,20 @@ function renderAll() {
         const modulationBtns = related.querySelectorAll('.play-modulation-btn');
         modulationBtns.forEach(btn => {
             btn.addEventListener('click', () => {
+                // If already playing, stop it
+                if (btn.disabled) {
+                    stopCurrentPlayback();
+                    if (btn.buttonTimeout) {
+                        clearTimeout(btn.buttonTimeout);
+                        btn.buttonTimeout = null;
+                    }
+                    // Restore button immediately
+                    btn.innerHTML = btn.originalText || btn.innerHTML;
+                    btn.disabled = false;
+                    btn.style.opacity = '1';
+                    return;
+                }
+
                 const modulationType = btn.getAttribute('data-modulation-type');
                 const detailsElement = btn.closest('details');
                 const relatedIndex = Array.from(related.children).indexOf(detailsElement);
@@ -2163,10 +2336,12 @@ function renderAll() {
                 if (!relatedKey) return;
 
                 const originalText = btn.innerHTML;
+                btn.originalText = originalText; // Store for restoration
                 const playingText = `<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <polygon points="5,3 19,12 5,21"></polygon>
+                    <rect x="6" y="4" width="4" height="16"></rect>
+                    <rect x="14" y="4" width="4" height="16"></rect>
                 </svg>
-                ${t('playCadencePlaying') || 'Playing...'}`;
+                ${t('stop') || 'Stop'}`;
 
                 btn.innerHTML = playingText;
                 btn.disabled = true;
@@ -2179,21 +2354,24 @@ function renderAll() {
                     : `${t('returnText')} from ${relatedKey.title}`;
 
                 if (chordSequence && chordSequence.length > 0) {
-                    playModulation(scale, chordSequence, sequenceName);
+                    // Play modulation and get the exact duration
+                    const totalDuration = playModulation(scale, chordSequence, sequenceName);
 
-                    // Calculate total duration: (number of chords * chord duration) + gaps + buffer
-                    const totalDuration = (chordSequence.length * 2.1 + 0.5) * 1000;
-
-                    setTimeout(() => {
-                        btn.innerHTML = originalText;
+                    // Store timeout reference for potential cancellation
+                    const buttonTimeout = setTimeout(() => {
+                        btn.innerHTML = btn.originalText || originalText;
                         btn.disabled = false;
                         btn.style.opacity = '1';
+                        btn.buttonTimeout = null;
                     }, totalDuration);
+
+                    // Store timeout reference on button for potential cancellation
+                    btn.buttonTimeout = buttonTimeout;
 
                     console.log(`Playing ${sequenceName}: ${chordSequence.join(' - ')}`);
                 } else {
                     // Restore button immediately if no chord sequence
-                    btn.innerHTML = originalText;
+                    btn.innerHTML = btn.originalText || originalText;
                     btn.disabled = false;
                     btn.style.opacity = '1';
                 }
