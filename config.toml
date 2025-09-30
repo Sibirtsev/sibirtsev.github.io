@@ -1,8 +1,13 @@
 baseURL = 'https://sibirtsev.com/'
-languageCode = 'en-us'
+languageCode = 'ru-RU'
 title = 'Alexey Sibirtsev'
 theme = 'SiberianCoder'
 googleAnalytics = "G-FYR06ENQX2"
+
+defaultContentLanguage = 'ru'
+# defaultContentLanguageInSubdir = true
+# disableDefaultLanguageRedirect = false
+
 
 [markup.goldmark.renderer]
 unsafe = true
@@ -16,44 +21,12 @@ pagerSize = 5
 
 [params]
 [params.social]
-  github = ""
+  github = "https://github.com/Sibirtsev"
   telegram = ""
   twitter = ""
-  linkedin = ""
-
-defaultContentLanguage = 'ru'
-defaultContentLanguageInSubdir = true
+  linkedin = "https://www.linkedin.com/in/alexeysibirtsev/"
 
 [languages]
-  [languages.en]
-    contentDir = 'content/en'
-    disabled = false
-    languageCode = 'en-US'
-    languageDirection = 'ltr'
-    languageName = 'English'
-    title = 'Alexey Sibirtsev'
-    weight = 1
-    [languages.en.menu]
-      [[languages.en.menu.main]]
-      name = "Posts"
-      url = "/posts/"
-      weight = 2
-
-      [[languages.en.menu.main]]
-      name = "Youtube"
-      url = "https://www.youtube.com/@alexey.sibirtsev"
-      weight = 3
-
-      [[languages.en.menu.main]]
-      name = "LinkedIn"
-      url = "https://www.linkedin.com/in/alexeysibirtsev/"
-      weight = 4
-
-      [[languages.en.menu.main]]
-      name = "Github"
-      url = "https://github.com/Sibirtsev"
-      weight = 5
-
   [languages.ru]
     contentDir = 'content/ru'
     disabled = false
@@ -61,12 +34,12 @@ defaultContentLanguageInSubdir = true
     languageDirection = 'ltr'
     languageName = 'Русский'
     title = 'Алексей Сибирцев'
-    weight = 2
+    weight = 1
 
     [languages.ru.menu]
       [[languages.ru.menu.main]]
       name = "Посты"
-      url = "/ru/posts/"
+      url = "/posts/"
       weight = 2
 
       [[languages.ru.menu.main]]
@@ -74,15 +47,38 @@ defaultContentLanguageInSubdir = true
       url = "https://www.youtube.com/@alexey.sibirtsev"
       weight = 3
 
-      [[languages.ru.menu.main]]
-      name = "ЛинкедИн"
-      url = "https://www.linkedin.com/in/alexeysibirtsev/"
-      weight = 4
+  [languages.en]
+    contentDir = 'content/en'
+    disabled = false
+    languageCode = 'en-US'
+    languageDirection = 'ltr'
+    languageName = 'English'
+    title = 'Alexey Sibirtsev'
+    weight = 2
+    [languages.en.menu]
+      [[languages.en.menu.main]]
+      name = "Posts"
+      url = "/en/posts/"
+      weight = 2
 
-      [[languages.ru.menu.main]]
-      name = "Гитхаб"
-      url = "https://github.com/Sibirtsev"
-      weight = 5
+      [[languages.en.menu.main]]
+      name = "Youtube"
+      url = "https://www.youtube.com/@alexey.sibirtsev"
+      weight = 3
+
+  [languages.de]
+    contentDir = 'content/de'
+    disabled = true
+    languageCode = 'de-DE'
+    languageDirection = 'ltr'
+    languageName = 'Deutsch'
+    title = 'Alexey Sibirtsev'
+    weight = 3
+    [languages.de.menu]
+      [[languages.de.menu.main]]
+      name = "Beiträge"
+      url = "/de/posts/"
+      weight = 2
 
 [markup]
   [markup.highlight]

@@ -1,0 +1,44 @@
+- id: welcome
+  translation: "Neueste Beiträge"
+
+- id: read_more
+  translation: "Weiterlesen →"
+
+- id: page
+  translation: "Seite"
+
+- id: from
+  translation: "von"
+
+- id: prev_page
+  translation: "← Vorherige"
+
+- id: next_page
+  translation: "Nächste →"
+
+- id: prev_post
+  translation: "← "
+
+- id: next_post
+  translation: " →"
+
+- id: menu
+  translation: "Menü"
+
+- id: back_to_posts
+  translation: "← Zurück zu Beiträgen"
+
+- id: page_not_found_text
+  translation: "Entschuldigung, die gesuchte Seite existiert nicht. Sie wurde möglicherweise verschoben oder gelöscht."
+
+- id: back_to_home
+  translation: "Zurück zur Startseite"
+
+- id: posts_by_tag
+  translation: "Beiträge mit dem Tag"
+
+- id: posts_by_category
+  translation: "Beiträge in der Kategorie"
+
+- id: table_of_contents
+  translation: "Inhaltsverzeichnis"

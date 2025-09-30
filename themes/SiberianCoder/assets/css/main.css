@@ -181,6 +181,11 @@ body footer div#footer-wrapper div#footer-content div#footer-content-column div 
   @apply inline-block no-underline py-1;
 }
 
+body footer div#footer-wrapper div#footer-content div#footer-content-column div ul li svg {
+  display: inline;
+  vertical-align: baseline;
+}
+
 /* Style for list */
 article .article-header,
 article .article-footer {

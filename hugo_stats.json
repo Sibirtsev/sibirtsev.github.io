@@ -40,6 +40,7 @@
       "header-logo",
       "heading-link",
       "hidden",
+      "hover:text-underline",
       "hover:underline",
       "list-reset",
       "md:text-sm",
