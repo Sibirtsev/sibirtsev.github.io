@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Guitar Tools — Index</title>
+    <link rel="stylesheet" href="styles.css?version=6211bf6d914f5682ff4a0e248fac5d6664e35b9f">
+</head>
+
+<body>
+    <header>
+        <div class="container header-row">
+            <div>
+                <h1 id="title">Guitar Tools</h1>
+                <div class="sub" id="subtitle">Chord voicings • Scales & arpeggios • Live fretboard • Audio playback
+                </div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 16px;">
+                <a href="harmony-navigator.html" class="lang-toggle-btn"
+                    style="text-decoration: none; color: var(--text);" title="Harmony Navigator">🎼 Navigator</a>
+                <div class="lang">
+                    <button id="langToggle" class="lang-toggle-btn" data-lang="en" title="Switch language">EN</button>
+                    <!-- hidden alias for pages that expect id="langSelect" -->
+                    <select id="langSelect"
+                        style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden;">
+                        <option value="en">English</option>
+                        <option value="ru">Русский</option>
+                    </select>
+                    <div class="theme-control" style="display:inline-flex;align-items:center;margin-left:10px;gap:8px;">
+                        <div class="theme-seg" role="tablist" aria-label="Theme chooser">
+                            <button class="seg-btn" data-mode="system" aria-pressed="false" title="Follow system theme"
+                                aria-label="System theme">
+                                <!-- computer icon -->
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="3" y="4" width="18" height="12" rx="2" ry="2"></rect>
+                                    <path d="M8 20h8"></path>
+                                </svg>
+                            </button>
+                            <button class="seg-btn" data-mode="light" aria-pressed="false" title="Light theme"
+                                aria-label="Light theme">
+                                <!-- sun icon -->
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="4"></circle>
+                                    <path d="M12 2v2"></path>
+                                    <path d="M12 20v2"></path>
+                                    <path d="M4.93 4.93l1.41 1.41"></path>
+                                    <path d="M17.66 17.66l1.41 1.41"></path>
+                                    <path d="M2 12h2"></path>
+                                    <path d="M20 12h2"></path>
+                                    <path d="M4.93 19.07l1.41-1.41"></path>
+                                    <path d="M17.66 6.34l1.41-1.41"></path>
+                                </svg>
+                            </button>
+                            <button class="seg-btn" data-mode="dark" aria-pressed="false" title="Dark theme"
+                                aria-label="Dark theme">
+                                <!-- moon icon -->
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                                </svg>
+                            </button>
+                        </div>
+                        <select id="themeSelect" aria-label="Theme"
+                            style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden;">
+                            <option value="system">System</option>
+                            <option value="light">Light</option>
+                            <option value="dark">Dark</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+    </header>
+
+    <main class="container">
+        <!-- Top: chord selection form and chord info (two equal columns) -->
+        <section id="chordPickArea">
+            <div class="grid two-column-grid mt">
+                <!-- Left card: chord selection -->
+                <div class="card">
+                    <div class="body">
+                        <h2 id="sec1">1) Choose a chord</h2>
+                        <div class="row3 mt">
+                            <div>
+                                <label id="rootLabel">Root</label>
+                                <select id="rootSel"></select>
+                            </div>
+                            <div>
+                                <label id="qualityLabel">Chord type</label>
+                                <select id="qualitySel"></select>
+                            </div>
+                            <div>
+                                <label id="bassLabel">Bass (slash chord)</label>
+                                <select id="bassSel"></select>
+                            </div>
+                        </div>
+                        <div class="mt">
+                            <label id="labExt">Extensions</label>
+                            <div id="extWrap" class="chips"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right card: chord info -->
+                <div class="card">
+                    <div class="body">
+                        <h2 id="sec2">2) Chord info</h2>
+                        <div class="info" id="chordInfo"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <nav class="tabs" role="tablist" aria-selected="true">
+            <button class="tab-btn" role="tab" aria-selected="true" data-target="chordsFrame"
+                id="tab-chords">Fingerings</button>
+            <button class="tab-btn" role="tab" aria-selected="false" data-target="arpeggiosFrame"
+                id="tab-arpeggios">Arpeggios</button>
+            <button class="tab-btn" role="tab" aria-selected="false" data-target="scalesFrame"
+                id="tab-scales">Scales</button>
+        </nav>
+
+        <section class="tab-panels">
+            <div class="panel" role="tabpanel" aria-labelledby="tab-chords" id="panel-chords">
+                <!-- chords content will be injected here (lazy-loaded, no iframe) -->
+                <div id="chordsRoot" class="embedded-root"></div>
+            </div>
+
+            <div class="panel" role="tabpanel" aria-labelledby="tab-arpeggios" id="panel-arpeggios" hidden>
+                <!-- arpeggios content will be injected here (lazy-loaded, no iframe) -->
+                <div id="arpeggiosRoot" class="embedded-root"></div>
+            </div>
+
+            <div class="panel" role="tabpanel" aria-labelledby="tab-scales" id="panel-scales" hidden>
+                <!-- scales content will be injected here (lazy-loaded, no iframe) -->
+                <div id="scalesRoot" class="embedded-root"></div>
+            </div>
+        </section>
+
+        <div class="foot" id="footer"></div>
+    </main>
+
+    <script src="./common-i18n.js?version=6211bf6d914f5682ff4a0e248fac5d6664e35b9f"></script>
+    <script src="./common-data.js?version=6211bf6d914f5682ff4a0e248fac5d6664e35b9f"></script>
+    <script src="./theme.js?version=6211bf6d914f5682ff4a0e248fac5d6664e35b9f"></script>
+    <script src="./scripts.js?version=6211bf6d914f5682ff4a0e248fac5d6664e35b9f"></script>
+</body>
+
+</html>
