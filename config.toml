@@ -22,7 +22,7 @@ pagerSize = 5
 [params]
 [params.social]
   github = "https://github.com/Sibirtsev"
-  telegram = ""
+  telegram = "https://t.me/read_run_play"
   twitter = ""
   linkedin = "https://www.linkedin.com/in/alexeysibirtsev/"
 
