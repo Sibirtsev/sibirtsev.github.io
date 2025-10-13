@@ -25,6 +25,7 @@ pagerSize = 5
   telegram = "https://t.me/read_run_play"
   twitter = ""
   linkedin = "https://www.linkedin.com/in/alexeysibirtsev/"
+  instagram = "https://www.instagram.com/sibirtsev/"
 
 [languages]
   [languages.ru]
