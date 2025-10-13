@@ -11,9 +11,11 @@
       "h1",
       "h2",
       "h3",
+      "h4",
       "head",
       "header",
       "html",
+      "iframe",
       "li",
       "link",
       "main",
@@ -53,14 +55,18 @@
       "page-title",
       "text-4xl",
       "text-base",
+      "text-left",
       "text-lg",
+      "text-right",
       "toc",
       "toc-desktop",
       "toc-mobile"
     ],
     "ids": [
       "TableOfContents",
+      "be-useful",
       "chroma-style",
+      "disclaimer",
       "footer-content",
       "footer-content-column",
       "footer-wrapper",
@@ -72,7 +78,13 @@
       "nav-toggle",
       "sun",
       "theme-toggle",
-      "привет-мир"
+      "total-recall",
+      "видео-на-youtube",
+      "книги",
+      "книги-арнольда-шварценеггера",
+      "правила",
+      "привет-мир",
+      "принципы"
     ]
   }
 }

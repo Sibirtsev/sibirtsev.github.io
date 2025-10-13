@@ -3,6 +3,8 @@
 <title>{{ .Title }} - {{ .Site.Title }}</title>
 <link rel="alternate" type="application/rss+xml" href='{{ "index.xml" | relURL }}' title="{{ .Site.Title }}">
 
+{{ partial "seo.html" . }}
+
 {{- if hugo.IsProduction | or (eq site.Params.env "production") }}
 {{- template "_internal/google_analytics.html" . }}
 {{- end -}}

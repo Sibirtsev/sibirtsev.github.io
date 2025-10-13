@@ -3,6 +3,7 @@ languageCode = 'ru-RU'
 title = 'Alexey Sibirtsev'
 theme = 'SiberianCoder'
 googleAnalytics = "G-FYR06ENQX2"
+enableRobotsTXT = true
 
 defaultContentLanguage = 'ru'
 # defaultContentLanguageInSubdir = true
@@ -20,6 +21,15 @@ pagerSize = 5
   category = "categories"
 
 [params]
+  description = "Личный сайт Алексея Сибирцева: посты, заметки и проекты."
+  images = ["/apple-touch-icon.png"]
+  logo = "/favicon-32x32.png"
+  author = "Alexey Sibirtsev"
+  # twitter handles in @format
+  twitterSite = ""
+  twitterCreator = ""
+  # set to true to noindex the whole site (overridden per page by params.noindex)
+  noindex = false
 [params.social]
   github = "https://github.com/Sibirtsev"
   telegram = "https://t.me/read_run_play"
@@ -97,6 +107,11 @@ pagerSize = 5
     startLevel = 1
     endLevel = 6
     ordered = false
+
+[sitemap]
+  changefreq = "monthly"
+  priority = 0.5
+  filename = "sitemap.xml"
 
 [build]
   [build.buildStats]
