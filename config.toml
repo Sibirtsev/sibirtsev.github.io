@@ -27,6 +27,10 @@ pagerSize = 5
   linkedin = "https://www.linkedin.com/in/alexeysibirtsev/"
   instagram = "https://www.instagram.com/sibirtsev/"
 
+[[params.links]]
+  name = "Guitar helper"
+  url = "https://sixstringsapp.com/"
+
 [languages]
   [languages.ru]
     contentDir = 'content/ru'

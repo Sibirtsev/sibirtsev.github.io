@@ -162,7 +162,7 @@ body footer div#footer-wrapper div#footer-content {
 }
 
 body footer div#footer-wrapper div#footer-content div#footer-content-column {
-  @apply flex w-full md:w-1/2;
+  @apply flex w-full md:w-1/3;
 }
 
 body footer div#footer-wrapper div#footer-content div#footer-content-column div {
