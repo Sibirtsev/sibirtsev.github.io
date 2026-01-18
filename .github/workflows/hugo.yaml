@@ -34,6 +34,9 @@ jobs:
     steps:
       - name: Checkout репозитория
         uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
       
       - name: Установка зависимостей TailwindCSS
         run: |
@@ -45,6 +48,10 @@ jobs:
         with:
           hugo-version: 'latest'
           extended: true  # Нужно для работы с PostCSS
+
+      - name: Setup Pages
+        id: pages
+        uses: actions/configure-pages@v4
 
       - name: Генерация статического сайта
         env:
