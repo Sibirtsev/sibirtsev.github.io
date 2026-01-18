@@ -53,6 +53,11 @@ pagerSize = 5
 
     [languages.ru.menu]
       [[languages.ru.menu.main]]
+      name = "Портфолио"
+      url = "/portfolio/"
+      weight = 1
+
+      [[languages.ru.menu.main]]
       name = "Посты"
       url = "/posts/"
       weight = 2
@@ -64,13 +69,18 @@ pagerSize = 5
 
   [languages.en]
     contentDir = 'content/en'
-    disabled = false
+    disabled = true
     languageCode = 'en-US'
     languageDirection = 'ltr'
     languageName = 'English'
     title = 'Alexey Sibirtsev'
     weight = 2
     [languages.en.menu]
+      [[languages.en.menu.main]]
+      name = "Portfolio"
+      url = "/en/portfolio/"
+      weight = 1
+
       [[languages.en.menu.main]]
       name = "Posts"
       url = "/en/posts/"

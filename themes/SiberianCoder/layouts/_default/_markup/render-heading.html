@@ -1,5 +1,0 @@
-{{ $level := .Level }}
-{{ $anchor := .Anchor | safeURL }}
-<h{{ $level }} id="{{ $anchor }}" class="custom-heading">
-    {{ .Text | safeHTML }} <a href="#{{ $anchor }}" class="heading-link">#</a>
-</h{{ $level }}>
