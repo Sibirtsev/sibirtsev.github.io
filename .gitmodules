@@ -1,0 +1,3 @@
+[submodule "themes/SiberianCoder"]
+	path = themes/SiberianCoder
+	url = https://github.com/Sibirtsev/hugo-theme-siberiancoder.git
