@@ -1,4 +1,5 @@
 baseURL = 'https://sibirtsev.com/'
+canonifyURLs = true
 languageCode = 'ru-RU'
 title = 'Alexey Sibirtsev'
 theme = 'SiberianCoder'
