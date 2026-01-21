@@ -8,7 +8,7 @@ image: "/images/portfolio/six-strings/six-strings.png"
 tags: ["музыка", "образование", "инструмент"]
 categories: ["Web", "Music"]
 links:
-  website: "https://sixstringsapp.com/"
+  website: "https://sixstringsapp.com/#/ru/"
 technologies: ["JavaScript", "HTML5", "CSS3", "Music Theory"]
 weight: 1
 ---
@@ -22,12 +22,12 @@ weight: 1
 ### Ритмический тренажёр
 !["Ритмический тренажёр"](/images/portfolio/six-strings/rhythm-trainer.png "Ритмический тренажёр")
 
-Данный [тренажёр](https://sixstringsapp.com/#/rhythm-trainer) основан на ритмическом алфавите Бенни Греба. Позволяет развивать чувство ритма, ощущение внутренней пульсации для гитаристов и других музыкантов.
+Данный [тренажёр](https://sixstringsapp.com/#/ru/rhythm-trainer) основан на ритмическом алфавите Бенни Греба. Позволяет развивать чувство ритма, ощущение внутренней пульсации для гитаристов и других музыкантов.
 
 ### Генератор ритмов
 !["Генератор ритмов"](/images/portfolio/six-strings/rhythm-gen.png "Генератор ритмов")
 
-Создаёт бесконечное количество уникальных ритмических рисунков на основе выбранного стиля и сложности. Отличный инструмент для практики и импровизации. Попробуйте [здесь](https://sixstringsapp.com/#/rhythm-generator).
+Создаёт бесконечное количество уникальных ритмических рисунков на основе выбранного стиля и сложности. Отличный инструмент для практики и импровизации. Попробуйте [здесь](https://sixstringsapp.com/#/ru/rhythm-generator).
 
 ### Гармония
 {{< image-gallery gallery_dir="/images/portfolio/six-strings/harmony" >}}
@@ -39,24 +39,23 @@ weight: 1
 А самой главной фишкой этого раздела является "Конструктор песни". С его помощью можно создавать собственные аккордовые прогрессии, слушать их и сохранять для дальнейшего использования. Экспорт в миди файл позволяет использовать созданные прогрессии в цифровых аудио рабочих станциях (DAW).
 
 Ссылки:
-- [Кварто-квинтовый круг](https://sixstringsapp.com/#/circle-of-fifths)
-- [Гармония и аккорды](https://sixstringsapp.com/#/harmony)
-- [Каденции](https://sixstringsapp.com/#/harmony?note=C&mode=major&tab=cadences)
-- [Модуляции](https://sixstringsapp.com/#/harmony?note=C&mode=major&tab=modulations)
-- [Конструктор песни](https://sixstringsapp.com/#/harmony?note=C&mode=major&tab=song)
-
+- [Кварто-квинтовый круг](https://sixstringsapp.com/#/ru/circle-of-fifths)
+- [Гармония и аккорды](https://sixstringsapp.com/#/ru/harmony)
+- [Каденции](https://sixstringsapp.com/#/ru/harmony?note=C&mode=major&tab=cadences)
+- [Модуляции](https://sixstringsapp.com/#/ru/harmony?note=C&mode=major&tab=modulations)
+- [Конструктор песни](https://sixstringsapp.com/#/ru/harmony?note=C&mode=major&tab=song)
 ### Поиск аккордов, гамм и аппликатур арпеджио
 {{< image-gallery gallery_dir="/images/portfolio/six-strings/chords" >}}
 
 Этот раздел позволяет быстро находить аккорды, гаммы и аппликатуры арпеджио на грифе гитары. Можно выбрать тип аккорда или гаммы и увидеть все возможные варианты. Каждый вариант можно прослушать и увидеть его расположение на грифе. Для каждого аккорда во вкладке "Арпеджио" показаны аппликатуры в разных позициях. А во вкладке "Гаммы" - все совместимые гаммы, которыми можно обыграть выбранный аккорд. Кроме того, есть возможность выбрать строй гитары и увидеть, как аккорд или гамма будут выглядеть в этом строе.
 
-Найдите нужную аппликатуру [здесь](https://sixstringsapp.com/#/chords).
+Найдите нужную аппликатуру [здесь](https://sixstringsapp.com/#/ru/chords).
 
 
 ### Исследователь грифа
 !["Генератор ритмов"](/images/portfolio/six-strings/fretboard.png "Исследователь грифа" )
 
-Данный [раздел](https://sixstringsapp.com/#/scales-fretboard-explorer?root=E&mode=chord&display=intervals&chord=maj7&chordCat=seventh) помогает изучать гриф гитары. Выбирайте строй гитаты и отображение нот или интервалов и изучайте аккорды и гамммы.
+Данный [раздел](https://sixstringsapp.com/#/ru/scales-fretboard-explorer?root=E&mode=chord&display=intervals&chord=maj7&chordCat=seventh) помогает изучать гриф гитары. Выбирайте строй гитаты и отображение нот или интервалов и изучайте аккорды и гамммы.
 
 ### Система CAGED
 !["CAGED система"](/images/portfolio/six-strings/caged.png "CAGED система" )
@@ -64,5 +63,4 @@ weight: 1
 ### Определитель аккордов
 !["Определитель аккордов"](/images/portfolio/six-strings/chord-identifier.png "Определитель аккордов" )
 
-Увидели как гитарист играет аккорд, но не знаете как он называется? А может быть вы эксперементировали, нашли клёвый звук, но не знаете как записать, чтобы поделиться с друзьями? Введите ноты аккорда в [данный инструмент](https://sixstringsapp.com/#/chord-identifier) и узнайте его возможное название.
-
+Увидели как гитарист играет аккорд, но не знаете как он называется? А может быть вы эксперементировали, нашли клёвый звук, но не знаете как записать, чтобы поделиться с друзьями? Введите ноты аккорда в [данный инструмент](https://sixstringsapp.com/#/ru/chord-identifier) и узнайте его возможное название.
