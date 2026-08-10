@@ -1,6 +1,6 @@
 baseURL = 'https://sibirtsev.com/'
 canonifyURLs = true
-languageCode = 'ru-RU'
+locale = 'ru-RU'
 title = 'Alexey Sibirtsev'
 theme = 'SiberianCoder'
 googleAnalytics = "G-FYR06ENQX2"
@@ -46,9 +46,9 @@ pagerSize = 5
   [languages.ru]
     contentDir = 'content/ru'
     disabled = false
-    languageCode = 'ru-RU'
-    languageDirection = 'ltr'
-    languageName = 'Русский'
+    locale = 'ru-RU'
+    direction = 'ltr'
+    label = 'Русский'
     title = 'Алексей Сибирцев'
     weight = 1
 
@@ -71,9 +71,9 @@ pagerSize = 5
   [languages.en]
     contentDir = 'content/en'
     disabled = false
-    languageCode = 'en-US'
-    languageDirection = 'ltr'
-    languageName = 'English'
+    locale = 'en-US'
+    direction = 'ltr'
+    label = 'English'
     title = 'Alexey Sibirtsev'
     weight = 2
     [languages.en.menu]
@@ -95,9 +95,9 @@ pagerSize = 5
   [languages.de]
     contentDir = 'content/de'
     disabled = true
-    languageCode = 'de-DE'
-    languageDirection = 'ltr'
-    languageName = 'Deutsch'
+    locale = 'de-DE'
+    direction = 'ltr'
+    label = 'Deutsch'
     title = 'Alexey Sibirtsev'
     weight = 3
     [languages.de.menu]

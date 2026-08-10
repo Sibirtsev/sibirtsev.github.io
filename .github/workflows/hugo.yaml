@@ -30,7 +30,10 @@ defaults:
 jobs:
   # Build job
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    env:
+      HUGO_VERSION: '0.164.0'
+      NODE_VERSION: '22'
     steps:
       - name: Checkout репозитория
         uses: actions/checkout@v4
@@ -39,15 +42,19 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.SUBMODULE_TOKEN }}
       
-      - name: Установка зависимостей TailwindCSS
-        run: |
-          wget https://github.com/tailwindlabs/tailwindcss/releases/latest/download/tailwindcss-linux-x64 -O /usr/local/bin/tailwindcss
-          chmod +x /usr/local/bin/tailwindcss
+      - name: Установка Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - name: Установка npm-зависимостей
+        run: npm ci
 
       - name: Установка Hugo
         uses: peaceiris/actions-hugo@v2
         with:
-          hugo-version: 'latest'
+          hugo-version: ${{ env.HUGO_VERSION }}
           extended: true  # Нужно для работы с PostCSS
 
       - name: Setup Pages
@@ -59,10 +66,7 @@ jobs:
           HUGO_CACHEDIR: ${{ runner.temp }}/hugo_cache
           HUGO_ENVIRONMENT: production
           TZ: Europe/Berlin
-        run: |
-          hugo \
-            --gc \
-            --minify
+        run: npm run build
       
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
@@ -74,7 +78,7 @@ jobs:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     needs: build
     steps:
       - name: Deploy to GitHub Pages

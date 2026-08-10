@@ -1,0 +1,11 @@
+{
+  "private": true,
+  "scripts": {
+    "build": "hugo --gc --minify",
+    "dev": "hugo server --buildDrafts --disableFastRender --bind 127.0.0.1 --baseURL http://localhost:1313/"
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "4.3.3",
+    "tailwindcss": "4.3.3"
+  }
+}

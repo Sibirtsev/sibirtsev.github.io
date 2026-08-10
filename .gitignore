@@ -1,3 +1,7 @@
 public/*
 resources/*
+node_modules/
 tailwindcss
+tailwindcss.exe
+.hugo_build.lock
+*.zip
