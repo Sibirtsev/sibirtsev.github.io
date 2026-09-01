@@ -108,6 +108,10 @@
       color: yellow;
     }
 
+    .voice-current-word {
+      box-shadow: inset 0 -0.12em 0 #00ff88;
+    }
+
     .sr-only {
       position: absolute;
       width: 1px;
@@ -125,9 +129,7 @@
       flex-direction: column;
       height: 100vh;
       overflow: hidden;
-      -webkit-transition: all 0.3s ease;
-      -moz-transition: all 0.3s ease;
-      transition: all 0.3s ease;
+      --guide-position: 40%;
     }
 
     .col {
@@ -158,6 +160,37 @@
       -moz-user-select: none;
       -ms-user-select: none;
       user-select: none;
+    }
+
+    #content-column::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: var(--guide-position);
+      height: 44px;
+      transform: translateY(-50%);
+      border-top: 1px solid rgba(0, 255, 136, 0.45);
+      border-bottom: 1px solid rgba(0, 255, 136, 0.45);
+      background: rgba(0, 255, 136, 0.06);
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    #content-column::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(to bottom, var(--prompter-bg, #000) 0%, rgba(0, 0, 0, 0) 24%, rgba(0, 0, 0, 0) 76%, var(--prompter-bg, #000) 100%);
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    #voice-status {
+      color: #aaa;
+      font-size: 0.85rem;
+      min-width: 90px;
     }
 
     #scroll-container {
@@ -242,7 +275,7 @@
     }
 
     #advanced-settings {
-      transition: all 0.3s ease;
+      transition: opacity 0.15s ease;
     }
 
     /* По умолчанию скрываем дополнительные настройки, но оставляем базовую структуру */
@@ -251,6 +284,7 @@
       top: -9999px !important;
       left: -9999px !important;
       opacity: 0 !important;
+      visibility: hidden !important;
       z-index: -1 !important;
       pointer-events: none !important;
     }
@@ -314,17 +348,7 @@
     }
 
     /* Убираем видимые элементы настроек только когда они НЕ в полноэкранном режиме */
-    #advanced-settings:not(.show) * {
-      display: none !important;
-      visibility: hidden !important;
-    }
-
     /* Показываем элементы настроек в полноэкранном режиме */
-    #advanced-settings.show * {
-      display: block !important;
-      visibility: visible !important;
-    }
-
     #advanced-settings.show .input-group {
       display: flex !important;
     }
@@ -446,25 +470,35 @@
     input[type="range"] {
       -webkit-appearance: none;
       appearance: none;
-      background: transparent;
+      height: 36px;
+      background:
+        linear-gradient(to right,
+          #00ff88 0%,
+          #00ff88 var(--range-progress, 0%),
+          #3f3f3f var(--range-progress, 0%),
+          #3f3f3f 100%);
+      border: 1px solid #666;
+      border-radius: 999px;
+      padding: 0 4px;
       cursor: pointer;
     }
 
     input[type="range"]::-webkit-slider-track {
-      background: #555;
-      height: 4px;
-      border-radius: 2px;
+      height: 12px;
+      background: transparent;
+      border-radius: 999px;
     }
 
     input[type="range"]::-webkit-slider-thumb {
       -webkit-appearance: none;
       appearance: none;
-      height: 18px;
-      width: 18px;
+      height: 30px;
+      width: 30px;
       border-radius: 50%;
       background: #00ff88;
       cursor: pointer;
-      border: 2px solid #333;
+      border: 3px solid #111;
+      box-shadow: 0 0 0 2px #8fffd0, 0 2px 8px rgba(0, 0, 0, 0.55);
       transition: all 0.2s ease;
     }
 
@@ -474,23 +508,25 @@
     }
 
     input[type="range"]::-moz-range-track {
-      background: #555;
-      height: 4px;
-      border-radius: 2px;
+      height: 12px;
+      background: transparent;
+      border-radius: 999px;
       border: none;
     }
 
     input[type="range"]::-moz-range-thumb {
-      height: 18px;
-      width: 18px;
+      height: 30px;
+      width: 30px;
       border-radius: 50%;
       background: #00ff88;
       cursor: pointer;
-      border: 2px solid #333;
+      border: 3px solid #111;
+      box-shadow: 0 0 0 2px #8fffd0, 0 2px 8px rgba(0, 0, 0, 0.55);
       transition: all 0.2s ease;
     }
 
-    input[type="number"] {
+    input[type="number"],
+    select {
       background: #333;
       color: #fff;
       border: 1px solid #555;
@@ -500,7 +536,13 @@
       transition: border-color 0.2s ease;
     }
 
-    input[type="number"]:hover {
+    select {
+      width: 100%;
+      padding: 8px 10px;
+    }
+
+    input[type="number"]:hover,
+    select:hover {
       border-color: #666;
     }
 
@@ -632,6 +674,7 @@
       top: -9999px !important;
       left: -9999px !important;
       opacity: 0 !important;
+      visibility: hidden !important;
       z-index: -1 !important;
       pointer-events: none !important;
     }
@@ -697,17 +740,7 @@
     /* Полноэкранные настройки не влияют на layout контейнера */
 
     /* Убираем видимые элементы настроек только когда они НЕ в полноэкранном режиме */
-    #advanced-settings:not(.show) * {
-      display: none !important;
-      visibility: hidden !important;
-    }
-
     /* Показываем элементы настроек в полноэкранном режиме */
-    #advanced-settings.show * {
-      display: block !important;
-      visibility: visible !important;
-    }
-
     #advanced-settings.show .input-group {
       display: flex !important;
     }
@@ -845,6 +878,251 @@
         padding: 12px 16px;
       }
     }
+
+    /* Overlay controls */
+    .container {
+      position: relative;
+    }
+
+    #content-column {
+      height: 100vh;
+    }
+
+    #control-column {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: max(14px, env(safe-area-inset-bottom));
+      width: 100%;
+      height: auto;
+      padding: 0;
+      background: transparent;
+      overflow: visible;
+      z-index: 10;
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      align-items: center;
+      pointer-events: none;
+    }
+
+    #control-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      width: auto;
+      flex: 0 0 auto;
+      justify-content: center;
+      margin: 0;
+      padding: 0;
+      background: transparent;
+      border: 0;
+      border-radius: 0;
+      box-shadow: none;
+      -webkit-backdrop-filter: none;
+      backdrop-filter: none;
+      pointer-events: auto;
+    }
+
+    #advanced-settings.show {
+      pointer-events: auto !important;
+    }
+
+    #control-row button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 44px;
+      height: 44px;
+      min-width: 44px;
+      min-height: 44px;
+      padding: 10px 12px;
+      margin: 0;
+      border-radius: 6px;
+    }
+
+    #control-row button svg {
+      width: 21px;
+      height: 21px;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
+      pointer-events: none;
+    }
+
+    #voice-status {
+      max-width: 90px;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .voice-control {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      height: 44px;
+      padding-right: 12px;
+      background: linear-gradient(135deg, #333, #2a2a2a);
+      border: 1px solid #555;
+      border-radius: 6px;
+      pointer-events: auto;
+    }
+
+    .voice-control.active {
+      background: linear-gradient(135deg, #00cc66, #00aa55);
+      border-color: #00aa55;
+      color: #000;
+      font-weight: 600;
+    }
+
+    .voice-control.active #voice-status {
+      color: #000;
+    }
+
+    .voice-control #voice-button {
+      background: transparent;
+      border: 0;
+      box-shadow: none;
+      color: inherit;
+    }
+
+    .voice-control #voice-button:hover {
+      transform: none;
+      box-shadow: none;
+    }
+
+    .text-actions,
+    .settings-tools {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .text-actions {
+      justify-content: flex-end;
+      margin-top: 8px;
+    }
+
+    .text-actions input[type="file"] {
+      display: none !important;
+    }
+
+    .settings-tools {
+      flex-wrap: wrap;
+      align-items: flex-end;
+    }
+
+    .settings-tools label {
+      flex: 0 0 auto;
+      margin-bottom: 0;
+    }
+
+    .settings-tools select {
+      width: 120px;
+      min-height: 44px;
+    }
+
+    .icon-toggle-button,
+    .file-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;
+      gap: 8px;
+    }
+
+    .icon-toggle-button {
+      width: 48px;
+      min-width: 48px;
+      padding: 0;
+    }
+
+    .icon-toggle-button svg,
+    .file-button svg {
+      width: 22px;
+      height: 22px;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
+      pointer-events: none;
+    }
+
+    .slider input[type="range"] {
+      min-height: 36px;
+      width: 100%;
+    }
+
+    .slider input[type="range"]::-webkit-slider-track {
+      height: 12px;
+    }
+
+    .slider input[type="range"]::-webkit-slider-thumb {
+      width: 30px;
+      height: 30px;
+      margin-top: -9px;
+    }
+
+    .slider input[type="range"]::-moz-range-track {
+      height: 12px;
+    }
+
+    .slider input[type="range"]::-moz-range-thumb {
+      width: 30px;
+      height: 30px;
+    }
+
+    #advanced-settings.show .text-actions,
+    #advanced-settings.show .settings-tools {
+      display: flex !important;
+    }
+
+    #advanced-settings.show .settings-tools label,
+    #advanced-settings.show .settings-tools select,
+    #advanced-settings.show .settings-tools button,
+    #advanced-settings.show .text-actions button {
+      display: inline-flex !important;
+    }
+
+    #advanced-settings.show .settings-tools .icon-toggle-button {
+      width: 48px !important;
+      height: 44px !important;
+      min-width: 48px !important;
+      padding: 0 !important;
+      margin: 0 !important;
+    }
+
+    #advanced-settings.show .slider input[type="range"] {
+      height: 36px !important;
+      margin: 8px 0 !important;
+    }
+
+    [hidden] {
+      display: none !important;
+    }
+
+    @media (max-width: 480px) {
+      #control-row {
+        gap: 6px;
+        padding: 6px;
+      }
+
+      #control-row button {
+        width: 40px;
+        height: 40px;
+        min-width: 40px;
+        min-height: 40px;
+      }
+
+      #voice-status {
+        max-width: 68px;
+      }
+    }
   </style>
 </head>
 
@@ -852,21 +1130,76 @@
   <div class="container" role="application" aria-label="Teleprompter Application">
     <aside class="col" id="control-column" role="region" aria-label="Controls Panel">
       <section id="control-row" role="group" aria-label="Playback Controls">
-        <button id="play-button" aria-describedby="play-help">Play</button>
+        <button id="play-button" aria-label="Play" title="Play" aria-describedby="play-help">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M8 5v14l11-7Z" fill="currentColor" stroke="none"></path>
+          </svg>
+        </button>
         <div id="play-help" class="sr-only">Start or pause text scrolling</div>
 
-        <button onclick="stop()" aria-describedby="stop-help">Stop</button>
+        <span id="voice-control" class="voice-control">
+          <button id="voice-button" aria-label="Mic Scroll" title="Mic Scroll" aria-pressed="false"
+            aria-describedby="voice-help">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 14a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v5a3 3 0 0 0 3 3Z"></path>
+              <path d="M19 11a7 7 0 0 1-14 0"></path>
+              <path d="M12 18v3"></path>
+              <path d="M8 21h8"></path>
+            </svg>
+          </button>
+          <span id="voice-status" aria-live="polite">Mic idle</span>
+        </span>
+        <div id="voice-help" class="sr-only">Use speech recognition to follow spoken words</div>
+
+        <button id="stop-button" onclick="stop()" aria-label="Stop" title="Stop" aria-describedby="stop-help">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <rect x="7" y="7" width="10" height="10" rx="1.5" fill="currentColor" stroke="none"></rect>
+          </svg>
+        </button>
         <div id="stop-help" class="sr-only">Stop scrolling and return to start</div>
 
-        <button onclick="jump(-0.1)" aria-describedby="back-help" class="desktop-only">-10%</button>
+        <button id="back-button" onclick="jump(-0.1)" aria-label="Back 10%" title="Back 10%"
+          aria-describedby="back-help" class="desktop-only">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M11 7 6 12l5 5"></path>
+            <path d="M18 7l-5 5 5 5"></path>
+          </svg>
+        </button>
         <div id="back-help" class="sr-only">Jump back 10 percent</div>
 
-        <button onclick="jump(0.1)" aria-describedby="forward-help" class="desktop-only">+10%</button>
-        <div id="forward-help" class="sr-only">Jump forward 10 percent</div> <button id="fullscreen-button"
-          aria-describedby="fullscreen-help">Fullscreen</button>
+        <button id="forward-button" onclick="jump(0.1)" aria-label="Forward 10%" title="Forward 10%"
+          aria-describedby="forward-help" class="desktop-only">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="m13 7 5 5-5 5"></path>
+            <path d="m6 7 5 5-5 5"></path>
+          </svg>
+        </button>
+        <div id="forward-help" class="sr-only">Jump forward 10 percent</div>
+
+        <button id="fullscreen-button" aria-label="Fullscreen" title="Fullscreen" aria-describedby="fullscreen-help">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M8 3H3v5"></path>
+            <path d="M16 3h5v5"></path>
+            <path d="M8 21H3v-5"></path>
+            <path d="M16 21h5v-5"></path>
+          </svg>
+        </button>
         <div id="fullscreen-help" class="sr-only">Toggle fullscreen mode</div>
 
-        <button id="settings-toggle" aria-describedby="settings-help" aria-expanded="false">Settings</button>
+        <button id="settings-toggle" aria-label="Settings" title="Settings" aria-describedby="settings-help"
+          aria-expanded="false">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z"></path>
+            <path d="M4 12h2"></path>
+            <path d="M18 12h2"></path>
+            <path d="M12 4v2"></path>
+            <path d="M12 18v2"></path>
+            <path d="m6.3 6.3 1.4 1.4"></path>
+            <path d="m16.3 16.3 1.4 1.4"></path>
+            <path d="m17.7 6.3-1.4 1.4"></path>
+            <path d="m7.7 16.3-1.4 1.4"></path>
+          </svg>
+        </button>
         <div id="settings-help" class="sr-only">Show or hide additional settings</div>
       </section>
 
@@ -882,11 +1215,23 @@
           <textarea id="input-text" placeholder="Enter text to scroll" aria-label="Text content for teleprompter"
             aria-describedby="text-help">
             </textarea>
+          <div class="text-actions">
+            <input type="file" id="text-file-input" accept=".txt,text/plain" class="sr-only">
+            <button type="button" id="import-text-button" class="file-button" aria-label="Import text file"
+              title="Import text file">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 3v12"></path>
+                <path d="m7 10 5 5 5-5"></path>
+                <path d="M5 21h14"></path>
+              </svg>
+              TXT
+            </button>
+          </div>
           <div id="text-help" class="sr-only">Enter the text you want to display in the teleprompter. Use the controls
             below to adjust speed and appearance.</div>
         </div>
 
-        <div class="setting">
+        <div class="setting slider">
           <label for="speed-range">Speed</label>
           <div class="input-group">
             <input type="range" id="speed-range" min="0" max="10" step="0.1" value="1" aria-describedby="speed-help">
@@ -896,7 +1241,7 @@
           <div id="speed-help" class="sr-only">Control scrolling speed from 0 to 10</div>
         </div>
 
-        <div class="setting">
+        <div class="setting slider">
           <label for="font-range">Font Size</label>
           <div class="input-group">
             <input type="range" id="font-range" min="16" max="80" step="1" value="32" aria-describedby="font-help">
@@ -906,7 +1251,7 @@
           <div id="font-help" class="sr-only">Adjust font size from 16 to 80 pixels</div>
         </div>
 
-        <div class="setting desktop-only">
+        <div class="setting slider desktop-only">
           <label for="width-range">Text Width</label>
           <div class="input-group">
             <input type="range" id="width-range" min="60" max="100" step="5" value="100" aria-describedby="width-help">
@@ -916,30 +1261,45 @@
           <div id="width-help" class="sr-only">Adjust text area width from 60% to 100% of screen width</div>
         </div>
 
-        <div class="setting">
+        <div class="setting slider">
+          <label for="guide-position-range">Reading Line</label>
+          <div class="input-group">
+            <input type="range" id="guide-position-range" min="30" max="50" step="1" value="40"
+              aria-describedby="guide-position-help">
+            <input type="number" id="guide-position-number" min="30" max="50" step="1" value="40"
+              aria-label="Reading line position" aria-describedby="guide-position-help">
+          </div>
+          <div id="guide-position-help" class="sr-only">Adjust reading guide position from 30 to 50 percent of screen height</div>
+        </div>
+
+        <div class="setting settings-tools">
+          <label for="voice-language">Mic Language</label>
+          <select id="voice-language" aria-describedby="voice-language-help">
+            <option value="auto">Auto</option>
+            <option value="ru-RU">Russian</option>
+            <option value="en-US">English</option>
+          </select>
+          <div id="voice-language-help" class="sr-only">Select speech recognition language</div>
           <button type="button" id="highlight-button" aria-pressed="false" aria-describedby="highlight-help"
-            class="toggle-button">
-            Highlight: OFF
+            class="icon-toggle-button" aria-label="Highlight: OFF" title="Highlight">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M4 19h16"></path>
+              <path d="M8 15 12 5l4 10"></path>
+              <path d="M9.5 11h5"></path>
+            </svg>
           </button>
           <div id="highlight-help" class="sr-only">When enabled, highlights the first two letters of each word to aid
             reading</div>
-        </div>
-
-        <div class="setting">
           <button type="button" id="mirror-button" aria-pressed="false" aria-describedby="mirror-help"
-            class="toggle-button">
-            Mirror: OFF
+            class="icon-toggle-button" aria-label="Mirror: OFF" title="Mirror">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 4v16"></path>
+              <path d="M4 7h4l2 10H6Z"></path>
+              <path d="M20 7h-4l-2 10h4Z"></path>
+            </svg>
           </button>
           <div id="mirror-help" class="sr-only">When enabled, mirrors text horizontally for use with teleprompter
             mirrors</div>
-        </div>
-
-        <div class="setting">
-          <button type="button" id="share-button" aria-describedby="share-help" class="action-button">
-            📤 Поделиться ссылкой
-          </button>
-          <div id="share-help" class="sr-only">Share link via Chrome's "Send to your devices" or copy to clipboard.
-            Right-click for more options</div>
         </div>
       </section>
     </aside>
@@ -1008,6 +1368,8 @@
       };
     };
 
+    const debouncedSaveSettings = debounce(saveSettings, 400);
+
     /**
      * Initializes mobile scroll prevention
      */
@@ -1017,6 +1379,7 @@
         document.body.removeEventListener('touchmove', window.mobileScrollListeners.touchmove);
         document.body.removeEventListener('touchstart', window.mobileScrollListeners.touchstart);
         document.body.removeEventListener('touchend', window.mobileScrollListeners.touchend);
+        window.mobileScrollListeners = null;
       }
 
       // Only apply on mobile devices
@@ -1052,123 +1415,30 @@
       }
     }
 
-    /**
-     * Shows sharing options menu
-     */
-    function showShareOptions(x, y) {
-      // Remove any existing menu
-      const existingMenu = document.querySelector('.share-menu');
-      if (existingMenu) {
-        existingMenu.remove();
-      }
-
-      const menu = document.createElement('div');
-      menu.className = 'share-menu';
-      menu.style.cssText = `
-        position: fixed;
-        top: ${y}px;
-        left: ${x}px;
-        background: #333;
-        border: 2px solid #555;
-        border-radius: 8px;
-        padding: 8px 0;
-        z-index: 10000;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-        min-width: 200px;
-      `;
-
-      const options = [
-        {
-          text: '🔗 Обычное копирование',
-          action: async () => {
-            const result = createShareableURL();
-            if (result.success) {
-              await navigator.clipboard.writeText(result.url);
-              alert('Ссылка скопирована в буфер обмена!');
-            }
-          }
-        },
-        {
-          text: '📱 Отправить на устройство',
-          action: async () => {
-            const result = createShareableURL();
-            if (result.success && navigator.share) {
-              try {
-                await navigator.share({
-                  title: 'Teleprompter Settings',
-                  text: 'Настройки телепромптера',
-                  url: result.url
-                });
-              } catch (error) {
-                if (error.name !== 'AbortError') {
-                  alert('Web Share API недоступен');
-                }
-              }
-            } else {
-              alert('Web Share API недоступен в этом браузере');
-            }
-          }
-        }
-      ];
-
-      options.forEach(option => {
-        const item = document.createElement('div');
-        item.style.cssText = `
-          padding: 12px 16px;
-          cursor: pointer;
-          color: white;
-          font-size: 14px;
-          transition: background-color 0.2s;
-        `;
-        item.textContent = option.text;
-
-        item.addEventListener('mouseenter', () => {
-          item.style.backgroundColor = '#555';
-        });
-
-        item.addEventListener('mouseleave', () => {
-          item.style.backgroundColor = 'transparent';
-        });
-
-        item.addEventListener('click', () => {
-          option.action();
-          menu.remove();
-        });
-
-        menu.appendChild(item);
-      });
-
-      document.body.appendChild(menu);
-
-      // Close menu when clicking outside
-      const closeMenu = (event) => {
-        if (!menu.contains(event.target)) {
-          menu.remove();
-          document.removeEventListener('click', closeMenu);
-        }
-      };
-
-      setTimeout(() => {
-        document.addEventListener('click', closeMenu);
-      }, 100);
-    }
-
     /*********************************
      * DOM Element References
      *********************************/
     const elements = {
       inputText: $('input-text'),
+      textFileInput: $('text-file-input'),
+      importTextButton: $('import-text-button'),
       speedRange: $('speed-range'),
       speedNumber: $('speed-number'),
       fontRange: $('font-range'),
       fontNumber: $('font-number'),
       widthRange: $('width-range'),
       widthNumber: $('width-number'),
+      guidePositionRange: $('guide-position-range'),
+      guidePositionNumber: $('guide-position-number'),
+      voiceLanguage: $('voice-language'),
       highlightButton: $('highlight-button'),
       mirrorButton: $('mirror-button'),
       contentColumn: $('content-column'),
       scrollContainer: $('scroll-container'),
       playButton: $('play-button'),
+      voiceControl: $('voice-control'),
+      voiceButton: $('voice-button'),
+      voiceStatus: $('voice-status'),
       fullscreenButton: $('fullscreen-button'),
       settingsToggle: $('settings-toggle'),
       advancedSettings: $('advanced-settings')
@@ -1181,6 +1451,8 @@
       speed: 1,
       fontSize: 32,
       textWidth: 100, // Text area width percentage (desktop only)
+      guidePosition: 40,
+      voiceLanguage: 'auto',
       highlight: false,
       mirrored: false,
       isPlaying: false,
@@ -1188,7 +1460,30 @@
       animationId: null,
       startTime: 0,
       pausedTime: 0,
-      scrollTarget: 0
+      resumeAfterSettings: false,
+      refreshAfterSettings: false,
+      metricsAfterSettings: false,
+      metricsDirty: true,
+      durationMs: 0,
+      cachedWordCount: 0,
+      contentDirty: true,
+      preparedTrackWords: false,
+      preparedHighlight: null,
+      scrollTarget: 0,
+      recognition: null,
+      isListening: false,
+      voiceWords: [],
+      currentWordIndex: 0,
+      currentVoiceElement: null,
+      lastVoiceWord: ''
+    };
+
+    const buttonIcons = {
+      play: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7Z" fill="currentColor" stroke="none"></path></svg>',
+      pause: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14"></path><path d="M16 5v14"></path></svg>',
+      mic: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 14a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v5a3 3 0 0 0 3 3Z"></path><path d="M19 11a7 7 0 0 1-14 0"></path><path d="M12 18v3"></path><path d="M8 21h8"></path></svg>',
+      fullscreen: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3H3v5"></path><path d="M16 3h5v5"></path><path d="M8 21H3v-5"></path><path d="M16 21h5v-5"></path></svg>',
+      exitFullscreen: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3v6H3"></path><path d="M15 3v6h6"></path><path d="M9 21v-6H3"></path><path d="M15 21v-6h6"></path></svg>'
     };
 
     /*********************************
@@ -1204,6 +1499,8 @@
           speed: state.speed,
           fontSize: state.fontSize,
           textWidth: state.textWidth,
+          guidePosition: state.guidePosition,
+          voiceLanguage: state.voiceLanguage,
           highlight: state.highlight,
           mirrored: state.mirrored,
           text: elements.inputText ? elements.inputText.value : ''
@@ -1235,6 +1532,12 @@
         if (typeof settings.textWidth === 'number') {
           state.textWidth = validateNumber(settings.textWidth, 60, 100, 100);
         }
+        if (typeof settings.guidePosition === 'number') {
+          state.guidePosition = validateNumber(settings.guidePosition, 30, 50, 40);
+        }
+        if (typeof settings.voiceLanguage === 'string' && ['auto', 'ru-RU', 'en-US'].includes(settings.voiceLanguage)) {
+          state.voiceLanguage = settings.voiceLanguage;
+        }
         if (typeof settings.highlight === 'boolean') {
           state.highlight = settings.highlight;
         }
@@ -1251,6 +1554,12 @@
         }
         if (elements.widthRange && elements.widthNumber) {
           elements.widthRange.value = elements.widthNumber.value = state.textWidth;
+        }
+        if (elements.guidePositionRange && elements.guidePositionNumber) {
+          elements.guidePositionRange.value = elements.guidePositionNumber.value = state.guidePosition;
+        }
+        if (elements.voiceLanguage) {
+          elements.voiceLanguage.value = state.voiceLanguage;
         }
         if (elements.inputText && settings.text) {
           elements.inputText.value = settings.text;
@@ -1274,186 +1583,6 @@
       }
     }
 
-    /*********************************
-     * URL Sharing Functions
-     *********************************/
-
-    /**
-     * Compresses text using simple LZW-like algorithm
-     */
-    function compressText(text) {
-      if (!text) return '';
-
-      try {
-        // Simple compression: replace common patterns
-        return text
-          .replace(/\s+/g, ' ') // Multiple spaces to single
-          .replace(/\n\s*/g, '\n') // Clean line breaks
-          .trim();
-      } catch (error) {
-        console.error('Error compressing text:', error);
-        return text;
-      }
-    }
-
-    /**
-     * Creates a shareable URL with current settings
-     */
-    function createShareableURL() {
-      try {
-        const settings = {
-          s: state.speed, // speed
-          f: state.fontSize, // font
-          w: state.textWidth, // width
-          h: state.highlight ? 1 : 0, // highlight
-          m: state.mirrored ? 1 : 0, // mirror
-          t: compressText(elements.inputText ? elements.inputText.value : '') // text
-        };
-
-        // Convert to base64 to make URL-safe
-        const dataString = JSON.stringify(settings);
-        const base64Data = btoa(encodeURIComponent(dataString));
-
-        const baseURL = window.location.origin + window.location.pathname;
-        const shareURL = `${baseURL}#shared=${base64Data}`;
-
-        // Check URL length limit (2000 chars is safe for most browsers)
-        if (shareURL.length > 2000) {
-          return {
-            success: false,
-            url: null,
-            reason: 'too_long',
-            length: shareURL.length,
-            data: base64Data
-          };
-        }
-
-        return {
-          success: true,
-          url: shareURL,
-          length: shareURL.length,
-          data: base64Data
-        };
-
-      } catch (error) {
-        console.error('Error creating shareable URL:', error);
-        return { success: false, error: error.message };
-      }
-    }
-
-    /**
-     * Loads settings from URL hash
-     */
-    function loadFromURL() {
-      try {
-        const hash = window.location.hash;
-        if (!hash.startsWith('#shared=')) return false;
-
-        const base64Data = hash.replace('#shared=', '');
-        const dataString = decodeURIComponent(atob(base64Data));
-        const settings = JSON.parse(dataString);
-
-        // Apply settings
-        if (typeof settings.s === 'number') {
-          state.speed = validateNumber(settings.s, 0, 10, 1);
-        }
-        if (typeof settings.f === 'number') {
-          state.fontSize = validateNumber(settings.f, 16, 80, 32);
-        }
-        if (typeof settings.w === 'number') {
-          state.textWidth = validateNumber(settings.w, 60, 100, 100);
-        }
-        if (typeof settings.h === 'number') {
-          state.highlight = settings.h === 1;
-        }
-        if (typeof settings.m === 'number') {
-          state.mirrored = settings.m === 1;
-        }
-        if (settings.t && elements.inputText) {
-          elements.inputText.value = settings.t;
-        }
-
-        // Update UI
-        if (elements.speedRange && elements.speedNumber) {
-          elements.speedRange.value = elements.speedNumber.value = state.speed;
-        }
-        if (elements.fontRange && elements.fontNumber) {
-          elements.fontRange.value = elements.fontNumber.value = state.fontSize;
-        }
-        if (elements.widthRange && elements.widthNumber) {
-          elements.widthRange.value = elements.widthNumber.value = state.textWidth;
-        }
-
-        // Clear the hash to keep URL clean
-        history.replaceState(null, null, window.location.pathname);
-
-        console.log('Settings loaded from URL successfully');
-        return true;
-
-      } catch (error) {
-        console.error('Error loading from URL:', error);
-        return false;
-      }
-    }
-
-    /**
-     * Shares URL using Web Share API or copies to clipboard as fallback
-     */
-    async function shareViaURL() {
-      try {
-        const result = createShareableURL();
-
-        if (!result.success) {
-          if (result.reason === 'too_long') {
-            alert(`URL слишком длинный (${result.length} символов). Попробуйте сократить текст или используйте экспорт в файл.`);
-            return false;
-          } else {
-            alert('Ошибка создания ссылки: ' + (result.error || 'Unknown error'));
-            return false;
-          }
-        }
-
-        // Check if Web Share API is supported (Chrome's "Send to your devices" feature)
-        if (navigator.share) {
-          try {
-            await navigator.share({
-              title: 'Teleprompter Settings',
-              text: 'Настройки телепромптера',
-              url: result.url
-            });
-            console.log('Successfully shared via Web Share API');
-            return true;
-          } catch (shareError) {
-            // User cancelled or sharing failed, fall back to clipboard
-            if (shareError.name !== 'AbortError') {
-              console.warn('Web Share API failed, falling back to clipboard:', shareError);
-            }
-          }
-        }
-
-        // Fallback: Copy to clipboard
-        if (navigator.clipboard) {
-          await navigator.clipboard.writeText(result.url);
-          alert(`Ссылка скопирована в буфер обмена!\nДлина: ${result.length} символов\n\nВы можете использовать функцию "Отправить на устройство" в меню Chrome.`);
-        } else {
-          // Fallback for older browsers
-          const textArea = document.createElement('textarea');
-          textArea.value = result.url;
-          document.body.appendChild(textArea);
-          textArea.select();
-          document.execCommand('copy');
-          document.body.removeChild(textArea);
-          alert(`Ссылка скопирована в буфер обмена!\nДлина: ${result.length} символов\n\nВы можете использовать функцию "Отправить на устройство" в меню Chrome.`);
-        }
-
-        return true;
-
-      } catch (error) {
-        console.error('Error sharing URL:', error);
-        alert('Ошибка при копировании ссылки: ' + error.message);
-        return false;
-      }
-    }
 
     /*********************************
      * Core Helper Functions
@@ -1554,69 +1683,149 @@
         console.error('Error applying text width:', error);
       }
     }
+
+    function applyGuidePosition() {
+      if (elements.contentColumn) {
+        elements.contentColumn.style.setProperty('--guide-position', state.guidePosition + '%');
+        elements.contentColumn.style.setProperty('--prompter-bg', getComputedStyle(elements.contentColumn).backgroundColor || '#000');
+      }
+    }
+
+    function guideOffset() {
+      return elements.scrollContainer ? elements.scrollContainer.clientHeight * (state.guidePosition / 100) : 0;
+    }
+
+    function wordIndexAtGuide() {
+      if (!state.voiceWords.length || !elements.scrollContainer) return 0;
+
+      const guideY = elements.scrollContainer.scrollTop + guideOffset();
+      const index = state.voiceWords.findIndex(item => item.element.offsetTop + item.element.offsetHeight / 2 >= guideY);
+      return index === -1 ? state.voiceWords.length - 1 : index;
+    }
+
+    function recalculateScrollMetrics(progress = currentProgress()) {
+      if (!elements.scrollContainer) return;
+
+      const view = elements.scrollContainer.clientHeight;
+      const lineHeight = parseFloat(getComputedStyle(elements.scrollContainer).lineHeight) || state.fontSize * 1.5;
+      const guideY = guideOffset();
+      const topPadding = Math.max(guideY - lineHeight / 2, 0);
+      const bottomPadding = Math.max(view - guideY - lineHeight / 2, 0);
+
+      elements.scrollContainer.style.paddingTop = topPadding + 'px';
+      elements.scrollContainer.style.paddingBottom = bottomPadding + 'px';
+      state.scrollTarget = Math.max(elements.scrollContainer.scrollHeight - view, 0);
+      elements.scrollContainer.scrollTop = clamp(progress, 0, 1) * state.scrollTarget;
+      state.metricsDirty = false;
+    }
+
+    function markContentDirty() {
+      state.contentDirty = true;
+      state.durationMs = 0;
+      state.cachedWordCount = 0;
+    }
+
+    function isContentReady(trackWords = false) {
+      return !state.contentDirty
+        && state.preparedHighlight === state.highlight
+        && (!trackWords || state.preparedTrackWords);
+    }
+
+    function seekToProgress(progress) {
+      if (!elements.scrollContainer || state.scrollTarget <= 0) {
+        prepareScroll(progress);
+        return;
+      }
+
+      const nextProgress = clamp(progress, 0, 1);
+      elements.scrollContainer.scrollTop = nextProgress * state.scrollTarget;
+
+      if (state.isPlaying) {
+        state.pausedTime = nextProgress * (state.durationMs || calculateDuration());
+        state.startTime = performance.now();
+      }
+    }
+
     /**
      * Safely builds HTML content with highlighting support
      * @param {string} text - Input text to process
      * @returns {DocumentFragment} - Safe DOM fragment
      */
-    function buildHTML(text) {
+    function buildHTML(text, trackWords = false) {
       const fragment = document.createDocumentFragment();
+      state.voiceWords = [];
 
-      if (!state.highlight) {
-        // Simple text with line breaks
-        const lines = text.split(/\n/);
-        lines.forEach((line, index) => {
-          if (index > 0) {
+      if (!state.highlight && !trackWords) {
+        text.split(/\n/).forEach((line, lineIndex) => {
+          if (lineIndex > 0) {
             fragment.appendChild(document.createElement('br'));
           }
-          if (line.trim()) {
-            fragment.appendChild(document.createTextNode(line));
-          }
+          fragment.appendChild(document.createTextNode(line));
         });
         return fragment;
       }
 
-      // Highlight mode - process word by word
       const lines = text.split(/\n/);
       lines.forEach((line, lineIndex) => {
         if (lineIndex > 0) {
           fragment.appendChild(document.createElement('br'));
         }
 
-        const words = line.split(/(\s+)/);
-        words.forEach(part => {
+        const parts = line.split(/(\s+)/);
+        parts.forEach(part => {
           if (/\s+/.test(part)) {
             // Keep spaces as text nodes
             fragment.appendChild(document.createTextNode(part));
           } else if (part.length > 0) {
-            // Create highlighted word
-            const first = part.slice(0, 2);
-            const rest = part.slice(2);
+            const wordSpan = document.createElement('span');
+            const clean = normalizeVoiceWord(part);
 
-            if (first) {
-              const highlightSpan = document.createElement('span');
-              highlightSpan.className = 'highlight';
-              highlightSpan.textContent = first;
-              fragment.appendChild(highlightSpan);
+            if (trackWords && clean) {
+              state.voiceWords.push({ clean, element: wordSpan });
             }
 
-            if (rest) {
-              fragment.appendChild(document.createTextNode(rest));
+            if (state.highlight) {
+              const first = part.slice(0, 2);
+              const rest = part.slice(2);
+
+              if (first) {
+                const highlightSpan = document.createElement('span');
+                highlightSpan.className = 'highlight';
+                highlightSpan.textContent = first;
+                wordSpan.appendChild(highlightSpan);
+              }
+
+              if (rest) {
+                wordSpan.appendChild(document.createTextNode(rest));
+              }
+            } else {
+              wordSpan.textContent = part;
             }
+
+            fragment.appendChild(wordSpan);
           }
         });
       });
 
       return fragment;
     }
+
+    function normalizeVoiceWord(word) {
+      try {
+        return word.replace(/[^\p{L}\p{N}]/gu, '').toLowerCase();
+      } catch (error) {
+        return word.replace(/[^a-z0-9\u0400-\u04ff]/gi, '').toLowerCase();
+      }
+    }
     /*********************************
      * Content Management Functions
      *********************************/
-    function prepareScroll(p = 0) {
+    function prepareScroll(p = 0, trackWords = state.isListening) {
       try {
         applyFont();
         applyMirror();
         applyTextWidth();
+        applyGuidePosition();
 
         if (!elements.scrollContainer || !elements.inputText || !elements.contentColumn) {
           console.error('Missing required DOM elements for scroll preparation');
@@ -1624,18 +1833,23 @@
         }
 
         // Clear previous content safely
+        state.currentVoiceElement = null;
         elements.scrollContainer.innerHTML = '';
 
         // Append safe content
         const textContent = elements.inputText.value.replace(/\r/g, "");
-        const safeContent = buildHTML(textContent);
+        state.cachedWordCount = wordCount(textContent);
+        const safeContent = buildHTML(textContent, trackWords);
         elements.scrollContainer.appendChild(safeContent);
+        state.contentDirty = false;
+        state.preparedTrackWords = trackWords;
+        state.preparedHighlight = state.highlight;
 
-        const total = elements.scrollContainer.scrollHeight;
-        const view = elements.scrollContainer.clientHeight;
-        // Скролим до полностью пустого экрана (весь контент + высота экрана)
-        state.scrollTarget = Math.max(total, 0);
-        elements.scrollContainer.scrollTop = p * state.scrollTarget;
+        recalculateScrollMetrics(p);
+        state.currentWordIndex = state.voiceWords.length
+          ? clamp(state.currentWordIndex, 0, state.voiceWords.length - 1)
+          : 0;
+        updateVoiceHighlight();
       } catch (error) {
         console.error('Error preparing scroll:', error);
       }
@@ -1654,7 +1868,7 @@
         if (!state.startTime) state.startTime = timestamp;
 
         const elapsed = timestamp - state.startTime + state.pausedTime;
-        const duration = calculateDuration();
+        const duration = state.durationMs || calculateDuration();
 
         if (duration <= 0) {
           stop();
@@ -1686,7 +1900,7 @@
       try {
         if (!elements.inputText) return 0;
 
-        const words = wordCount(elements.inputText.value);
+        const words = state.cachedWordCount || wordCount(elements.inputText.value);
         const speedWPM = Math.max(state.speed * 60, 1); // Convert to words per minute, minimum 1
 
         return (words / speedWPM) * 60000; // Convert to milliseconds
@@ -1702,6 +1916,7 @@
      */
     function play(startProgress = 0) {
       try {
+        if (state.isListening) stopVoice();
         if (state.isPlaying) return;
 
         // Check if there's text content
@@ -1711,7 +1926,13 @@
           return;
         }
 
-        prepareScroll(startProgress);
+        if (!isContentReady(false)) {
+          prepareScroll(startProgress);
+        } else if (state.metricsDirty) {
+          recalculateScrollMetrics(startProgress);
+        } else {
+          seekToProgress(startProgress);
+        }
 
         const duration = calculateDuration();
 
@@ -1721,6 +1942,7 @@
         }
 
         state.isPlaying = true;
+        state.durationMs = duration;
         state.pausedTime = startProgress * duration;
         state.startTime = 0;
 
@@ -1762,6 +1984,7 @@
     function stop() {
       try {
         state.isPlaying = false;
+        stopVoice();
 
         if (state.animationId) {
           cancelAnimationFrame(state.animationId);
@@ -1770,11 +1993,14 @@
 
         state.startTime = 0;
         state.pausedTime = 0;
+        state.durationMs = 0;
+        state.currentWordIndex = 0;
 
         if (elements.scrollContainer) {
           elements.scrollContainer.scrollTop = 0;
         }
 
+        updateVoiceHighlight();
         updatePlayButton();
       } catch (error) {
         console.error('Error stopping playback:', error);
@@ -1791,6 +2017,210 @@
         play(currentProgress());
       }
     }
+
+    function updateVoiceButton() {
+      if (!elements.voiceButton) return;
+
+      setIconButton(elements.voiceButton, buttonIcons.mic, state.isListening ? 'Mic On' : 'Mic Scroll');
+      elements.voiceButton.setAttribute('aria-pressed', state.isListening.toString());
+      elements.voiceButton.classList.toggle('active', state.isListening);
+      if (elements.voiceControl) {
+        elements.voiceControl.classList.toggle('active', state.isListening);
+      }
+    }
+
+    function setIconButton(button, icon, label) {
+      button.innerHTML = icon;
+      button.setAttribute('aria-label', label);
+      button.title = label;
+    }
+
+    function setVoiceStatus(message) {
+      if (elements.voiceStatus) {
+        elements.voiceStatus.textContent = message;
+      }
+    }
+
+    function updateVoiceHighlight() {
+      if (state.currentVoiceElement) {
+        state.currentVoiceElement.classList.remove('voice-current-word');
+        state.currentVoiceElement = null;
+      }
+
+      if (!state.isListening || !state.voiceWords[state.currentWordIndex]) return;
+
+      state.currentVoiceElement = state.voiceWords[state.currentWordIndex].element;
+      state.currentVoiceElement.classList.add('voice-current-word');
+    }
+
+    function scrollToCurrentVoiceWord() {
+      if (!elements.scrollContainer || !state.voiceWords[state.currentWordIndex]) return;
+
+      const element = state.voiceWords[state.currentWordIndex].element;
+      const top = element.offsetTop - guideOffset() + element.offsetHeight / 2;
+      elements.scrollContainer.scrollTop = Math.max(top, 0);
+    }
+
+    function handleVoiceWords(words) {
+      if (!state.voiceWords.length || !words.length) return;
+
+      const heardWords = words.map(normalizeVoiceWord).filter(Boolean);
+      const phrase = heardWords.slice(-5).join(' ');
+      const heard = new Set(heardWords.filter(word => word.length > 2));
+      if (!heard.size && heardWords.length < 2) return;
+
+      const start = state.currentWordIndex;
+      const end = Math.min(state.voiceWords.length, start + 12);
+
+      for (let index = start; index < end; index++) {
+        const item = state.voiceWords[index];
+        const next = state.voiceWords[index + 1];
+        if (!next || !phrase.includes(item.clean + ' ' + next.clean)) continue;
+        if (item.clean === state.lastVoiceWord && index > start) continue;
+
+        state.lastVoiceWord = item.clean;
+        state.currentWordIndex = Math.min(index + 2, state.voiceWords.length - 1);
+        updateVoiceHighlight();
+        scrollToCurrentVoiceWord();
+        return;
+      }
+
+      for (let index = start; index < end; index++) {
+        const item = state.voiceWords[index];
+        if (item.clean.length < 3 || !heard.has(item.clean)) continue;
+        if (item.clean === state.lastVoiceWord && index > start) continue;
+
+        state.lastVoiceWord = item.clean;
+        state.currentWordIndex = Math.min(index + 1, state.voiceWords.length - 1);
+        updateVoiceHighlight();
+        scrollToCurrentVoiceWord();
+        return;
+      }
+    }
+
+    function speechLanguage() {
+      if (state.voiceLanguage !== 'auto') return state.voiceLanguage;
+
+      const text = elements.inputText ? elements.inputText.value : '';
+      const cyrillic = (text.match(/[\u0400-\u04ff]/g) || []).length;
+      const latin = (text.match(/[a-z]/gi) || []).length;
+
+      if (cyrillic > latin) return 'ru-RU';
+      if (latin > cyrillic) return 'en-US';
+
+      const lang = navigator.language || document.documentElement.lang || 'en-US';
+      return lang === 'ru' ? 'ru-RU' : lang;
+    }
+
+    function startVoice() {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+      if (!SpeechRecognition) {
+        setVoiceStatus('Not supported');
+        alert('Voice recognition is not supported in this browser. Try Chrome, Edge, or Safari.');
+        return;
+      }
+
+      if (!elements.inputText || !elements.inputText.value.trim()) {
+        setVoiceStatus('No text');
+        alert('Please enter text before starting voice scrolling.');
+        return;
+      }
+
+      const startProgress = currentProgress();
+      pause();
+      if (isContentReady(true)) {
+        recalculateScrollMetrics(startProgress);
+      } else {
+        prepareScroll(startProgress, true);
+      }
+
+      state.currentWordIndex = wordIndexAtGuide();
+      state.lastVoiceWord = '';
+      state.recognition = new SpeechRecognition();
+      state.recognition.continuous = true;
+      state.recognition.interimResults = true;
+      state.recognition.lang = speechLanguage();
+
+      state.recognition.onresult = (event) => {
+        setVoiceStatus('Following');
+        let transcript = '';
+        for (let index = event.resultIndex; index < event.results.length; index++) {
+          transcript += ' ' + event.results[index][0].transcript;
+        }
+
+        handleVoiceWords(transcript.trim().split(/\s+/).slice(-5));
+      };
+
+      state.recognition.onerror = (event) => {
+        console.error('Speech recognition error:', event.error);
+        if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
+          alert('Microphone access is blocked.');
+          setVoiceStatus('Mic blocked');
+          stopVoice();
+        } else {
+          setVoiceStatus('Mic error');
+        }
+      };
+
+      state.recognition.onend = () => {
+        if (!state.isListening) return;
+
+        try {
+          state.recognition.start();
+        } catch (error) {
+          console.error('Failed to restart speech recognition:', error);
+          stopVoice();
+        }
+      };
+
+      try {
+        state.isListening = true;
+        setVoiceStatus('Starting');
+        state.recognition.start();
+        updateVoiceButton();
+        setVoiceStatus('Listening');
+        updateVoiceHighlight();
+        scrollToCurrentVoiceWord();
+      } catch (error) {
+        console.error('Failed to start speech recognition:', error);
+        setVoiceStatus('Start failed');
+        stopVoice();
+      }
+    }
+
+    function stopVoice() {
+      const recognition = state.recognition;
+
+      state.isListening = false;
+      state.recognition = null;
+      state.lastVoiceWord = '';
+
+      if (recognition) {
+        recognition.onresult = null;
+        recognition.onerror = null;
+        recognition.onend = null;
+        try {
+          recognition.stop();
+        } catch (error) {
+          console.error('Failed to stop speech recognition:', error);
+        }
+      }
+
+      updateVoiceButton();
+      if (elements.voiceStatus && !['Mic blocked', 'Mic error', 'Start failed', 'Not supported', 'No text'].includes(elements.voiceStatus.textContent)) {
+        setVoiceStatus('Mic idle');
+      }
+      updateVoiceHighlight();
+    }
+
+    function toggleVoice() {
+      if (state.isListening) {
+        stopVoice();
+      } else {
+        startVoice();
+      }
+    }
     /*********************************
      * UI Update Functions
      *********************************/
@@ -1801,7 +2231,7 @@
     function updatePlayButton() {
       try {
         if (elements.playButton) {
-          elements.playButton.textContent = state.isPlaying ? 'Pause' : 'Play';
+          setIconButton(elements.playButton, state.isPlaying ? buttonIcons.pause : buttonIcons.play, state.isPlaying ? 'Pause' : 'Play');
           elements.playButton.setAttribute('aria-pressed', state.isPlaying.toString());
         }
       } catch (error) {
@@ -1815,7 +2245,9 @@
     function updateToggleButton(button, isActive, label) {
       try {
         if (button) {
-          button.textContent = `${label}: ${isActive ? 'ON' : 'OFF'}`;
+          const text = `${label}: ${isActive ? 'ON' : 'OFF'}`;
+          button.setAttribute('aria-label', text);
+          button.title = text;
           button.setAttribute('aria-pressed', isActive.toString());
           button.classList.toggle('active', isActive);
         }
@@ -1832,17 +2264,7 @@
       try {
         const currentPos = currentProgress();
         const newPos = clamp(currentPos + delta, 0, 1);
-        const wasPlaying = state.isPlaying;
-
-        if (wasPlaying) {
-          pause();
-        }
-
-        prepareScroll(newPos);
-
-        if (wasPlaying) {
-          play(newPos);
-        }
+        seekToProgress(newPos);
       } catch (error) {
         console.error('Error jumping:', error);
       }
@@ -1860,15 +2282,40 @@
           pause();
         }
 
-        prepareScroll(currentPos);
-
         if (wasPlaying) {
           play(currentPos);
+        } else {
+          prepareScroll(currentPos);
         }
       } catch (error) {
         console.error('Error refreshing content:', error);
       }
-    }, 100);
+    }, 500);
+
+    function isSettingsOpen() {
+      return !!(elements.advancedSettings && elements.advancedSettings.classList.contains('show'));
+    }
+
+    function requestContentRefresh() {
+      if (isSettingsOpen()) {
+        state.refreshAfterSettings = true;
+        markContentDirty();
+        return;
+      }
+      refreshMaintainingProgress();
+    }
+
+    function requestMetricsRefresh(progress = currentProgress()) {
+      if (isSettingsOpen()) {
+        state.metricsAfterSettings = true;
+        state.metricsDirty = true;
+        return;
+      }
+      applyFont();
+      applyTextWidth();
+      applyGuidePosition();
+      recalculateScrollMetrics(progress);
+    }
 
     /*********************************
      * Input Synchronization Functions
@@ -1882,18 +2329,35 @@
      */
     function syncInputs(rangeEl, numberEl, updateFn) {
       if (!rangeEl || !numberEl) return;
+      updateRangeProgress(rangeEl);
 
-      const handler = (e) => {
+      const handler = (e, commit = false) => {
         try {
-          updateFn(e.target.value);
+          updateFn(e.target.value, commit);
           rangeEl.value = numberEl.value;
+          updateRangeProgress(rangeEl);
+          if (commit) {
+            saveSettings();
+          } else {
+            debouncedSaveSettings();
+          }
         } catch (error) {
           console.error('Error in input handler:', error);
         }
       };
 
-      rangeEl.addEventListener('input', handler);
-      numberEl.addEventListener('input', handler);
+      rangeEl.addEventListener('input', event => handler(event));
+      numberEl.addEventListener('input', event => handler(event));
+      rangeEl.addEventListener('change', event => handler(event, true));
+      numberEl.addEventListener('change', event => handler(event, true));
+    }
+
+    function updateRangeProgress(rangeEl) {
+      const min = parseFloat(rangeEl.min || '0');
+      const max = parseFloat(rangeEl.max || '100');
+      const value = parseFloat(rangeEl.value || '0');
+      const progress = max === min ? 0 : ((value - min) / (max - min)) * 100;
+      rangeEl.style.setProperty('--range-progress', clamp(progress, 0, 100) + '%');
     }
 
     /**
@@ -1903,30 +2367,68 @@
     function updateSpeed(value) {
       state.speed = validateNumber(value, 0, 10, 1);
       elements.speedRange.value = elements.speedNumber.value = state.speed;
-      refreshMaintainingProgress();
-      saveSettings();
+      updateRangeProgress(elements.speedRange);
     }
 
     /**
      * Updates font size setting
      * @param {string|number} value - New font size value
      */
-    function updateFontSize(value) {
+    function updateFontSize(value, commit = false) {
       state.fontSize = validateNumber(value, 16, 80, 32);
       elements.fontRange.value = elements.fontNumber.value = state.fontSize;
-      refreshMaintainingProgress();
-      saveSettings();
+      updateRangeProgress(elements.fontRange);
+      if (commit) {
+        requestMetricsRefresh(currentProgress());
+      }
     }
 
     /**
      * Updates text width setting (desktop only)
      * @param {string|number} value - New width percentage value
      */
-    function updateTextWidth(value) {
+    function updateTextWidth(value, commit = false) {
       state.textWidth = validateNumber(value, 60, 100, 100);
       elements.widthRange.value = elements.widthNumber.value = state.textWidth;
-      refreshMaintainingProgress();
+      updateRangeProgress(elements.widthRange);
+      if (commit) {
+        requestMetricsRefresh(currentProgress());
+      }
+    }
+
+    function updateGuidePosition(value, commit = false) {
+      state.guidePosition = validateNumber(value, 30, 50, 40);
+      elements.guidePositionRange.value = elements.guidePositionNumber.value = state.guidePosition;
+      updateRangeProgress(elements.guidePositionRange);
+      applyGuidePosition();
+      if (commit) requestMetricsRefresh(currentProgress());
+    }
+
+    function updateVoiceLanguage(value) {
+      state.voiceLanguage = ['auto', 'ru-RU', 'en-US'].includes(value) ? value : 'auto';
+      if (elements.voiceLanguage) {
+        elements.voiceLanguage.value = state.voiceLanguage;
+      }
       saveSettings();
+
+      if (state.isListening) {
+        stopVoice();
+        startVoice();
+      }
+    }
+
+    function importTextFile(file) {
+      if (!file || !elements.inputText) return;
+
+      const reader = new FileReader();
+      reader.onload = () => {
+        elements.inputText.value = String(reader.result || '');
+        markContentDirty();
+        requestContentRefresh();
+        saveSettings();
+      };
+      reader.onerror = () => alert('Could not read the selected text file.');
+      reader.readAsText(file);
     }
 
     /**
@@ -1965,18 +2467,18 @@
       console.log('Current orientation:', orientation, 'window:', window.innerWidth + 'x' + window.innerHeight);
 
       // Портретная ориентация: показываем только основные кнопки
-      const portraitButtons = ['play-button', 'settings-toggle'];
+      const portraitButtons = ['play-button', 'voice-button', 'stop-button', 'settings-toggle'];
 
       // Альбомная ориентация: показываем все кнопки
-      const landscapeButtons = ['play-button', 'settings-toggle'];
-
       // Дополнительные кнопки только для альбомной ориентации
       const landscapeOnlyButtons = [
+        'back-button',
+        'forward-button',
         'fullscreen-button'
       ];
 
       // Кнопки, которые есть через onclick (нужно найти по тексту)
-      const allButtons = document.querySelectorAll('#control-row button, #control-row .input-group button');
+      const allButtons = document.querySelectorAll('#control-row button');
 
       allButtons.forEach(button => {
         const buttonId = button.id;
@@ -1987,7 +2489,7 @@
           buttonText === 'Stop' ||
           buttonText === 'Play' ||
           buttonText === 'Pause') {
-          button.style.display = 'inline-block';
+          button.style.display = 'inline-flex';
         }
         // Дополнительные кнопки только в альбомной ориентации
         else if (buttonText === '+10%' ||
@@ -1996,14 +2498,14 @@
           buttonText === 'Highlight' ||
           buttonText === 'Mirror' ||
           landscapeOnlyButtons.includes(buttonId)) {
-          button.style.display = isPortrait ? 'none' : 'inline-block';
+          button.style.display = isPortrait ? 'none' : 'inline-flex';
         }
       });
 
       // Также скрываем/показываем элементы с классами desktop-only
       const desktopElements = document.querySelectorAll('.desktop-only');
       desktopElements.forEach(el => {
-        el.style.display = isPortrait ? 'none' : 'inline-block';
+        el.style.display = isPortrait ? 'none' : (el.matches('#control-row button') ? 'inline-flex' : 'inline-block');
       });
     }
 
@@ -2037,14 +2539,19 @@
      * Opens fullscreen settings on mobile
      */
     function openAdvancedSettings() {
-      const container = document.querySelector('.container');
+      state.resumeAfterSettings = state.isPlaying;
+      if (state.isPlaying) {
+        pause();
+      }
+      if (state.isListening) {
+        stopVoice();
+      }
 
       elements.advancedSettings.classList.add('show');
       elements.settingsToggle.classList.add('active');
-      elements.settingsToggle.textContent = 'Settings';
+      elements.settingsToggle.title = 'Close settings';
+      elements.settingsToggle.setAttribute('aria-label', 'Close settings');
       elements.settingsToggle.setAttribute('aria-expanded', 'true');
-
-      if (container) container.classList.add('settings-expanded');
 
       // Block body scroll when settings are open
       document.body.style.overflow = 'hidden';
@@ -2054,17 +2561,37 @@
      * Closes fullscreen settings on mobile  
      */
     function closeAdvancedSettings() {
-      const container = document.querySelector('.container');
-
       elements.advancedSettings.classList.remove('show');
       elements.settingsToggle.classList.remove('active');
-      elements.settingsToggle.textContent = 'Settings';
+      elements.settingsToggle.title = 'Settings';
+      elements.settingsToggle.setAttribute('aria-label', 'Settings');
       elements.settingsToggle.setAttribute('aria-expanded', 'false');
-
-      if (container) container.classList.remove('settings-expanded');
 
       // Restore body scroll
       document.body.style.overflow = '';
+
+      if (state.refreshAfterSettings) {
+        state.refreshAfterSettings = false;
+        state.metricsAfterSettings = false;
+        prepareScroll(currentProgress());
+      } else if (state.metricsAfterSettings) {
+        state.metricsAfterSettings = false;
+        requestMetricsRefresh(currentProgress());
+      }
+
+      if (state.resumeAfterSettings) {
+        state.resumeAfterSettings = false;
+        const progress = currentProgress();
+        const duration = calculateDuration();
+        if (duration > 0) {
+          state.isPlaying = true;
+          state.durationMs = duration;
+          state.pausedTime = progress * duration;
+          state.startTime = 0;
+          updatePlayButton();
+          state.animationId = requestAnimationFrame(animationStep);
+        }
+      }
     }
 
     /*********************************
@@ -2075,6 +2602,10 @@
         // Play/Pause button
         if (elements.playButton) {
           elements.playButton.addEventListener('click', togglePlayPause);
+        }
+
+        if (elements.voiceButton) {
+          elements.voiceButton.addEventListener('click', toggleVoice);
         }
 
         // Fullscreen button
@@ -2097,13 +2628,27 @@
         syncInputs(elements.speedRange, elements.speedNumber, updateSpeed);
         syncInputs(elements.fontRange, elements.fontNumber, updateFontSize);
         syncInputs(elements.widthRange, elements.widthNumber, updateTextWidth);
+        syncInputs(elements.guidePositionRange, elements.guidePositionNumber, updateGuidePosition);
+
+        if (elements.voiceLanguage) {
+          elements.voiceLanguage.addEventListener('change', event => updateVoiceLanguage(event.target.value));
+        }
+
+        if (elements.importTextButton && elements.textFileInput) {
+          elements.importTextButton.addEventListener('click', () => elements.textFileInput.click());
+          elements.textFileInput.addEventListener('change', event => {
+            importTextFile(event.target.files && event.target.files[0]);
+            event.target.value = '';
+          });
+        }
 
         // Toggle buttons
         if (elements.highlightButton) {
           elements.highlightButton.addEventListener('click', () => {
             state.highlight = !state.highlight;
+            markContentDirty();
             updateToggleButton(elements.highlightButton, state.highlight, 'Highlight');
-            refreshMaintainingProgress();
+            requestContentRefresh();
             saveSettings();
           });
         }
@@ -2112,29 +2657,19 @@
           elements.mirrorButton.addEventListener('click', () => {
             state.mirrored = !state.mirrored;
             updateToggleButton(elements.mirrorButton, state.mirrored, 'Mirror');
-            refreshMaintainingProgress();
+            applyMirror();
             saveSettings();
-          });
-        }
-
-        // Share button with context menu support
-        const shareButton = $('share-button');
-        if (shareButton) {
-          shareButton.addEventListener('click', shareViaURL);
-
-          // Add context menu for advanced sharing options
-          shareButton.addEventListener('contextmenu', (event) => {
-            event.preventDefault();
-            showShareOptions(event.pageX, event.pageY);
           });
         }
 
         // Text input changes
         if (elements.inputText) {
           elements.inputText.addEventListener('input', () => {
-            refreshMaintainingProgress();
-            saveSettings();
+            markContentDirty();
+            requestContentRefresh();
+            debouncedSaveSettings();
           });
+          elements.inputText.addEventListener('change', saveSettings);
         }
 
         // Keyboard shortcuts
@@ -2168,10 +2703,11 @@
               event.preventDefault();
               // Toggle highlight
               state.highlight = !state.highlight;
+              markContentDirty();
               if (elements.highlightButton) {
                 updateToggleButton(elements.highlightButton, state.highlight, 'Highlight');
               }
-              refreshMaintainingProgress();
+              requestContentRefresh();
               saveSettings();
               break;
             case 'KeyM':
@@ -2181,7 +2717,7 @@
               if (elements.mirrorButton) {
                 updateToggleButton(elements.mirrorButton, state.mirrored, 'Mirror');
               }
-              refreshMaintainingProgress();
+              applyMirror();
               saveSettings();
               break;
           }
@@ -2191,12 +2727,17 @@
         document.addEventListener('fullscreenchange', () => {
           state.isFullscreen = !!document.fullscreenElement;
           if (elements.fullscreenButton) {
-            elements.fullscreenButton.textContent = state.isFullscreen ? 'Exit Fullscreen' : 'Fullscreen';
+            setIconButton(
+              elements.fullscreenButton,
+              state.isFullscreen ? buttonIcons.exitFullscreen : buttonIcons.fullscreen,
+              state.isFullscreen ? 'Exit fullscreen' : 'Fullscreen'
+            );
           }
         });
 
         // Window resize events - reapply width settings and update button visibility
         window.addEventListener('resize', debounce(() => {
+          state.metricsDirty = true;
           applyTextWidth();
           // Re-initialize mobile scroll prevention if needed
           initializeMobileScrollPrevention();
@@ -2237,16 +2778,14 @@
           return;
         }
 
-        // Check for shared settings in URL first, then load saved settings
-        if (!loadFromURL()) {
-          loadSettings();
-        }
+        loadSettings();
 
         // Setup event listeners
         setupEventListeners();
 
         // Initialize UI state
         updatePlayButton();
+        updateVoiceButton();
 
         // Initialize settings toggle state
         if (elements.settingsToggle) {
@@ -2264,13 +2803,15 @@
           updateToggleButton(elements.mirrorButton, state.mirrored, 'Mirror');
         }
 
-        prepareScroll(0);
-
         // Add default text only if no saved text exists
         if (!elements.inputText.value.trim()) {
           elements.inputText.value = "Добро пожаловать в телепромптер! Это тестовый текст для демонстрации работы скрола. Вы можете заменить этот текст на свой собственный.";
           saveSettings(); // Save the default text
-        } console.log('Teleprompter initialized successfully');
+        }
+
+        prepareScroll(0);
+
+        console.log('Teleprompter initialized successfully');
         console.log('Current state:', state);
       } catch (error) {
         console.error('Error during initialization:', error);
