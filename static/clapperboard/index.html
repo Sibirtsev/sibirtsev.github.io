@@ -1,0 +1,270 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Clapperboard</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #fff;
+      --fg: #000;
+      --line: #000;
+      --muted: #444;
+    }
+
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --bg: #000;
+      --fg: #fff;
+      --line: #fff;
+      --muted: #cfcfcf;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--fg);
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    main {
+      min-height: 100vh;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      gap: 3vh;
+      padding: clamp(16px, 4vw, 40px);
+    }
+
+    .top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      border-bottom: 3px solid var(--line);
+      padding-bottom: 16px;
+    }
+
+    .time {
+      font-size: clamp(24px, 7vw, 72px);
+      font-weight: 800;
+      line-height: 1;
+      white-space: nowrap;
+    }
+
+    button {
+      min-width: 48px;
+      min-height: 48px;
+      border: 3px solid var(--line);
+      background: var(--bg);
+      color: var(--fg);
+      font: 800 clamp(18px, 4vw, 36px) / 1 Arial, Helvetica, sans-serif;
+      cursor: pointer;
+    }
+
+    .codes {
+      display: grid;
+      align-content: center;
+      gap: 3vh;
+    }
+
+    label {
+      display: block;
+      color: var(--muted);
+      font-size: clamp(14px, 3vw, 28px);
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .code-row {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
+      align-items: baseline;
+      gap: clamp(8px, 2vw, 24px);
+      border-bottom: 4px solid var(--line);
+    }
+
+    .prefix,
+    input,
+    textarea {
+      color: var(--fg);
+      font-weight: 900;
+      letter-spacing: 0;
+    }
+
+    .prefix,
+    input {
+      font-size: clamp(76px, 28vw, 260px);
+      line-height: .9;
+    }
+
+    input,
+    textarea {
+      width: 100%;
+      border: 0;
+      outline: 0;
+      background: transparent;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    input {
+      padding: 0;
+      font-variant-numeric: tabular-nums;
+    }
+
+    textarea {
+      min-height: 22vh;
+      resize: none;
+      border: 3px solid var(--line);
+      padding: clamp(10px, 2vw, 20px);
+      font-size: clamp(28px, 8vw, 86px);
+      line-height: 1.05;
+    }
+
+    .details {
+      display: grid;
+      gap: 8px;
+    }
+
+    @media (orientation: landscape) {
+      main {
+        gap: 2vh;
+      }
+
+      .codes {
+        grid-template-columns: 1fr 1fr;
+        align-items: center;
+      }
+
+      .details {
+        grid-column: 1 / -1;
+      }
+
+      textarea {
+        min-height: 18vh;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="top">
+      <div id="clock" class="time" aria-live="polite"></div>
+      <button id="themeToggle" type="button" aria-label="Переключить тему">◐</button>
+    </div>
+
+    <div class="codes">
+      <section>
+        <label for="scene">Сцена</label>
+        <div class="code-row">
+          <span class="prefix">S</span>
+          <input id="scene" inputmode="numeric" autocomplete="off" maxlength="3" aria-label="Номер сцены">
+        </div>
+      </section>
+
+      <section>
+        <label for="take">Дубль</label>
+        <div class="code-row">
+          <span class="prefix">T</span>
+          <input id="take" inputmode="numeric" autocomplete="off" maxlength="2" aria-label="Номер дубля">
+        </div>
+      </section>
+
+      <section class="details">
+        <label for="note">Детали</label>
+        <textarea id="note" autocomplete="off" aria-label="Детали сцены"></textarea>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    const storageKey = "youtube-clapperboard";
+    const fields = {
+      scene: document.getElementById("scene"),
+      take: document.getElementById("take"),
+      note: document.getElementById("note"),
+      theme: document.documentElement
+    };
+    const lengths = { scene: 3, take: 2 };
+
+    let state = {
+      scene: "000",
+      take: "00",
+      note: "",
+      theme: "light"
+    };
+
+    try {
+      state = { ...state, ...JSON.parse(localStorage.getItem(storageKey) || "{}") };
+    } catch {
+      localStorage.removeItem(storageKey);
+    }
+
+    function digits(value, max) {
+      return value.replace(/\D/g, "").slice(0, max);
+    }
+
+    function padded(value, max) {
+      return digits(value, max).padStart(max, "0").slice(-max);
+    }
+
+    function save() {
+      localStorage.setItem(storageKey, JSON.stringify(state));
+    }
+
+    function applyState() {
+      fields.scene.value = padded(state.scene, lengths.scene);
+      fields.take.value = padded(state.take, lengths.take);
+      fields.note.value = state.note;
+      fields.theme.dataset.theme = state.theme;
+    }
+
+    function bindNumber(name) {
+      const input = fields[name];
+      const max = lengths[name];
+
+      input.addEventListener("focus", () => input.select());
+      input.addEventListener("input", () => {
+        input.value = digits(input.value, max);
+        state[name] = input.value;
+        save();
+      });
+      input.addEventListener("blur", () => {
+        input.value = padded(input.value, max);
+        state[name] = input.value;
+        save();
+      });
+    }
+
+    function updateClock() {
+      const now = new Date();
+      const two = value => String(value).padStart(2, "0");
+      document.getElementById("clock").textContent =
+        `${two(now.getDate())}.${two(now.getMonth() + 1)}.${now.getFullYear()} ${two(now.getHours())}:${two(now.getMinutes())}`;
+    }
+
+    bindNumber("scene");
+    bindNumber("take");
+
+    fields.note.addEventListener("input", () => {
+      state.note = fields.note.value;
+      save();
+    });
+
+    document.getElementById("themeToggle").addEventListener("click", () => {
+      state.theme = state.theme === "dark" ? "light" : "dark";
+      applyState();
+      save();
+    });
+
+    applyState();
+    updateClock();
+    setInterval(updateClock, 1000);
+  </script>
+</body>
+</html>
